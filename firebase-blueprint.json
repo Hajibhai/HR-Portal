@@ -1,0 +1,147 @@
+{
+  "entities": {
+    "Employee": {
+      "title": "Employee",
+      "description": "Employee profile and employment details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "designation": { "type": "string" },
+        "department": { "type": "string" },
+        "joiningDate": { "type": "string" },
+        "type": { "type": "string", "enum": ["Staff", "Worker"] },
+        "company": { "type": "string" },
+        "status": { "type": "string", "enum": ["Active", "Inactive"] },
+        "team": { "type": "string", "enum": ["Internal Team", "External Team", "Office Staff"] },
+        "workLocation": { "type": "string" },
+        "leaveBalance": { "type": "number" },
+        "bankName": { "type": "string" },
+        "iban": { "type": "string" },
+        "salary": {
+          "type": "object",
+          "properties": {
+            "basic": { "type": "number" },
+            "housing": { "type": "number" },
+            "transport": { "type": "number" },
+            "other": { "type": "number" },
+            "airTicket": { "type": "number" },
+            "leaveSalary": { "type": "number" }
+          }
+        },
+        "active": { "type": "boolean" },
+        "offboardingDetails": { "type": "object" },
+        "rejoiningDate": { "type": "string" },
+        "rejoiningReason": { "type": "string" },
+        "documents": { "type": "object" },
+        "vacationScheduledDate": { "type": "string" }
+      },
+      "required": ["id", "code", "name", "company", "active"]
+    },
+    "AttendanceRecord": {
+      "title": "Attendance Record",
+      "description": "Daily attendance log for an employee",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string" },
+        "hoursWorked": { "type": "number" },
+        "overtimeHours": { "type": "number" },
+        "checkInTime": { "type": "string" },
+        "checkOutTime": { "type": "string" },
+        "otAttachment": { "type": "string" },
+        "updatedBy": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "required": ["id", "employeeId", "date", "status"]
+    },
+    "LeaveRequest": {
+      "title": "Leave Request",
+      "description": "Employee leave application",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "type": { "type": "string" },
+        "reason": { "type": "string" },
+        "status": { "type": "string" },
+        "appliedOn": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "approvedBy": { "type": "string" }
+      },
+      "required": ["id", "employeeId", "startDate", "endDate", "status"]
+    },
+    "DeductionRecord": {
+      "title": "Deduction Record",
+      "description": "Salary deduction or advance record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "date": { "type": "string" },
+        "type": { "type": "string" },
+        "amount": { "type": "number" },
+        "note": { "type": "string" }
+      },
+      "required": ["id", "employeeId", "date", "amount"]
+    },
+    "SystemUser": {
+      "title": "System User",
+      "description": "Application user with specific roles and permissions",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "active": { "type": "boolean" },
+        "permissions": { "type": "object" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Company": {
+      "title": "Company",
+      "description": "Company entity name",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": ["name"]
+    }
+  },
+  "firestore": {
+    "/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Collection of employee profiles"
+    },
+    "/attendance/{recordId}": {
+      "schema": "AttendanceRecord",
+      "description": "Daily attendance records"
+    },
+    "/leaves/{leaveId}": {
+      "schema": "LeaveRequest",
+      "description": "Leave requests and approvals"
+    },
+    "/deductions/{deductionId}": {
+      "schema": "DeductionRecord",
+      "description": "Salary deductions and advances"
+    },
+    "/users/{userId}": {
+      "schema": "SystemUser",
+      "description": "System users and their permissions"
+    },
+    "/companies/{companyId}": {
+      "schema": "Company",
+      "description": "List of companies managed in the system"
+    },
+    "/settings/about": {
+      "schema": "object",
+      "description": "General application about data"
+    }
+  }
+}

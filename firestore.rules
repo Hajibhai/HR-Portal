@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Admin' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Creator' ||
+         (request.auth.token.email == "abdulkaderp3010@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /employees/{employeeId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /attendance/{recordId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /leaves/{leaveId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // Users can apply for leaves
+    }
+
+    match /deductions/{deductionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /companies/{companyId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /settings/about {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
