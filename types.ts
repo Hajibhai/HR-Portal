@@ -66,6 +66,7 @@ export interface Employee {
   offboardingDetails?: OffboardingDetails;
   rejoiningDate?: string;
   rejoiningReason?: string;
+  profileImage?: string;
   
   // New Document Fields
   documents?: EmployeeDocuments;

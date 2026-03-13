@@ -1,19 +1,30 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
 import { 
   Users, Calendar, UserPlus, LogOut, ArrowRight,
   Building2, CheckCircle, XCircle, Trash2, 
   AlertCircle, Eye, Edit, CheckSquare, 
-  Copy, FileText, DollarSign,
+  Copy, FileText, DollarSign, CreditCard,
   BarChart3, UserMinus, Wallet, Plane, X, Save, Plus,
+  ChevronLeft, ChevronRight,
   Settings, Search, Bell, LogOut as SignOut, UserCog,
   Briefcase, HardHat, ShieldCheck, Download, Printer,
-  MoreVertical, Check, X as CloseIcon, Filter, Shield, Key
+  MoreVertical, Check, X as CloseIcon, Filter, Shield, Key,
+  Activity, LayoutGrid, ListFilter, ChevronDown, Globe, HelpCircle,
+  TrendingUp, Clock, ArrowUpRight, ArrowDownRight, BarChart2
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts';
 import { 
   onAuthStateChanged,
@@ -46,6 +57,7 @@ import {
 } from './services/storageService';
 import { DEFAULT_ABOUT_DATA, CREATOR_USER } from './constants';
 import SmartCommand from './components/SmartCommand';
+import { Layout } from './components/Layout';
 
 // --- Constants & Helpers ---
 const LEGEND: any = {
@@ -408,6 +420,43 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                         <div className="space-y-6">
                             <h3 className="text-lg font-bold text-gray-900">Personal Information</h3>
                             <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-1.5 col-span-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Profile Image</label>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 overflow-hidden">
+                                            {data.profileImage ? (
+                                                <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                            ) : (
+                                                <Users className="w-8 h-8 text-slate-300" />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <input 
+                                                type="file" 
+                                                id="profile-upload"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => {
+                                                            setData({ ...data, profileImage: reader.result as string });
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                            />
+                                            <label 
+                                                htmlFor="profile-upload"
+                                                className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-100 transition-colors"
+                                            >
+                                                Upload Photo
+                                            </label>
+                                            <p className="text-[10px] text-slate-400">JPG, PNG or GIF. Max 1MB.</p>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Employee Code *</label>
                                     <input 
@@ -679,7 +728,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
     );
 };
 
-const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => void, users: SystemUser[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void }) => {
+const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onClose: () => void, users: SystemUser[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void, currentUser: SystemUser }) => {
     const [localUsers, setLocalUsers] = useState<SystemUser[]>(users);
     const [showAdd, setShowAdd] = useState(false);
     const [editingUser, setEditingUser] = useState<SystemUser | null>(null);
@@ -689,7 +738,7 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
         role: '', 
         name: '',
         permissions: {
-            canViewDashboard: false,
+            canViewDashboard: true,
             canManageEmployees: false,
             canViewDirectory: false,
             canManageAttendance: false,
@@ -708,15 +757,18 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
     }, [users]);
 
     const handleAdd = async () => {
-        if (!newUser.username || !newUser.password || !newUser.name) {
-            alert("Please fill in all fields");
+        console.log("Attempting to add new user:", { ...newUser, password: '***' });
+        if (!newUser.username || !newUser.password || !newUser.name || !newUser.role) {
+            alert("Please fill in all fields (Name, Username, Password, and Role)");
             return;
         }
         try {
             const userEmail = newUser.username.includes('@') ? newUser.username : `${newUser.username}@system.local`;
+            console.log("Creating Auth user with email:", userEmail);
             
             // Create the user in Firebase Auth first
             const authUser = await adminCreateUser(userEmail, newUser.password);
+            console.log("Auth user created successfully, UID:", authUser.uid);
             
             const userToSave: SystemUser = {
                 uid: authUser.uid,
@@ -724,11 +776,13 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
                 username: newUser.username,
                 password: newUser.password,
                 name: newUser.name,
-                role: newUser.role as UserRole,
+                role: newUser.role as any,
                 active: true,
                 permissions: newUser.permissions
             };
+            console.log("Saving user to Firestore...");
             await saveSystemUser(userToSave);
+            console.log("User saved to Firestore successfully.");
             setShowAdd(false);
             setNewUser({ 
                 username: '', 
@@ -736,7 +790,7 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
                 role: '', 
                 name: '',
                 permissions: {
-                    canViewDashboard: false,
+                    canViewDashboard: true, // Default to true for new users
                     canManageEmployees: false,
                     canViewDirectory: false,
                     canManageAttendance: false,
@@ -750,7 +804,8 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
                 }
             });
         } catch (e: any) {
-            alert(e.message);
+            console.error("Error in handleAdd:", e);
+            alert("Failed to save user: " + e.message);
         }
     };
 
@@ -836,16 +891,12 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-indigo-600 uppercase">Role</label>
-                                    <select 
-                                        className="w-full p-2 border rounded-lg text-sm bg-white" 
+                                    <input 
+                                        className="w-full p-2 border rounded-lg text-sm" 
+                                        placeholder="Enter Role Manually" 
                                         value={newUser.role} 
-                                        onChange={e=>setNewUser({...newUser, role: e.target.value as UserRole})}
-                                    >
-                                        <option value="">Select Role</option>
-                                        {Object.values(UserRole).map(role => (
-                                            <option key={role} value={role}>{role}</option>
-                                        ))}
-                                    </select>
+                                        onChange={e=>setNewUser({...newUser, role: e.target.value})} 
+                                    />
                                 </div>
                             </div>
 
@@ -894,15 +945,12 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-orange-600 uppercase">Role</label>
-                                    <select 
-                                        className="w-full p-2 border rounded-lg text-sm bg-white" 
+                                    <input 
+                                        className="w-full p-2 border rounded-lg text-sm" 
+                                        placeholder="Enter Role Manually" 
                                         value={editingUser.role} 
-                                        onChange={e=>setEditingUser({...editingUser, role: e.target.value as UserRole})}
-                                    >
-                                        {Object.values(UserRole).map(role => (
-                                            <option key={role} value={role}>{role}</option>
-                                        ))}
-                                    </select>
+                                        onChange={e=>setEditingUser({...editingUser, role: e.target.value as any})} 
+                                    />
                                 </div>
                             </div>
                             
@@ -934,7 +982,16 @@ const UserManagementModal = ({ onClose, users, openConfirm }: { onClose: () => v
                     )}
 
                     <div className="space-y-2">
-                        {localUsers.map(u => (
+                        {localUsers
+                            .filter(u => {
+                                // Creator sees everyone
+                                if (currentUser.role === UserRole.CREATOR) {
+                                    return true;
+                                }
+                                // Others see everyone EXCEPT the Creator
+                                return u.role !== UserRole.CREATOR;
+                            })
+                            .map(u => (
                             <div key={u.uid || u.username} className="flex items-center justify-between p-3 border rounded-xl hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xs">
@@ -1425,6 +1482,33 @@ export default function App() {
   }, [isAuthReady, user]);
 
   // Handlers
+  const navItems = useMemo(() => {
+    const baseItems = [
+      { id: 'dashboard', label: 'Dashboard', icon: BarChart3, permission: 'canViewDashboard' },
+      { id: 'staff', label: 'Staff Directory', icon: Users, permission: 'canManageEmployees' },
+      { id: 'ex-employees', label: 'Ex-Employees', icon: UserMinus, permission: 'canManageEmployees' }, 
+      { id: 'timesheet', label: 'Monthly Timesheet', icon: Calendar, permission: 'canViewTimesheet' },
+      { id: 'deductions', label: 'Deductions', icon: Wallet, permission: 'canManagePayroll' },
+      { id: 'leave', label: 'Leave Management', icon: FileText, permission: 'canManageLeaves' },
+      { id: 'payroll', label: 'Payroll Register', icon: DollarSign, permission: 'canViewPayroll' },
+      { id: 'reports', label: 'Reports', icon: BarChart3, permission: 'canViewReports' },
+      { id: 'about', label: 'About', icon: AlertCircle },
+    ];
+    
+    if (!systemUser) return baseItems.filter(item => !item.permission);
+    
+    return baseItems.filter(item => !item.permission || (systemUser.permissions as any)[item.permission]);
+  }, [systemUser]);
+
+  useEffect(() => {
+    if (systemUser) {
+      const currentTabItem = navItems.find(item => item.id === activeTab);
+      if (currentTabItem && currentTabItem.permission && !(systemUser.permissions as any)[currentTabItem.permission]) {
+        setActiveTab('dashboard');
+      }
+    }
+  }, [activeTab, systemUser, navItems]);
+
   const handleOffboard = async (data: OffboardingDetails) => {
       if (showOffboarding) {
           await offboardEmployee(showOffboarding.id, data);
@@ -1480,174 +1564,111 @@ export default function App() {
     );
   }
 
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'staff', label: 'Staff Directory', icon: Users },
-    { id: 'ex-employees', label: 'Ex-Employees', icon: UserMinus }, 
-    { id: 'timesheet', label: 'Monthly Timesheet', icon: Calendar },
-    { id: 'deductions', label: 'Deductions', icon: Wallet },
-    { id: 'leave', label: 'Leave Management', icon: FileText },
-    { id: 'payroll', label: 'Payroll Register', icon: DollarSign },
-    { id: 'reports', label: 'Reports', icon: BarChart3 },
-    { id: 'about', label: 'About', icon: AlertCircle },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#f3f4f6] font-sans text-slate-900 flex flex-col">
-      {/* Top Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-[1920px] mx-auto">
-            {/* Top Row */}
-            <div className="px-6 py-2 flex justify-between items-center bg-white">
-                <div className="flex items-center gap-3">
-                    <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm"><Building2 className="text-white w-5 h-5" /></div>
-                    <span className="font-bold text-xl tracking-tight text-gray-900">ShiftSync</span>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <select className="bg-gray-50 border border-gray-200 text-xs font-medium text-gray-600 py-1.5 px-3 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500">
-                            <option>All Companies</option>
-                            {companies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                        </select>
-                        <button className="p-2 text-gray-400 hover:text-indigo-600 transition-colors"><Settings className="w-4 h-4" /></button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <select className="bg-gray-50 border border-gray-200 text-xs font-medium text-gray-600 py-1.5 px-3 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500">
-                            <option>All Teams</option>
-                            <option>Internal Team</option>
-                            <option>External Team</option>
-                            <option>Office Staff</option>
-                        </select>
-                    </div>
-
-                    <div className="h-8 w-px bg-gray-100 mx-1"></div>
-
-                    <div className="flex items-center gap-3 pl-2">
-                        <div className="text-right hidden sm:block">
-                            <div className="text-sm font-bold text-gray-900 leading-none">{systemUser.name}</div>
-                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">{systemUser.role}</div>
-                        </div>
-                        <div className="w-9 h-9 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 border border-indigo-100 font-bold text-sm shadow-sm">
-                            {systemUser.name.charAt(0)}
-                        </div>
-                        <button 
-                          onClick={logout}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                          title="Logout"
-                        >
-                            <SignOut className="w-5 h-5" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Navigation Row */}
-            <nav className="px-6 flex gap-1 overflow-x-auto no-scrollbar border-t border-gray-50">
-                {navItems.map(item => (
-                    <button
-                        key={item.id}
-                        onClick={() => setActiveTab(item.id)}
-                        className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                            activeTab === item.id 
-                            ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50' 
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                        }`}
-                    >
-                        <item.icon className={`w-4 h-4 ${activeTab === item.id ? 'text-indigo-600' : 'text-gray-400'}`} />
-                        {item.label}
-                    </button>
-                ))}
-            </nav>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="flex-1 p-6 max-w-[1920px] mx-auto w-full">
-         {activeTab === 'dashboard' && (
-             <DashboardView 
-                employees={employees} 
-                attendance={attendance} 
-                user={systemUser}
-                onOpenUserManagement={() => setShowUserManagement(true)}
-                onOpenManageCompanies={() => setShowManageCompanies(true)}
-                onOpenOnboarding={() => setShowOnboarding(true)}
-                onUpdate={() => {}}
-             />
-         )}
-         {activeTab === 'staff' && (
-             <StaffDirectoryView 
-               employees={employees.filter(e => e.active)} 
-               onAdd={() => setShowOnboarding(true)} 
-               onEdit={(e: Employee) => setShowEdit(e)} 
-               onOffboard={(e: Employee) => setShowOffboarding(e)}
-             />
-         )}
-         {activeTab === 'ex-employees' && (
-             <StaffDirectoryView 
-                employees={employees.filter(e => !e.active)} 
-                onEdit={(e: Employee) => setShowEdit(e)}
-                onDelete={handleDeleteEmployee}
-                onRejoin={handleRejoinEmployee}
-                readOnly={true}
-             />
-         )}
-         {activeTab === 'timesheet' && (
-             <TimesheetView employees={employees.filter(e => e.active)} attendance={attendance} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
-         )}
-         {activeTab === 'deductions' && (
-             <DeductionsView employees={employees} deductions={deductions} openConfirm={openConfirm} />
-         )}
-         {activeTab === 'leave' && (
-             <LeaveManagementView employees={employees} leaveRequests={leaveRequests} user={systemUser} />
-         )}
-         {activeTab === 'payroll' && (
-             <PayrollRegisterView employees={employees.filter(e => e.active)} attendance={attendance} deductions={deductions} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
-         )}
-         {activeTab === 'reports' && (
-             <ReportsView employees={employees} attendance={attendance} />
-         )}
-         {activeTab === 'about' && (
-             <AboutView />
-         )}
-      </main>
+    <Layout
+      navItems={navItems}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      user={systemUser}
+      onLogout={logout}
+      companies={companies}
+    >
+      {activeTab === 'dashboard' && (
+        <DashboardView 
+          employees={employees} 
+          attendance={attendance} 
+          user={systemUser}
+          onOpenUserManagement={() => setShowUserManagement(true)}
+          onOpenManageCompanies={() => setShowManageCompanies(true)}
+          onOpenOnboarding={() => setShowOnboarding(true)}
+          onUpdate={() => {}}
+        />
+      )}
+      {activeTab === 'staff' && (
+        <StaffDirectoryView 
+          employees={employees.filter(e => e.active)} 
+          onAdd={() => setShowOnboarding(true)} 
+          onEdit={(e: Employee) => setShowEdit(e)} 
+          onOffboard={(e: Employee) => setShowOffboarding(e)}
+        />
+      )}
+      {activeTab === 'ex-employees' && (
+        <StaffDirectoryView 
+          employees={employees.filter(e => !e.active)} 
+          onEdit={(e: Employee) => setShowEdit(e)}
+          onDelete={handleDeleteEmployee}
+          onRejoin={handleRejoinEmployee}
+          readOnly={true}
+        />
+      )}
+      {activeTab === 'timesheet' && (
+        <TimesheetView employees={employees.filter(e => e.active)} attendance={attendance} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} currentUser={systemUser} />
+      )}
+      {activeTab === 'deductions' && (
+        <DeductionsView employees={employees} deductions={deductions} openConfirm={openConfirm} />
+      )}
+      {activeTab === 'leave' && (
+        <LeaveManagementView employees={employees} leaveRequests={leaveRequests} user={systemUser} />
+      )}
+      {activeTab === 'payroll' && (
+        <PayrollRegisterView employees={employees.filter(e => e.active)} attendance={attendance} deductions={deductions} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
+      )}
+      {activeTab === 'reports' && (
+        <ReportsView employees={employees} attendance={attendance} />
+      )}
+      {activeTab === 'about' && (
+        <AboutView />
+      )}
 
       {/* Modals */}
-      {showOnboarding && <OnboardingWizard companies={companies} onComplete={async (d) => { 
-          const fullData = { ...d, id: Math.random().toString(36).substr(2, 9) } as Employee;
-          await saveEmployee(fullData); 
-          setShowOnboarding(false); 
-      }} onCancel={() => setShowOnboarding(false)} />}
-      {showOffboarding && <OffboardingWizard employee={showOffboarding} onComplete={handleOffboard} onCancel={() => setShowOffboarding(null)} />}
-      {showEdit && <EditEmployeeModal companies={companies} employee={showEdit} onSave={async (d) => { await saveEmployee(d); setShowEdit(null); }} onCancel={() => setShowEdit(null)} />}
-      {showUserManagement && <UserManagementModal onClose={() => setShowUserManagement(false)} users={systemUsers} openConfirm={openConfirm} />}
-      {showManageCompanies && <ManageCompaniesModal onClose={() => setShowManageCompanies(false)} companies={companies} openConfirm={openConfirm} />}
-      {showBulkImport && <BulkImportModal onClose={() => setShowBulkImport(false)} onImport={(data) => {
-          // Basic mapping logic for import
-          data.forEach(async item => {
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingWizard companies={companies} onComplete={async (d) => { 
+            const fullData = { ...d, id: Math.random().toString(36).substr(2, 9) } as Employee;
+            await saveEmployee(fullData); 
+            setShowOnboarding(false); 
+          }} onCancel={() => setShowOnboarding(false)} />
+        )}
+        {showOffboarding && (
+          <OffboardingWizard employee={showOffboarding} onComplete={handleOffboard} onCancel={() => setShowOffboarding(null)} />
+        )}
+        {showEdit && (
+          <EditEmployeeModal companies={companies} employee={showEdit} onSave={async (d) => { await saveEmployee(d); setShowEdit(null); }} onCancel={() => setShowEdit(null)} />
+        )}
+        {showUserManagement && (
+          <UserManagementModal onClose={() => setShowUserManagement(false)} users={systemUsers} openConfirm={openConfirm} currentUser={systemUser} />
+        )}
+        {showManageCompanies && (
+          <ManageCompaniesModal onClose={() => setShowManageCompanies(false)} companies={companies} openConfirm={openConfirm} />
+        )}
+        {showBulkImport && (
+          <BulkImportModal onClose={() => setShowBulkImport(false)} onImport={(data) => {
+            data.forEach(async item => {
               const newEmp: Employee = {
-                  id: Math.random().toString(36).substr(2, 9),
-                  code: String(item.Code || item.code || ''),
-                  name: String(item.Name || item.name || ''),
-                  company: String(item.Company || item.company || (companies[0] || 'Default')),
-                  team: 'Internal Team',
-                  designation: String(item.Designation || item.designation || 'Helper'),
-                  department: String(item.Department || item.department || 'Operations'),
-                  type: StaffType.WORKER,
-                  status: 'Active',
-                  active: true,
-                  joiningDate: new Date().toISOString().split('T')[0],
-                  workLocation: 'Dubai',
-                  leaveBalance: 30,
-                  salary: { basic: 0, housing: 0, transport: 0, other: 0, airTicket: 0, leaveSalary: 0 }
+                id: Math.random().toString(36).substr(2, 9),
+                code: String(item.Code || item.code || ''),
+                name: String(item.Name || item.name || ''),
+                company: String(item.Company || item.company || (companies[0] || 'Default')),
+                team: 'Internal Team',
+                designation: String(item.Designation || item.designation || 'Helper'),
+                department: String(item.Department || item.department || 'Operations'),
+                type: StaffType.WORKER,
+                status: 'Active',
+                active: true,
+                joiningDate: new Date().toISOString().split('T')[0],
+                workLocation: 'Dubai',
+                leaveBalance: 30,
+                salary: { basic: 0, housing: 0, transport: 0, other: 0, airTicket: 0, leaveSalary: 0 }
               };
               await saveEmployee(newEmp);
-          });
-      }} />}
+            });
+            setShowBulkImport(false);
+          }} />
+        )}
+      </AnimatePresence>
       
       <ConfirmationModal isOpen={confirmModal.isOpen} onClose={() => setConfirmModal({...confirmModal, isOpen: false})} {...confirmModal} />
-    </div>
+    </Layout>
   );
 }
 
@@ -1659,193 +1680,571 @@ const DashboardView = ({ employees, attendance, user, onOpenUserManagement, onOp
     const internalTeam = activeStaff.filter((e:any) => e.team === 'Internal Team').length;
     const externalTeam = activeStaff.filter((e:any) => e.team === 'External Team').length;
     const officeStaff = activeStaff.filter((e:any) => e.team === 'Office Staff' || e.type === StaffType.OFFICE).length;
-    const exEmployees = employees.filter((e:any) => !e.active).length;
-
-    // Company grouping
-    const companyStats = useMemo(() => {
+    
+    // Chart Data: Staff by Department
+    const deptStats = useMemo(() => {
         const counts: Record<string, number> = {};
         activeStaff.forEach((e:any) => {
-            counts[e.company] = (counts[e.company] || 0) + 1;
+            counts[e.department] = (counts[e.department] || 0) + 1;
         });
-        return Object.entries(counts).sort((a,b) => b[1] - a[1]);
+        return Object.entries(counts).map(([name, value]) => ({ name, value }));
     }, [activeStaff]);
 
+    // Chart Data: Monthly Growth (Mocked for visual impact)
+    const growthData = [
+        { month: 'Oct', count: activeStaff.length - 15 },
+        { month: 'Nov', count: activeStaff.length - 12 },
+        { month: 'Dec', count: activeStaff.length - 8 },
+        { month: 'Jan', count: activeStaff.length - 5 },
+        { month: 'Feb', count: activeStaff.length - 2 },
+        { month: 'Mar', count: activeStaff.length },
+    ];
+
+    const COLORS = ['#0ea5e9', '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b'];
+
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 pb-12">
             {/* Header Section */}
-            <div className="flex justify-between items-end mb-2">
-                <h2 className="text-2xl font-bold text-gray-900">Overview</h2>
-                <div className="flex gap-2">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
+                        <Activity className="w-4 h-4" />
+                        System Intelligence
+                    </div>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
+                    <p className="text-slate-500 font-medium max-w-xl">
+                        Welcome back, <span className="text-slate-900 font-bold">{user.name}</span>. 
+                        The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
+                    </p>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-3">
                     <button 
                         onClick={onOpenOnboarding}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
+                        className="flex-1 sm:flex-none bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
                     >
-                        <UserPlus className="w-4 h-4" /> Onboard
+                        <UserPlus className="w-4 h-4" /> Onboard Staff
                     </button>
-                    <button 
-                        onClick={onOpenManageCompanies}
-                        className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
-                    >
-                        <Building2 className="w-4 h-4" /> Companies
-                    </button>
-                    <button 
-                        onClick={onOpenUserManagement}
-                        className="bg-[#1e293b] hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
-                    >
-                        <UserCog className="w-4 h-4" /> User Management
-                    </button>
+                    <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+                        <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="Manage Companies">
+                            <Building2 className="w-5 h-5" />
+                        </button>
+                        <div className="w-px h-4 bg-slate-200"></div>
+                        <button onClick={onOpenUserManagement} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="System Users">
+                            <UserCog className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* Stats Cards Row */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                <DashboardStatCard title="Total Active Staff" value={activeStaff.length} icon={Users} iconColor="text-blue-600" bgIcon="bg-blue-50" />
-                <DashboardStatCard title="Internal Team" value={internalTeam} icon={Users} iconColor="text-green-600" bgIcon="bg-green-50" />
-                <DashboardStatCard title="External Team" value={externalTeam} icon={HardHat} iconColor="text-orange-600" bgIcon="bg-orange-50" />
-                <DashboardStatCard title="Office Staff" value={officeStaff} icon={Building2} iconColor="text-indigo-600" bgIcon="bg-indigo-50" />
-                <DashboardStatCard title="Ex-Employees" value={exEmployees} icon={UserMinus} iconColor="text-red-600" bgIcon="bg-red-50" />
-            </div>
+            {/* Bento Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Stat Cards */}
+                <BentoStatCard 
+                    title="Active Workforce" 
+                    value={activeStaff.length} 
+                    trend="+12.5%" 
+                    isUp={true}
+                    icon={Users} 
+                    color="brand"
+                />
+                <BentoStatCard 
+                    title="Office Personnel" 
+                    value={officeStaff} 
+                    trend="+4.2%" 
+                    isUp={true}
+                    icon={Building2} 
+                    color="indigo"
+                />
+                <BentoStatCard 
+                    title="Field Operations" 
+                    value={externalTeam} 
+                    trend="-2.1%" 
+                    isUp={false}
+                    icon={HardHat} 
+                    color="orange"
+                />
+                <BentoStatCard 
+                    title="Internal Support" 
+                    value={internalTeam} 
+                    trend="+8.0%" 
+                    isUp={true}
+                    icon={ShieldCheck} 
+                    color="emerald"
+                />
 
-            {/* Bottom Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
-                {/* Staff by Company Widget */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                        <Building2 className="w-5 h-5 text-gray-500" />
-                        <h3 className="font-bold text-gray-900">Staff by Company</h3>
+                {/* Main Analytics Chart */}
+                <div className="md:col-span-2 lg:col-span-3 bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm flex flex-col min-h-[400px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Workforce Growth</h3>
+                            <p className="text-sm text-slate-400 font-medium">Monthly active personnel trends</p>
+                        </div>
+                        <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl">
+                            <button className="px-3 py-1.5 bg-white text-brand-600 text-xs font-bold rounded-lg shadow-sm">6 Months</button>
+                            <button className="px-3 py-1.5 text-slate-400 text-xs font-bold hover:text-slate-600">1 Year</button>
+                        </div>
                     </div>
-                    <div className="space-y-3">
-                        {companyStats.map(([company, count]) => (
-                            <div key={company} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100 transition-colors group">
-                                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide group-hover:text-gray-900">{company}</span>
-                                <span className="bg-white border border-gray-200 text-gray-700 font-bold text-xs px-2.5 py-1 rounded-md shadow-sm">{count}</span>
-                            </div>
-                        ))}
+                    <div className="flex-1 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={growthData}>
+                                <defs>
+                                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3}/>
+                                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                    dataKey="month" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}}
+                                    dy={10}
+                                />
+                                <YAxis 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}}
+                                />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
+                                    itemStyle={{ fontWeight: 'bold', fontSize: '14px' }}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="count" 
+                                    stroke="#0ea5e9" 
+                                    strokeWidth={4} 
+                                    fillOpacity={1} 
+                                    fill="url(#colorCount)" 
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* My Access Widget (Dark Card) */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col">
-                    <div className="flex items-center gap-2 mb-6">
-                        <ShieldCheck className="w-5 h-5 text-gray-500" />
-                        <h3 className="font-bold text-gray-900">My Access</h3>
-                    </div>
-                    
-                    <div className="bg-[#0f172a] rounded-xl p-8 text-white flex-1 flex flex-col justify-between relative overflow-hidden">
-                        {/* Decorative background blur */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                {/* Department Distribution */}
+                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white flex flex-col min-h-[400px] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                    <div className="relative z-10">
+                        <h3 className="text-xl font-black tracking-tight mb-1">Department Mix</h3>
+                        <p className="text-sm text-slate-400 font-medium mb-6">Distribution by function</p>
                         
-                        <div className="mb-8 relative z-10">
-                            <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center text-xl font-bold mb-4">
-                                {user.name.charAt(0)}
-                            </div>
-                            <h4 className="text-xl font-bold">{user.name}</h4>
-                            <p className="text-slate-400 text-sm">@{user.username}</p>
+                        <div className="h-48 w-full mb-6">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={deptStats}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {deptStats.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '12px', border: 'none', color: '#000' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-8 relative z-10">
-                            {Object.entries(user.permissions).filter(([k,v]) => v).map(([key, val]) => (
-                                <div key={key} className="flex items-center gap-2 text-sm text-slate-300">
-                                    <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
-                                    <span>{key.replace('can', '').replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <div className="space-y-3">
+                            {deptStats.slice(0, 4).map((dept, idx) => (
+                                <div key={dept.name} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }}></div>
+                                        <span className="text-xs font-bold text-slate-300 truncate max-w-[120px]">{dept.name}</span>
+                                    </div>
+                                    <span className="text-xs font-black">{dept.value}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
+
+                {/* Recent Activity Log */}
+                <div className="md:col-span-2 lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm flex flex-col">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-brand-50 rounded-2xl">
+                                <Activity className="w-5 h-5 text-brand-600" />
+                            </div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">System Activity</h3>
+                        </div>
+                        <button className="text-xs font-bold text-brand-600 hover:underline">View Audit Log</button>
+                    </div>
+                    
+                    <div className="space-y-6 flex-1">
+                        <ActivityItem 
+                            icon={UserPlus} 
+                            title="New Employee Onboarded" 
+                            desc="Ahmed Hassan joined as Site Engineer" 
+                            time="2 hours ago" 
+                            color="emerald"
+                        />
+                        <ActivityItem 
+                            icon={FileText} 
+                            title="Leave Request Approved" 
+                            desc="John Doe's annual leave (14 days)" 
+                            time="5 hours ago" 
+                            color="brand"
+                        />
+                        <ActivityItem 
+                            icon={DollarSign} 
+                            title="Payroll Register Generated" 
+                            desc="March 2026 register for Al Reem General" 
+                            time="Yesterday" 
+                            color="indigo"
+                        />
+                        <ActivityItem 
+                            icon={AlertCircle} 
+                            title="Document Expiry Warning" 
+                            desc="5 Emirates IDs expiring in 30 days" 
+                            time="Yesterday" 
+                            color="orange"
+                        />
+                    </div>
+                </div>
+
+                {/* Quick Actions & Access */}
+                <div className="md:col-span-2 lg:col-span-2 bg-brand-600 rounded-[2.5rem] p-8 text-white flex flex-col relative overflow-hidden group">
+                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mb-20 transition-transform duration-700 group-hover:scale-110"></div>
+                    
+                    <div className="relative z-10 flex flex-col h-full">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-xl font-black tracking-tight">Quick Operations</h3>
+                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                <LayoutGrid className="w-5 h-5" />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 flex-1">
+                            <QuickActionButton icon={Download} label="Export Data" />
+                            <QuickActionButton icon={ListFilter} label="Smart Filter" />
+                            <QuickActionButton icon={Bell} label="Broadcast" />
+                            <QuickActionButton icon={Settings} label="Preferences" />
+                        </div>
+
+                        <div className="mt-8 p-4 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-md">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-brand-600 font-bold">
+                                    {user.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold">{user.name}</p>
+                                    <p className="text-[10px] text-white/60 font-bold uppercase tracking-widest">Active Session</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-const DashboardStatCard = ({ title, value, icon: Icon, iconColor, bgIcon }: any) => (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between min-h-[140px] hover:shadow-md transition-shadow">
-        <div className="flex justify-between items-start">
-            <span className="text-gray-500 text-xs font-medium uppercase tracking-wider">{title}</span>
-        </div>
-        <div className="flex justify-between items-end mt-4">
-            <span className="text-4xl font-bold text-gray-900 tracking-tight">{value}</span>
-            <div className={`p-3 rounded-xl ${bgIcon}`}>
-                <Icon className={`w-6 h-6 ${iconColor}`} />
+const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) => {
+    const colors: any = {
+        brand: "bg-brand-50 text-brand-600 border-brand-100 shadow-brand-500/5",
+        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/5",
+        orange: "bg-orange-50 text-orange-600 border-orange-100 shadow-orange-500/5",
+        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100 shadow-indigo-500/5",
+    };
+
+    return (
+        <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white p-8 rounded-[2.5rem] border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[200px] transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 group"
+        >
+            <div className="flex justify-between items-start">
+                <div className={cn("p-3.5 rounded-2xl transition-all duration-500 group-hover:rotate-6", colors[color])}>
+                    <Icon className="w-6 h-6" />
+                </div>
+                <div className={cn(
+                    "flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black tracking-tight",
+                    isUp ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
+                )}>
+                    {isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                    {trend}
+                </div>
             </div>
+            <div>
+                <span className="text-4xl font-black text-slate-900 tracking-tighter">{value}</span>
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">{title}</p>
+            </div>
+        </motion.div>
+    );
+};
+
+const ActivityItem = ({ icon: Icon, title, desc, time, color }: any) => {
+    const colors: any = {
+        brand: "bg-brand-50 text-brand-600",
+        emerald: "bg-emerald-50 text-emerald-600",
+        orange: "bg-orange-50 text-orange-600",
+        indigo: "bg-indigo-50 text-indigo-600",
+    };
+
+    return (
+        <div className="flex items-start gap-4 group cursor-pointer">
+            <div className={cn("p-3 rounded-2xl transition-all group-hover:scale-110", colors[color])}>
+                <Icon className="w-4 h-4" />
+            </div>
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm font-bold text-slate-900 truncate">{title}</h4>
+                    <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap uppercase tracking-widest">{time}</span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{desc}</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-600 transition-colors self-center" />
         </div>
-    </div>
+    );
+};
+
+const QuickActionButton = ({ icon: Icon, label }: any) => (
+    <button className="flex flex-col items-center justify-center gap-3 p-4 bg-white/10 hover:bg-white/20 rounded-3xl border border-white/10 transition-all duration-300 group">
+        <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+        <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+    </button>
 );
+
+const DashboardStatCard = ({ title, value, icon: Icon, color, index }: any) => {
+    const colors: any = {
+        brand: "bg-brand-50 text-brand-600 border-brand-100",
+        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
+        orange: "bg-orange-50 text-orange-600 border-orange-100",
+        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100",
+        red: "bg-red-50 text-red-600 border-red-100"
+    };
+
+    return (
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="glass-card p-6 rounded-3xl flex flex-col justify-between min-h-[160px] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group"
+        >
+            <div className="flex justify-between items-start">
+                <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">{title}</span>
+                <div className={cn("p-2.5 rounded-2xl transition-transform duration-300 group-hover:scale-110", colors[color])}>
+                    <Icon className="w-5 h-5" />
+                </div>
+            </div>
+            <div className="mt-4">
+                <span className="text-4xl font-bold text-slate-900 tracking-tight">{value}</span>
+                <div className="flex items-center gap-1 mt-1">
+                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-full">+12%</span>
+                    <span className="text-[10px] text-slate-400 font-medium">from last month</span>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
 
 // --- Sub Views ---
 
 const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly }: any) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const filteredEmployees = employees.filter((e: Employee) => e.name.toLowerCase().includes(searchTerm.toLowerCase()) || e.code.includes(searchTerm));
+    const [companyFilter, setCompanyFilter] = useState('All');
+    const [deptFilter, setDeptFilter] = useState('All');
+
+    const companies = useMemo(() => ['All', ...Array.from(new Set(employees.map((e: any) => e.company)))], [employees]);
+    const departments = useMemo(() => ['All', ...Array.from(new Set(employees.map((e: any) => e.department)))], [employees]);
+
+    const filteredEmployees = useMemo(() => {
+        return employees.filter((e: Employee) => {
+            const matchesSearch = e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                e.code.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCompany = companyFilter === 'All' || e.company === companyFilter;
+            const matchesDept = deptFilter === 'All' || e.department === deptFilter;
+            return matchesSearch && matchesCompany && matchesDept;
+        });
+    }, [employees, searchTerm, companyFilter, deptFilter]);
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div className="relative w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <div className="space-y-6">
+            {/* Advanced Filter Bar */}
+            <div className="bg-white/70 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row gap-4 items-center">
+                <div className="relative flex-1 w-full">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input 
                         type="text" 
-                        placeholder="Search staff..." 
+                        placeholder="Search personnel by name or ID..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm w-full outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="pl-11 pr-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm w-full outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
                     />
                 </div>
-                {!readOnly && (
-                    <button onClick={onAdd} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-indigo-700">
-                        <UserPlus className="w-4 h-4" /> Add Employee
-                    </button>
-                )}
+                
+                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <select 
+                        value={companyFilter}
+                        onChange={(e) => setCompanyFilter(e.target.value)}
+                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
+                    >
+                        {companies.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+
+                    <select 
+                        value={deptFilter}
+                        onChange={(e) => setDeptFilter(e.target.value)}
+                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
+                    >
+                        {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+
+                    {!readOnly && (
+                        <button 
+                            onClick={onAdd} 
+                            className="flex-1 lg:flex-none bg-brand-600 text-white px-8 py-3.5 rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-brand-700 shadow-xl shadow-brand-500/20 transition-all active:scale-95"
+                        >
+                            <UserPlus className="w-4 h-4" /> Add Staff
+                        </button>
+                    )}
+                </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-200">
-                        <tr><th className="p-4">ID</th><th className="p-4">Name</th><th className="p-4">Role</th><th className="p-4">Company</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 text-sm">
-                        {filteredEmployees.map((e: Employee) => (
-                            <tr key={e.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="p-4 font-mono text-gray-500">{e.code}</td>
-                                <td className="p-4 font-medium text-gray-900">{e.name}</td>
-                                <td className="p-4 text-gray-600">{e.designation}</td>
-                                <td className="p-4 text-gray-500">{e.company}</td>
-                                <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-bold ${e.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{e.status}</span></td>
-                                <td className="p-4 flex gap-2">
-                                    {e.active ? (
-                                        !readOnly && (
-                                            <>
-                                                <button onClick={() => onEdit(e)} title="Edit" className="p-1.5 hover:bg-indigo-50 text-indigo-600 rounded"><Edit className="w-4 h-4" /></button>
-                                                <button onClick={() => onOffboard(e)} title="Offboard" className="p-1.5 hover:bg-red-50 text-red-600 rounded"><LogOut className="w-4 h-4" /></button>
-                                            </>
-                                        )
-                                    ) : (
-                                        <>
-                                            <button onClick={() => onEdit(e)} title="Edit" className="p-1.5 hover:bg-indigo-50 text-indigo-600 rounded"><Edit className="w-4 h-4" /></button>
-                                            <button onClick={() => onRejoin(e)} title="Rejoin" className="p-1.5 hover:bg-green-50 text-green-600 rounded"><UserPlus className="w-4 h-4" /></button>
-                                            <button onClick={() => onDelete(e)} title="Delete" className="p-1.5 hover:bg-red-50 text-red-600 rounded"><Trash2 className="w-4 h-4" /></button>
-                                        </>
-                                    )}
-                                </td>
+            <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden border border-white shadow-2xl shadow-slate-200/60">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50/80 border-b border-slate-100">
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Personnel Details</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Department & Role</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Organization</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {filteredEmployees.length === 0 && <div className="p-8 text-center text-gray-500">No employees found.</div>}
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            <AnimatePresence mode="popLayout">
+                                {filteredEmployees.map((e: Employee) => (
+                                    <motion.tr 
+                                        layout
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        key={e.id} 
+                                        className="hover:bg-brand-50/20 transition-colors group"
+                                    >
+                                        <td className="p-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 font-black border border-slate-200 group-hover:bg-white group-hover:border-brand-200 group-hover:text-brand-600 transition-all duration-300 overflow-hidden">
+                                                    {e.profileImage ? (
+                                                        <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                    ) : (
+                                                        e.name.charAt(0)
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="font-black text-slate-900 text-base">{e.name}</div>
+                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{e.code}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-6">
+                                            <div className="text-sm font-black text-slate-700">{e.designation}</div>
+                                            <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{e.team}</div>
+                                        </td>
+                                        <td className="p-6">
+                                            <span className="text-xs font-black text-slate-600 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200/60">
+                                                {e.company}
+                                            </span>
+                                        </td>
+                                        <td className="p-6">
+                                            <div className="flex items-center gap-2">
+                                                <div className={cn(
+                                                    "w-2 h-2 rounded-full animate-pulse",
+                                                    e.active ? "bg-emerald-500" : "bg-red-500"
+                                                )}></div>
+                                                <span className={cn(
+                                                    "text-[10px] font-black uppercase tracking-widest",
+                                                    e.active ? 'text-emerald-600' : 'text-red-600'
+                                                )}>
+                                                    {e.status}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="p-6">
+                                            <div className="flex justify-end gap-2">
+                                                <button 
+                                                    onClick={() => onEdit(e)} 
+                                                    className="p-2.5 hover:bg-white hover:shadow-lg text-brand-600 rounded-xl transition-all border border-transparent hover:border-brand-100 active:scale-90"
+                                                    title="Edit Record"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                                {e.active ? (
+                                                    !readOnly && (
+                                                        <button 
+                                                            onClick={() => onOffboard(e)} 
+                                                            className="p-2.5 hover:bg-white hover:shadow-lg text-red-600 rounded-xl transition-all border border-transparent hover:border-red-100 active:scale-90"
+                                                            title="Offboard"
+                                                        >
+                                                            <LogOut className="w-4 h-4" />
+                                                        </button>
+                                                    )
+                                                ) : (
+                                                    <button 
+                                                        onClick={() => onRejoin(e)} 
+                                                        className="p-2.5 hover:bg-white hover:shadow-lg text-emerald-600 rounded-xl transition-all border border-transparent hover:border-emerald-100 active:scale-90"
+                                                        title="Rejoin"
+                                                    >
+                                                        <UserPlus className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                                {!readOnly && (
+                                                    <button 
+                                                        onClick={() => onDelete(e)} 
+                                                        className="p-2.5 hover:bg-white hover:shadow-lg text-slate-400 hover:text-red-600 rounded-xl transition-all border border-transparent hover:border-slate-100 active:scale-90"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </motion.tr>
+                                ))}
+                            </AnimatePresence>
+                        </tbody>
+                    </table>
+                </div>
+                {filteredEmployees.length === 0 && (
+                    <div className="p-32 text-center">
+                        <div className="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-slate-100 shadow-inner">
+                            <Users className="w-10 h-10 text-slate-300" />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight">No personnel found</h3>
+                        <p className="text-slate-400 font-medium max-w-xs mx-auto mt-2">We couldn't find any records matching your current search or filter criteria.</p>
+                        <button 
+                            onClick={() => { setSearchTerm(''); setCompanyFilter('All'); setDeptFilter('All'); }}
+                            className="mt-6 text-sm font-black text-brand-600 hover:underline"
+                        >
+                            Reset all filters
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange }: any) => {
+const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, currentUser }: any) => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const daysInMonth = new Date(year, month, 0).getDate();
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [editingCell, setEditingCell] = useState<{empId: string, date: string} | null>(null);
 
-    const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'short' });
-    const shortYear = year.toString().slice(-2);
+    const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+    const fullYear = year.toString();
 
     const handlePrevMonth = () => {
         const d = new Date(year, month - 2);
@@ -1857,96 +2256,195 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange }: 
         onMonthChange(d.toISOString().slice(0, 7));
     };
 
+    const handleStatusUpdate = async (employeeId: string, date: string, status: AttendanceStatus) => {
+        await logAttendance(
+            employeeId,
+            status,
+            date,
+            0,
+            undefined,
+            currentUser?.username || 'System',
+            'Manual Update'
+        );
+        setEditingCell(null);
+    };
+
+    const filteredEmployees = useMemo(() => {
+        return employees.filter((e: Employee) => 
+            e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            e.code.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [employees, searchTerm]);
+
     return (
-        <div className="space-y-4">
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-4">
-                            <button onClick={handlePrevMonth} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"><X className="w-4 h-4 rotate-90" /></button>
-                            <span className="text-lg font-bold text-gray-800 min-w-[80px] text-center">{monthName} {shortYear}</span>
-                            <button onClick={handleNextMonth} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"><X className="w-4 h-4 -rotate-90" /></button>
+        <div className="space-y-6">
+            <div className="glass-card p-6 rounded-3xl border border-white shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                        <button 
+                            onClick={handlePrevMonth} 
+                            className="p-2 hover:bg-white hover:shadow-sm rounded-xl text-slate-600 transition-all active:scale-95"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <div className="px-4 text-center min-w-[140px] flex flex-col items-center">
+                            <div className="text-sm font-bold text-slate-900">{monthName}</div>
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                {fullYear}
+                                <img src="https://flagcdn.com/w20/ae.png" alt="UAE" className="w-3 h-2 rounded-sm" referrerPolicy="no-referrer" />
+                            </div>
                         </div>
+                        <button 
+                            onClick={handleNextMonth} 
+                            className="p-2 hover:bg-white hover:shadow-sm rounded-xl text-slate-600 transition-all active:scale-95"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input 
-                                type="text" 
-                                placeholder="Search Employee..." 
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm w-64 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                            />
-                        </div>
-                        <button className="flex items-center gap-2 px-3 py-2 border border-indigo-200 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-50 transition-colors">
-                            <Calendar className="w-4 h-4" /> Holidays
-                        </button>
-                        <button className="flex items-center gap-2 px-3 py-2 border border-orange-200 text-orange-600 rounded-lg text-xs font-bold hover:bg-orange-50 transition-colors">
-                            <Copy className="w-4 h-4" /> Copy
-                        </button>
+                    <div className="hidden xl:flex flex-wrap gap-2">
+                        {Object.entries(LEGEND).map(([status, meta]: any) => (
+                            <div key={status} className={cn(
+                                "px-3 py-1 rounded-full text-[10px] font-bold border transition-all hover:scale-105 cursor-default",
+                                meta.color.replace('text-', 'text-').replace('bg-', 'bg-'),
+                                "border-slate-100"
+                            )}>
+                                {meta.code}: {meta.label}
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 justify-end">
-                    {Object.entries(LEGEND).map(([status, meta]: any) => (
-                        <div key={status} className={`px-2 py-1 rounded text-[10px] font-bold ${meta.color.replace('text-800', 'text-gray-700')} border border-gray-100`}>
-                            {meta.code} - {meta.label}
-                        </div>
-                    ))}
+                <div className="flex items-center gap-3">
+                    <div className="relative flex-1 sm:flex-none">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input 
+                            type="text" 
+                            placeholder="Search staff..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-11 pr-4 py-2.5 bg-slate-100/50 border-none rounded-2xl text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+                        />
+                    </div>
+                    <button className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
+                        <Download className="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-                <table className="w-full text-center border-collapse text-[11px]">
-                    <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200">
-                            <th className="p-3 text-left bg-gray-50 sticky left-0 z-10 border-r border-gray-200 min-w-[40px] font-bold text-gray-500">#</th>
-                            <th className="p-3 text-left bg-gray-50 sticky left-40 z-10 border-r border-gray-200 min-w-[150px] font-bold text-gray-900">Employee</th>
-                            <th className="p-3 font-bold text-gray-900 border-r border-gray-200">Leave Bal</th>
-                            <th className="p-3 font-bold text-indigo-600 border-r border-gray-200">OT</th>
-                            {days.map(d => {
-                                const date = new Date(year, month - 1, d);
-                                const dayName = date.toLocaleString('default', { weekday: 'narrow' });
-                                const isSunday = date.getDay() === 0;
-                                return (
-                                    <th key={d} className={`p-1 w-8 border-r border-gray-100 ${isSunday ? 'text-red-500' : 'text-gray-900'}`}>
-                                        <div className="font-bold">{d}</div>
-                                        <div className="text-[9px] uppercase">{dayName}</div>
-                                    </th>
-                                );
-                            })}
-                            <th className="p-3 font-bold text-gray-900">Summary</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {employees.filter((e: Employee) => e.name.toLowerCase().includes(searchTerm.toLowerCase())).map((e: Employee, idx: number) => (
-                            <tr key={e.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="p-3 text-left border-r border-gray-100 sticky left-0 bg-white z-10 text-gray-400">{idx + 1}</td>
-                                <td className="p-3 text-left border-r border-gray-100 sticky left-40 bg-white z-10 font-bold text-gray-900">{e.name}</td>
-                                <td className="p-3 border-r border-gray-100 font-bold">{e.leaveBalance}</td>
-                                <td className="p-3 border-r border-gray-100 font-bold text-indigo-600">
-                                    {attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth)).reduce((sum, r) => sum + (r.overtimeHours || 0), 0)}
-                                </td>
+            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-center border-collapse text-[11px]">
+                        <thead>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="p-4 text-left bg-slate-50/80 backdrop-blur-sm sticky left-0 z-20 border-r border-slate-100 min-w-[180px]">
+                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Employee Name</span>
+                                </th>
+                                <th className="p-4 font-bold text-slate-500 border-r border-slate-100 uppercase tracking-widest text-[10px]">Leave</th>
+                                <th className="p-4 font-bold text-brand-600 border-r border-slate-100 uppercase tracking-widest text-[10px]">OT</th>
                                 {days.map(d => {
-                                    const dateStr = `${selectedMonth}-${String(d).padStart(2, '0')}`;
-                                    const record = attendance.find((r: AttendanceRecord) => r.employeeId === e.id && r.date === dateStr);
-                                    const meta = LEGEND[record?.status] || {};
-                                    const isSunday = new Date(year, month - 1, d).getDay() === 0;
+                                    const date = new Date(year, month - 1, d);
+                                    const dayName = date.toLocaleString('default', { weekday: 'narrow' });
+                                    const isSunday = date.getDay() === 0;
                                     return (
-                                        <td key={d} className={`border-r border-gray-100 p-1 font-bold ${meta.code ? meta.color : isSunday ? 'text-red-100' : 'text-gray-200'}`}>
-                                            {meta.code || (isSunday ? 'S' : '-')}
-                                        </td>
+                                        <th key={d} className={cn(
+                                            "p-2 w-10 border-r border-slate-50 min-w-[36px]",
+                                            isSunday ? 'bg-red-50/30 text-red-500' : 'text-slate-600'
+                                        )}>
+                                            <div className="font-bold text-sm">{d}</div>
+                                            <div className="text-[9px] font-bold uppercase opacity-60">{dayName}</div>
+                                        </th>
                                     );
                                 })}
-                                <td className="p-3 font-bold text-gray-900">
-                                    {attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth) && r.status === AttendanceStatus.PRESENT).length}P
-                                </td>
+                                <th className="p-4 font-bold text-slate-900 bg-slate-50/80 backdrop-blur-sm sticky right-0 z-20 border-l border-slate-100 uppercase tracking-widest text-[10px]">Total</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {filteredEmployees.map((e: Employee, idx: number) => (
+                                <tr key={e.id} className="hover:bg-brand-50/20 transition-colors group">
+                                    <td className="p-4 text-left border-r border-slate-100 sticky left-0 bg-white/90 backdrop-blur-sm z-10 group-hover:bg-brand-50/50 transition-colors">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-200 overflow-hidden">
+                                                {e.profileImage ? (
+                                                    <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                ) : (
+                                                    e.name.charAt(0)
+                                                )}
+                                            </div>
+                                            <span className="font-bold text-slate-900 truncate max-w-[120px]">{e.name}</span>
+                                        </div>
+                                    </td>
+                                    <td className="p-4 border-r border-slate-50 font-bold text-slate-500">{e.leaveBalance}</td>
+                                    <td className="p-4 border-r border-slate-50 font-bold text-brand-600">
+                                        {attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth)).reduce((sum, r) => sum + (r.overtimeHours || 0), 0)}
+                                    </td>
+                                    {days.map(d => {
+                                        const dateStr = `${selectedMonth}-${String(d).padStart(2, '0')}`;
+                                        const record = attendance.find((r: AttendanceRecord) => r.employeeId === e.id && r.date === dateStr);
+                                        const meta = LEGEND[record?.status] || {};
+                                        const isSunday = new Date(year, month - 1, d).getDay() === 0;
+                                        return (
+                                            <td key={d} className={cn(
+                                                "border-r border-slate-50 p-2 font-bold transition-all relative",
+                                                meta.code ? meta.color : isSunday ? 'bg-red-50/20 text-red-200' : 'text-slate-200 group-hover:text-slate-300'
+                                            )}>
+                                                <button 
+                                                    onClick={() => setEditingCell({ empId: e.id, date: dateStr })}
+                                                    className={cn(
+                                                        "w-6 h-6 flex items-center justify-center rounded-lg mx-auto transition-transform hover:scale-110 active:scale-90",
+                                                        meta.code && "bg-white shadow-sm border border-slate-100"
+                                                    )}
+                                                >
+                                                    {meta.code || (isSunday ? 'S' : '-')}
+                                                </button>
+
+                                                {editingCell?.empId === e.id && editingCell?.date === dateStr && (
+                                                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-2 grid grid-cols-4 gap-1 min-w-[160px]">
+                                                        {Object.entries(LEGEND).map(([status, m]: any) => (
+                                                            <button
+                                                                key={status}
+                                                                onClick={() => handleStatusUpdate(e.id, dateStr, status as AttendanceStatus)}
+                                                                className={cn(
+                                                                    "w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all hover:scale-110",
+                                                                    m.color,
+                                                                    record?.status === status && "ring-2 ring-brand-500 ring-offset-1"
+                                                                )}
+                                                                title={m.label}
+                                                            >
+                                                                {m.code}
+                                                            </button>
+                                                        ))}
+                                                        <button 
+                                                            onClick={() => setEditingCell(null)}
+                                                            className="col-span-4 mt-1 py-1 text-[9px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </td>
+                                        );
+                                    })}
+                                    <td className="p-4 font-bold text-slate-900 bg-white/90 backdrop-blur-sm sticky right-0 z-10 border-l border-slate-100 group-hover:bg-brand-50/50 transition-colors">
+                                        <div className="flex flex-col items-center">
+                                            <span className="text-brand-600">{attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth) && r.status === AttendanceStatus.PRESENT).length}P</span>
+                                            <span className="text-[9px] text-slate-400 font-bold">DAYS</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {filteredEmployees.length === 0 && (
+                    <div className="p-20 text-center">
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <Calendar className="w-8 h-8 text-slate-300" />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900">No records found</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto mt-1">Try searching for a different staff member or changing the month.</p>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -1954,6 +2452,7 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange }: 
 
 const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
     const [newItem, setNewItem] = useState<Partial<DeductionRecord>>({ type: 'Salary Advance', date: new Date().toISOString().split('T')[0] });
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleAdd = async () => {
         if(newItem.employeeId && newItem.amount && newItem.date) {
@@ -1961,28 +2460,81 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
             setNewItem({ type: 'Salary Advance', date: new Date().toISOString().split('T')[0] });
         }
     }
+
+    const filteredDeductions = useMemo(() => {
+        return deductions.filter((d: DeductionRecord) => {
+            const emp = employees.find((e: Employee) => e.id === d.employeeId);
+            const search = searchTerm.toLowerCase();
+            return (
+                emp?.name.toLowerCase().includes(search) ||
+                emp?.code.toLowerCase().includes(search) ||
+                d.type.toLowerCase().includes(search) ||
+                (d.note && d.note.toLowerCase().includes(search))
+            );
+        });
+    }, [deductions, employees, searchTerm]);
     
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">Deductions & Penalties</h2>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Deductions & Penalties</h2>
+                    <p className="text-slate-500 text-sm mt-1">Manage employee advances, fines, and asset damages.</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <input 
+                            type="text"
+                            placeholder="Search deductions..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-2xl border border-brand-100">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Financial Records</span>
+                    </div>
+                </div>
+            </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h3 className="font-bold text-gray-800 mb-6 text-sm">Add New Deduction</h3>
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Employee</label>
-                        <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500" value={newItem.employeeId || ''} onChange={e => setNewItem({...newItem, employeeId: e.target.value})}>
-                            <option value="">Select...</option>
+            <div className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/50">
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600">
+                        <Plus className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800">Record New Transaction</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Staff Member</label>
+                        <select 
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                            value={newItem.employeeId || ''} 
+                            onChange={e => setNewItem({...newItem, employeeId: e.target.value})}
+                        >
+                            <option value="">Select Employee</option>
                             {employees.map((e:any)=><option key={e.id} value={e.id}>{e.name}</option>)}
                         </select>
                     </div>
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date</label>
-                        <input type="date" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500" value={newItem.date || ''} onChange={e => setNewItem({...newItem, date: e.target.value})} />
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Date</label>
+                        <input 
+                            type="date" 
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                            value={newItem.date || ''} 
+                            onChange={e => setNewItem({...newItem, date: e.target.value})} 
+                        />
                     </div>
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Type</label>
-                        <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500" value={newItem.type} onChange={e => setNewItem({...newItem, type: e.target.value as any})}>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Category</label>
+                        <select 
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                            value={newItem.type} 
+                            onChange={e => setNewItem({...newItem, type: e.target.value as any})}
+                        >
                             <option>Salary Advance</option>
                             <option>Fine Amount</option>
                             <option>Damage Material/Asset</option>
@@ -1990,58 +2542,126 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
                             <option>Other</option>
                         </select>
                     </div>
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount</label>
-                        <input type="number" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500" placeholder="0.00" value={newItem.amount || ''} onChange={e => setNewItem({...newItem, amount: Number(e.target.value)})} />
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Amount (AED)</label>
+                        <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">AED</span>
+                            <input 
+                                type="number" 
+                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all font-bold text-slate-900" 
+                                placeholder="0.00" 
+                                value={newItem.amount || ''} 
+                                onChange={e => setNewItem({...newItem, amount: Number(e.target.value)})} 
+                            />
+                        </div>
                     </div>
-                    <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Description / Note</label>
-                        <input className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500" placeholder="Reason..." value={newItem.note || ''} onChange={e => setNewItem({...newItem, note: e.target.value})} />
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Notes</label>
+                        <div className="flex gap-2">
+                            <input 
+                                className="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                placeholder="Reason..." 
+                                value={newItem.note || ''} 
+                                onChange={e => setNewItem({...newItem, note: e.target.value})} 
+                            />
+                            <button 
+                                onClick={handleAdd}
+                                disabled={!newItem.employeeId || !newItem.amount}
+                                className="p-3 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-all active:scale-95 shadow-lg shadow-brand-200 disabled:opacity-50 disabled:scale-100"
+                            >
+                                <Check className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
-                    <button onClick={handleAdd} className="w-full bg-[#d32f2f] hover:bg-red-700 text-white py-2.5 rounded-lg text-sm font-bold transition-all shadow-md shadow-red-100">
-                        Add
-                    </button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left text-[11px]">
-                    <thead className="text-gray-400 font-bold uppercase tracking-wider bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th className="p-4">Date</th>
-                            <th className="p-4">Employee</th>
-                            <th className="p-4">Type</th>
-                            <th className="p-4">Note</th>
-                            <th className="p-4 text-right">Amount</th>
-                            <th className="p-4 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {deductions.map(d => (
-                            <tr key={d.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="p-4 text-gray-500">{d.date}</td>
-                                <td className="p-4 font-bold text-gray-900">{employees.find((e:any)=>e.id===d.employeeId)?.name || 'Unknown'}</td>
-                                <td className="p-4 text-gray-600">{d.type}</td>
-                                <td className="p-4 text-gray-400 italic">{d.note || '-'}</td>
-                                <td className="p-4 text-right font-bold text-gray-900">{d.amount.toFixed(2)}</td>
-                                <td className="p-4 text-center">
-                                    <button onClick={() => {
-                                        openConfirm("Delete Deduction", "Are you sure you want to remove this record?", async () => {
-                                            await deleteDeduction(d.id);
-                                        });
-                                    }} className="p-2 text-gray-300 hover:text-red-600 transition-colors"><Trash2 className="w-4 h-4"/></button>
-                                </td>
+            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Employee</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Note</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                             </tr>
-                        ))}
-                        {deductions.length === 0 && (
-                            <tr>
-                                <td colSpan={6} className="p-12 text-center text-gray-400 font-medium">
-                                    No deductions recorded.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            <AnimatePresence mode="popLayout">
+                                {filteredDeductions.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((d: DeductionRecord) => {
+                                    const emp = employees.find((e:any) => e.id === d.employeeId);
+                                    return (
+                                        <motion.tr 
+                                            key={d.id}
+                                            layout
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.95 }}
+                                            className="hover:bg-slate-50/50 transition-colors group"
+                                        >
+                                            <td className="p-5">
+                                                <div className="text-sm font-bold text-slate-900">{new Date(d.date).toLocaleDateString()}</div>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 border border-brand-100 overflow-hidden">
+                                                {emp?.profileImage ? (
+                                                    <img src={emp.profileImage} alt={emp.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                ) : (
+                                                    emp?.name?.charAt(0) || '?'
+                                                )}
+                                            </div>
+                                                    <div className="text-sm font-bold text-slate-700">{emp?.name || 'Unknown'}</div>
+                                                </div>
+                                            </td>
+                                            <td className="p-5">
+                                                <span className={cn(
+                                                    "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                                                    d.type === 'Fine Amount' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                    d.type === 'Salary Advance' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                    d.type === 'Loan Amount' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                    'bg-slate-50 text-slate-600 border-slate-100'
+                                                )}>
+                                                    {d.type}
+                                                </span>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="text-sm font-bold text-red-600">AED {d.amount.toFixed(2)}</div>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="text-sm text-slate-500 italic max-w-xs truncate">{d.note || '-'}</div>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="flex justify-end">
+                                                    <button 
+                                                        onClick={() => openConfirm("Delete Deduction", "Are you sure you want to remove this record?", async () => {
+                                                            await deleteDeduction(d.id!);
+                                                        })}
+                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </motion.tr>
+                                    );
+                                })}
+                            </AnimatePresence>
+                        </tbody>
+                    </table>
+                </div>
+                {deductions.length === 0 && (
+                    <div className="p-20 text-center">
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <CreditCard className="w-8 h-8 text-slate-300" />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900">No transactions yet</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto mt-1">Add deductions or penalties to see them listed here.</p>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -2050,6 +2670,7 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
 const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
     const [showNew, setShowNew] = useState(false);
     const [newReq, setNewReq] = useState({ employeeId: '', type: AttendanceStatus.ANNUAL_LEAVE, startDate: '', endDate: '', reason: '' });
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleSave = async () => {
         if(newReq.employeeId && newReq.startDate && newReq.endDate) {
@@ -2062,209 +2683,560 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
         await updateLeaveRequestStatus(id, status, user.name);
     };
 
+    const filteredRequests = useMemo(() => {
+        return leaveRequests.filter((r: LeaveRequest) => {
+            const emp = employees.find((e: Employee) => e.id === r.employeeId);
+            const search = searchTerm.toLowerCase();
+            return (
+                emp?.name.toLowerCase().includes(search) ||
+                emp?.code.toLowerCase().includes(search) ||
+                r.type.toLowerCase().includes(search) ||
+                r.reason?.toLowerCase().includes(search)
+            );
+        });
+    }, [leaveRequests, employees, searchTerm]);
+
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <h3 className="font-bold text-gray-700">Leave Requests</h3>
-                <button onClick={() => setShowNew(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                    <Plus className="w-4 h-4" /> New Request
-                </button>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Leave Management</h2>
+                    <p className="text-slate-500 text-sm mt-1">Review and approve employee time-off requests.</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <input 
+                            type="text"
+                            placeholder="Search requests..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
+                        />
+                    </div>
+                    <button 
+                        onClick={() => setShowNew(true)} 
+                        className="neo-button bg-brand-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-200"
+                    >
+                        <Plus className="w-5 h-5" /> New Request
+                    </button>
+                </div>
             </div>
 
-            {showNew && (
-                <div className="bg-white p-6 rounded-xl border border-indigo-100 shadow-md animate-in slide-in-from-top-2">
-                    <h4 className="font-bold mb-4">New Leave Request</h4>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <select className="border p-2 rounded" value={newReq.employeeId} onChange={e=>setNewReq({...newReq, employeeId:e.target.value})}>
-                            <option value="">Select Employee</option>
-                            {employees.map((e:any)=><option key={e.id} value={e.id}>{e.name}</option>)}
-                        </select>
-                        <select className="border p-2 rounded" value={newReq.type} onChange={e=>setNewReq({...newReq, type:e.target.value as any})}>
-                            <option value={AttendanceStatus.ANNUAL_LEAVE}>Annual Leave</option>
-                            <option value={AttendanceStatus.SICK_LEAVE}>Sick Leave</option>
-                            <option value={AttendanceStatus.EMERGENCY_LEAVE}>Emergency Leave</option>
-                            <option value={AttendanceStatus.UNPAID_LEAVE}>Unpaid Leave</option>
-                        </select>
-                        <input type="date" className="border p-2 rounded" value={newReq.startDate} onChange={e=>setNewReq({...newReq, startDate:e.target.value})} />
-                        <input type="date" className="border p-2 rounded" value={newReq.endDate} onChange={e=>setNewReq({...newReq, endDate:e.target.value})} />
-                        <input className="border p-2 rounded col-span-2" placeholder="Reason" value={newReq.reason} onChange={e=>setNewReq({...newReq, reason:e.target.value})} />
-                    </div>
-                    <div className="flex justify-end gap-2">
-                        <button onClick={() => setShowNew(false)} className="px-4 py-2 text-gray-600">Cancel</button>
-                        <button onClick={handleSave} className="px-4 py-2 bg-indigo-600 text-white rounded">Submit Request</button>
-                    </div>
-                </div>
-            )}
+            <AnimatePresence>
+                {showNew && (
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="glass-card p-8 rounded-3xl border-2 border-brand-100 shadow-xl mb-8">
+                            <h4 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-brand-600" />
+                                Create New Leave Request
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Employee</label>
+                                    <select 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        value={newReq.employeeId} 
+                                        onChange={e=>setNewReq({...newReq, employeeId:e.target.value})}
+                                    >
+                                        <option value="">Select Staff Member</option>
+                                        {employees.map((e:any)=><option key={e.id} value={e.id}>{e.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Leave Type</label>
+                                    <select 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        value={newReq.type} 
+                                        onChange={e=>setNewReq({...newReq, type:e.target.value as any})}
+                                    >
+                                        <option value={AttendanceStatus.ANNUAL_LEAVE}>Annual Leave</option>
+                                        <option value={AttendanceStatus.SICK_LEAVE}>Sick Leave</option>
+                                        <option value={AttendanceStatus.EMERGENCY_LEAVE}>Emergency Leave</option>
+                                        <option value={AttendanceStatus.UNPAID_LEAVE}>Unpaid Leave</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
+                                    <input 
+                                        type="date" 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        value={newReq.startDate} 
+                                        onChange={e=>setNewReq({...newReq, startDate:e.target.value})} 
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">End Date</label>
+                                    <input 
+                                        type="date" 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        value={newReq.endDate} 
+                                        onChange={e=>setNewReq({...newReq, endDate:e.target.value})} 
+                                    />
+                                </div>
+                                <div className="space-y-2 lg:col-span-4">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Reason / Description</label>
+                                    <textarea 
+                                        className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all min-h-[100px]" 
+                                        placeholder="Briefly explain the reason for leave..." 
+                                        value={newReq.reason} 
+                                        onChange={e=>setNewReq({...newReq, reason:e.target.value})} 
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                                <button 
+                                    onClick={() => setShowNew(false)} 
+                                    className="px-6 py-2.5 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleSave} 
+                                    className="neo-button bg-brand-600 text-white px-8 py-2.5 rounded-2xl font-bold shadow-lg shadow-brand-200"
+                                >
+                                    Submit Request
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <table className="w-full text-left text-sm">
-                    <thead className="bg-gray-50 font-semibold text-gray-500">
-                        <tr><th className="p-4">Employee</th><th className="p-4">Dates</th><th className="p-4">Type</th><th className="p-4">Reason</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr>
-                    </thead>
-                    <tbody className="divide-y">
-                        {leaveRequests.map(r => (
-                            <tr key={r.id}>
-                                <td className="p-4 font-medium">{employees.find((e:any)=>e.id===r.employeeId)?.name}</td>
-                                <td className="p-4 text-gray-500">{r.startDate} to {r.endDate}</td>
-                                <td className="p-4"><span className="px-2 py-1 bg-gray-100 rounded text-xs">{r.type}</span></td>
-                                <td className="p-4 text-gray-600">{r.reason}</td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold ${r.status === 'Approved' ? 'bg-green-100 text-green-700' : r.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                        {r.status}
-                                    </span>
-                                </td>
-                                <td className="p-4">
-                                    {r.status === 'Pending' && (
-                                        <div className="flex gap-2">
-                                            <button onClick={() => handleStatus(r.id, LeaveStatus.APPROVED)} className="p-1 bg-green-50 text-green-600 rounded hover:bg-green-100"><Check className="w-4 h-4"/></button>
-                                            <button onClick={() => handleStatus(r.id, LeaveStatus.REJECTED)} className="p-1 bg-red-50 text-red-600 rounded hover:bg-red-100"><X className="w-4 h-4"/></button>
-                                        </div>
-                                    )}
-                                </td>
+            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Employee</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Period</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                             </tr>
-                        ))}
-                        {leaveRequests.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-gray-500">No leave requests.</td></tr>}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            <AnimatePresence mode="popLayout">
+                                {filteredRequests.sort((a:any, b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((req: LeaveRequest) => {
+                                    const emp = employees.find((e:any) => e.id === req.employeeId);
+                                    return (
+                                        <motion.tr 
+                                            key={req.id}
+                                            layout
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="hover:bg-slate-50/50 transition-colors group"
+                                        >
+                                            <td className="p-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[12px] font-bold text-slate-500 border border-slate-200 overflow-hidden">
+                                                        {emp?.profileImage ? (
+                                                            <img src={emp.profileImage} alt={emp.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                        ) : (
+                                                            emp?.name?.charAt(0) || '?'
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm font-bold text-slate-900">{emp?.name || 'Unknown'}</div>
+                                                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{emp?.role || '-'}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="text-sm font-bold text-slate-700">{req.type}</div>
+                                                <div className="text-[10px] text-slate-400 italic truncate max-w-[150px]">{req.reason || 'No reason provided'}</div>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
+                                                    <span>{new Date(req.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                    <ArrowRight className="w-3 h-3 text-slate-300" />
+                                                    <span>{new Date(req.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                </div>
+                                                <div className="text-[10px] text-slate-400 font-bold">
+                                                    {Math.ceil((new Date(req.endDate).getTime() - new Date(req.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} Days
+                                                </div>
+                                            </td>
+                                            <td className="p-5">
+                                                <span className={cn(
+                                                    "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                                                    req.status === LeaveStatus.APPROVED ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                    req.status === LeaveStatus.REJECTED ? 'bg-red-50 text-red-600 border-red-100' :
+                                                    'bg-orange-50 text-orange-600 border-orange-100'
+                                                )}>
+                                                    {req.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="flex justify-end gap-2">
+                                                    {req.status === LeaveStatus.PENDING && (
+                                                        <>
+                                                            <button 
+                                                                onClick={() => handleStatus(req.id!, LeaveStatus.APPROVED)}
+                                                                className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                                                                title="Approve"
+                                                            >
+                                                                <Check className="w-5 h-5" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleStatus(req.id!, LeaveStatus.REJECTED)}
+                                                                className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                                title="Reject"
+                                                            >
+                                                                <X className="w-5 h-5" />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    <button 
+                                                        className="p-2 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+                                                        title="View Details"
+                                                    >
+                                                        <Eye className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </motion.tr>
+                                    );
+                                })}
+                            </AnimatePresence>
+                        </tbody>
+                    </table>
+                </div>
+                {leaveRequests.length === 0 && (
+                    <div className="p-20 text-center">
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <Calendar className="w-8 h-8 text-slate-300" />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900">No leave requests</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto mt-1">All caught up! No pending leave requests to review.</p>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
 const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth, onMonthChange }: any) => {
-     
+     const [searchTerm, setSearchTerm] = useState('');
+
+     const filteredEmployees = useMemo(() => {
+        return employees.filter((e: Employee) => 
+            e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            e.code.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [employees, searchTerm]);
+
      // Simple export stub
      const handleExport = () => {
         alert("Export functionality would generate a CSV/Excel file here.");
      };
 
      return (
-        <div className="space-y-4">
-             <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                 <div className="flex items-center gap-4">
-                     <h3 className="font-bold text-gray-700">Payroll Register</h3>
-                     <input type="month" value={selectedMonth} onChange={e=>onMonthChange(e.target.value)} className="border p-2 rounded text-sm" />
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                 <div>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Payroll Register</h2>
+                    <p className="text-slate-500 text-sm mt-1">Monthly salary breakdown and net pay calculations.</p>
                  </div>
-                 <button onClick={handleExport} className="text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded flex items-center gap-2 text-sm font-medium">
-                     <Download className="w-4 h-4" /> Export Report
-                 </button>
+                 <div className="flex items-center gap-3">
+                     <div className="relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <input 
+                            type="text"
+                            placeholder="Search staff..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
+                        />
+                    </div>
+                     <div className="relative group">
+                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
+                         <input 
+                            type="month" 
+                            value={selectedMonth} 
+                            onChange={e=>onMonthChange(e.target.value)} 
+                            className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm" 
+                         />
+                     </div>
+                     <button 
+                        onClick={handleExport} 
+                        className="neo-button bg-white text-slate-700 px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 border border-slate-200 shadow-sm hover:bg-slate-50"
+                     >
+                         <Download className="w-4 h-4" /> Export
+                     </button>
+                 </div>
              </div>
              
-             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-                 <table className="w-full text-left text-sm whitespace-nowrap">
-                     <thead className="bg-gray-50 font-semibold text-gray-500 border-b border-gray-200">
-                         <tr>
-                             <th className="p-4 sticky left-0 bg-gray-50">Employee</th>
-                             <th className="p-4 text-right">Basic</th>
-                             <th className="p-4 text-right">Housing</th>
-                             <th className="p-4 text-right">Transport</th>
-                             <th className="p-4 text-right">Other</th>
-                             <th className="p-4 text-right">Gross</th>
-                             <th className="p-4 text-right text-red-600">Unpaid Days</th>
-                             <th className="p-4 text-right text-red-600">Deductions</th>
-                             <th className="p-4 text-right text-green-600">OT Pay</th>
-                             <th className="p-4 text-right font-bold">Net Salary</th>
-                         </tr>
-                     </thead>
-                     <tbody className="divide-y divide-gray-100">
-                         {employees.map((e:Employee) => {
-                             const monthRecs = attendance.filter((r:any) => r.employeeId === e.id && r.date.startsWith(selectedMonth));
-                             const monthDeds = deductions.filter((d:any) => d.employeeId === e.id && d.date.startsWith(selectedMonth));
-                             const p = calculatePayroll(e, monthRecs, monthDeds);
-                             
-                             return (
-                                 <tr key={e.id} className="hover:bg-gray-50">
-                                     <td className="p-4 sticky left-0 bg-white font-medium border-r border-gray-100">{e.name}</td>
-                                     <td className="p-4 text-right text-gray-500">{p.breakdown.basic.toLocaleString()}</td>
-                                     <td className="p-4 text-right text-gray-500">{p.breakdown.housing.toLocaleString()}</td>
-                                     <td className="p-4 text-right text-gray-500">{p.breakdown.transport.toLocaleString()}</td>
-                                     <td className="p-4 text-right text-gray-500">{p.breakdown.other.toLocaleString()}</td>
-                                     <td className="p-4 text-right font-medium">{p.grossSalary.toLocaleString()}</td>
-                                     <td className="p-4 text-right text-red-500">{p.totalUnpaidDays}</td>
-                                     <td className="p-4 text-right text-red-600">-{p.totalDeductions.toFixed(0)}</td>
-                                     <td className="p-4 text-right text-green-600">+{p.otAmount.toFixed(0)}</td>
-                                     <td className="p-4 text-right font-bold text-indigo-700 bg-indigo-50/50">{p.netSalary.toFixed(0)}</td>
-                                 </tr>
-                             )
-                         })}
-                     </tbody>
-                 </table>
+             <div className="glass-card rounded-3xl border border-white shadow-xl shadow-slate-200/50 overflow-hidden">
+                 <div className="overflow-x-auto">
+                     <table className="w-full text-left border-collapse">
+                         <thead>
+                             <tr className="bg-slate-50/50 border-b border-slate-100">
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest sticky left-0 bg-white/80 backdrop-blur-md z-10">Employee</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Basic</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Housing</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Transport</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Other</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Gross</th>
+                                 <th className="p-5 text-[10px] font-bold text-red-400 uppercase tracking-widest text-right">Unpaid</th>
+                                 <th className="p-5 text-[10px] font-bold text-red-400 uppercase tracking-widest text-right">Deductions</th>
+                                 <th className="p-5 text-[10px] font-bold text-emerald-400 uppercase tracking-widest text-right">OT Pay</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-900 uppercase tracking-widest text-right">Net Salary</th>
+                             </tr>
+                         </thead>
+                         <tbody className="divide-y divide-slate-50">
+                             {filteredEmployees.map((e:Employee) => {
+                                 const monthRecs = attendance.filter((r:any) => r.employeeId === e.id && r.date.startsWith(selectedMonth));
+                                 const monthDeds = deductions.filter((d:any) => d.employeeId === e.id && d.date.startsWith(selectedMonth));
+                                 const p = calculatePayroll(e, monthRecs, monthDeds);
+                                 
+                                 return (
+                                     <tr key={e.id} className="hover:bg-slate-50/50 transition-colors group">
+                                         <td className="p-5 sticky left-0 bg-white group-hover:bg-slate-50/50 transition-colors z-10 border-r border-slate-100">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 overflow-hidden">
+                                                    {e.profileImage ? (
+                                                        <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                    ) : (
+                                                        e.name.charAt(0)
+                                                    )}
+                                                </div>
+                                                <div className="text-sm font-bold text-slate-900">{e.name}</div>
+                                            </div>
+                                         </td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.basic.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.housing.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.transport.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.other.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-slate-900">{p.grossSalary.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-red-500">{p.totalUnpaidDays}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-red-600">-{p.totalDeductions.toFixed(0)}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-emerald-600">+{p.otAmount.toFixed(0)}</td>
+                                         <td className="p-5 text-right">
+                                            <div className="inline-block px-4 py-1.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-black border border-brand-100">
+                                                {p.netSalary.toFixed(0)}
+                                            </div>
+                                         </td>
+                                     </tr>
+                                 )
+                             })}
+                         </tbody>
+                     </table>
+                 </div>
              </div>
         </div>
      );
 };
 
 const ReportsView = ({ employees, attendance }: any) => {
-    // Quick calculations
-    const totalStaff = employees.length;
-    const totalSpent = employees.reduce((acc: number, e: Employee) => acc + (e.salary.basic + e.salary.housing + e.salary.transport + e.salary.other), 0);
-    const lateDays = attendance.filter((r:AttendanceRecord) => r.status === 'P' && r.checkInTime && new Date(r.checkInTime).getHours() > 9).length; 
+    const activeStaff = useMemo(() => employees.filter((e: any) => e.active), [employees]);
     
+    const totalStaff = activeStaff.length;
+    const totalSpent = activeStaff.reduce((acc: number, e: Employee) => acc + (e.salary.basic + e.salary.housing + e.salary.transport + e.salary.other), 0);
+    
+    const lateDays = useMemo(() => {
+        return attendance.filter((r: AttendanceRecord) => 
+            r.status === 'P' && 
+            r.checkInTime && 
+            new Date(r.checkInTime).getHours() >= 9
+        ).length;
+    }, [attendance]);
+
     const companyData = useMemo(() => {
         const counts: Record<string, number> = {};
-        employees.filter((e:any) => e.active).forEach((e:any) => {
+        activeStaff.forEach((e: any) => {
             counts[e.company] = (counts[e.company] || 0) + 1;
         });
-        return Object.entries(counts).map(([name, value]) => ({ name, value }));
-    }, [employees]);
+        return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    }, [activeStaff]);
 
-    const COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+    const teamData = useMemo(() => {
+        const counts: Record<string, number> = {};
+        activeStaff.forEach((e: any) => {
+            counts[e.team] = (counts[e.team] || 0) + 1;
+        });
+        return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    }, [activeStaff]);
+
+    const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#f97316'];
 
     return (
-        <div className="space-y-6">
-            <h3 className="font-bold text-gray-900 text-xl">Company Reports</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-xl border shadow-sm">
-                    <h4 className="text-gray-500 text-sm uppercase font-bold">Monthly Payroll Liability</h4>
-                    <p className="text-3xl font-bold text-indigo-600 mt-2">AED {totalSpent.toLocaleString()}</p>
-                    <p className="text-xs text-gray-400 mt-1">Estimated fixed cost (excluding OT)</p>
+        <div className="space-y-8 pb-12">
+            <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+            >
+                <div>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">Analytics & Reports</h2>
+                    <p className="text-slate-500 font-medium">Real-time workforce intelligence and distribution.</p>
                 </div>
-                <div className="bg-white p-6 rounded-xl border shadow-sm">
-                    <h4 className="text-gray-500 text-sm uppercase font-bold">Late Arrivals (This Month)</h4>
-                    <p className="text-3xl font-bold text-orange-500 mt-2">{lateDays}</p>
-                    <p className="text-xs text-gray-400 mt-1">Based on check-in time &gt; 9:00 AM</p>
+                <div className="flex items-center gap-2">
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
+                        <Download className="w-4 h-4" /> Export Data
+                    </button>
+                    <button className="px-4 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2">
+                        <Printer className="w-4 h-4" /> Print Report
+                    </button>
                 </div>
-                <div className="bg-white p-6 rounded-xl border shadow-sm">
-                    <h4 className="text-gray-500 text-sm uppercase font-bold">Staff Turnover</h4>
-                    <p className="text-3xl font-bold text-blue-500 mt-2">0%</p>
-                    <p className="text-xs text-gray-400 mt-1">No exits recorded this month</p>
-                </div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                    { label: 'Active Staff', value: totalStaff, icon: Users, color: 'brand', delay: 0.1 },
+                    { label: 'Monthly Payroll', value: `AED ${totalSpent.toLocaleString()}`, icon: DollarSign, color: 'emerald', delay: 0.2 },
+                    { label: 'Late Arrivals', value: lateDays, icon: AlertCircle, color: 'orange', delay: 0.3 },
+                    { label: 'Total Teams', value: teamData.length, icon: Briefcase, color: 'violet', delay: 0.4 },
+                ].map((stat, i) => (
+                    <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: stat.delay }}
+                        className="glass-card p-6 rounded-3xl border border-white shadow-xl shadow-slate-200/40 group hover:scale-[1.02] transition-all"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className={cn(
+                                "w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12",
+                                stat.color === 'brand' ? 'bg-brand-50 text-brand-600' :
+                                stat.color === 'emerald' ? 'bg-emerald-50 text-emerald-600' :
+                                stat.color === 'orange' ? 'bg-orange-50 text-orange-600' :
+                                'bg-violet-50 text-violet-600'
+                            )}>
+                                <stat.icon className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</div>
+                                <div className="text-xl font-black text-slate-900">{stat.value}</div>
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
             </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-xl border shadow-sm h-80">
-                    <h4 className="font-bold text-gray-700 mb-4">Staff Distribution by Company</h4>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={companyData}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                            <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                            <Tooltip cursor={{fill: '#f3f4f6'}} />
-                            <Bar dataKey="value" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="lg:col-span-2 glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40"
+                >
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-lg font-bold text-slate-900">Staff Distribution by Company</h3>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-brand-500 rounded-full"></div>
+                            <span className="text-xs font-bold text-slate-500">Active Employees</span>
+                        </div>
+                    </div>
+                    <div className="h-[350px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={companyData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                    dataKey="name" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                    dy={10}
+                                />
+                                <YAxis 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                />
+                                <Tooltip 
+                                    cursor={{ fill: '#f8fafc' }}
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                />
+                                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                                    {companyData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </motion.div>
+
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40"
+                >
+                    <h3 className="text-lg font-bold text-slate-900 mb-8">Team Composition</h3>
+                    <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={teamData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={70}
+                                    outerRadius={100}
+                                    paddingAngle={8}
+                                    dataKey="value"
+                                >
+                                    {teamData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[(index + 3) % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                />
+                                <Legend 
+                                    verticalAlign="bottom" 
+                                    iconType="circle"
+                                    formatter={(value) => <span className="text-xs font-bold text-slate-600">{value}</span>}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </motion.div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40">
+                    <h3 className="text-lg font-bold text-slate-900 mb-6">Recent Activity</h3>
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((_, i) => (
+                            <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 border border-slate-100">
+                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-brand-600">
+                                    <UserPlus className="w-5 h-5" />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="text-sm font-bold text-slate-900">New employee onboarded</div>
+                                    <div className="text-xs text-slate-500">2 hours ago • HR Department</div>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-slate-300" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                
-                <div className="bg-white p-6 rounded-xl border shadow-sm h-80">
-                    <h4 className="font-bold text-gray-700 mb-4">Company Composition</h4>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={companyData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={80}
-                                paddingAngle={5}
-                                dataKey="value"
-                            >
-                                {companyData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                        </PieChart>
-                    </ResponsiveContainer>
+
+                <div className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40">
+                    <h3 className="text-lg font-bold text-slate-900 mb-6">Quick Actions</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <button className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 text-left hover:bg-brand-50 hover:border-brand-100 transition-all group">
+                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 transition-colors">
+                                <FileText className="w-6 h-6" />
+                            </div>
+                            <div className="font-bold text-slate-900">Attendance Report</div>
+                            <div className="text-xs text-slate-500 mt-1">Download monthly logs</div>
+                        </button>
+                        <button className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 text-left hover:bg-brand-50 hover:border-brand-100 transition-all group">
+                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 transition-colors">
+                                <Plus className="w-6 h-6" />
+                            </div>
+                            <div className="font-bold text-slate-900">Add Employee</div>
+                            <div className="text-xs text-slate-500 mt-1">Quick staff onboarding</div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
