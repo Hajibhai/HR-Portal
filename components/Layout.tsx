@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, ChevronDown, 
@@ -33,6 +33,29 @@ export const Layout: React.FC<LayoutProps> = ({
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (isSearchOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 100);
+    }
+  }, [isSearchOpen]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -85,21 +108,17 @@ export const Layout: React.FC<LayoutProps> = ({
             {/* Right Side Actions */}
             <div className="flex items-center gap-1 sm:gap-2">
               
-              {/* Search Bar - Desktop */}
-              <div className="hidden lg:flex items-center gap-2 bg-slate-100/80 px-4 py-2 rounded-2xl border border-slate-200/60 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-500/10 focus-within:border-brand-500 transition-all group">
-                <Search className="w-4 h-4 text-slate-400 group-focus-within:text-brand-600" />
-                <input 
-                  type="text" 
-                  placeholder="Search anything..." 
-                  className="bg-transparent border-none outline-none text-sm w-40 xl:w-64 placeholder:text-slate-400 font-medium"
-                />
-                <div className="hidden xl:flex items-center gap-1 ml-2">
-                  <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded">Ctrl</kbd>
-                  <span className="text-[10px] text-slate-400 font-bold">/</span>
-                  <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded">⌘</kbd>
-                  <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded">K</kbd>
+              {/* Search Icon - Desktop */}
+              <button 
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all group relative"
+                title="Search (Ctrl+K)"
+              >
+                <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <div className="absolute -bottom-1 -right-1 hidden xl:flex items-center gap-0.5 px-1 py-0.5 bg-white border border-slate-200 rounded shadow-sm scale-75">
+                  <span className="text-[8px] font-bold text-slate-400">⌘K</span>
                 </div>
-              </div>
+              </button>
 
               {/* Notifications */}
               <button className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all relative group">
@@ -172,6 +191,105 @@ export const Layout: React.FC<LayoutProps> = ({
                   )}
                 </AnimatePresence>
               </div>
+
+              {/* Search Modal */}
+              <AnimatePresence>
+                {isSearchOpen && (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setIsSearchOpen(false)}
+                      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100]"
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                      className="fixed top-[15%] left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white rounded-3xl shadow-2xl z-[101] overflow-hidden border border-slate-200"
+                    >
+                      <div className="p-6 border-b border-slate-100 flex items-center gap-4">
+                        <Search className="w-6 h-6 text-brand-600" />
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Search for employees, documents, or reports..."
+                          className="flex-1 bg-transparent border-none outline-none text-lg font-medium placeholder:text-slate-400"
+                        />
+                        <button 
+                          onClick={() => setIsSearchOpen(false)}
+                          className="p-2 hover:bg-slate-100 rounded-xl text-slate-400 transition-colors"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                      <div className="p-4 max-h-[60vh] overflow-y-auto">
+                        {searchQuery ? (
+                          <div className="space-y-2">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest px-2 mb-2">Search Results</p>
+                            <div className="p-8 text-center">
+                              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Search className="w-8 h-8 text-slate-300" />
+                              </div>
+                              <p className="text-slate-500 font-medium">No results found for "{searchQuery}"</p>
+                              <p className="text-slate-400 text-sm mt-1">Try searching for something else or check your spelling.</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-6 p-4">
+                            <div>
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Quick Actions</p>
+                              <div className="grid grid-cols-2 gap-3">
+                                {navItems.slice(0, 4).map((item: any) => (
+                                  <button 
+                                    key={item.id}
+                                    onClick={() => {
+                                      setActiveTab(item.id);
+                                      setIsSearchOpen(false);
+                                    }}
+                                    className="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 hover:border-brand-200 hover:bg-brand-50 transition-all group"
+                                  >
+                                    <div className="p-2 bg-slate-50 rounded-xl group-hover:bg-white transition-colors">
+                                      <item.icon className="w-4 h-4 text-slate-500 group-hover:text-brand-600" />
+                                    </div>
+                                    <span className="text-sm font-bold text-slate-700 group-hover:text-brand-700">{item.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Recent Searches</p>
+                              <div className="space-y-1">
+                                {['Employee Payroll', 'Leave Requests', 'Staff Directory'].map(term => (
+                                  <button key={term} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-brand-600 transition-all">
+                                    <Search className="w-3.5 h-3.5" /> {term}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+                        <div className="flex gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded">ESC</kbd>
+                            <span className="text-[10px] text-slate-400 font-bold">to close</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded">↵</kbd>
+                            <span className="text-[10px] text-slate-400 font-bold">to select</span>
+                          </div>
+                        </div>
+                        <div className="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Al Reem DMS Search</div>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
 
               {/* Mobile Menu Button */}
               <button

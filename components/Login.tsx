@@ -31,7 +31,7 @@ export const Login = () => {
                         <Building2 className="text-white w-8 h-8" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">ShiftSync</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Al Reem DMS</h1>
                         <p className="text-gray-500 mt-2 font-medium">Workforce Management System</p>
                     </div>
                 </div>
@@ -122,7 +122,7 @@ export const Login = () => {
                 </div>
 
                 <p className="text-center text-xs text-gray-400 font-medium">
-                    &copy; 2026 ShiftSync Workforce Management. All rights reserved.
+                    &copy; 2026 Al Reem DMS Workforce Management. All rights reserved.
                 </p>
             </div>
         </div>

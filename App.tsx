@@ -1347,7 +1347,7 @@ const AboutView = () => {
 
             <div className="bg-indigo-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
                 <div className="relative z-10">
-                    <h3 className="text-xl font-bold mb-2">ShiftSync Enterprise</h3>
+                    <h3 className="text-xl font-bold mb-2">Al Reem DMS Enterprise</h3>
                     <p className="text-indigo-100 mb-6 max-w-lg">
                         A robust workforce management ecosystem built for scale, efficiency, and real-time operational control.
                     </p>
