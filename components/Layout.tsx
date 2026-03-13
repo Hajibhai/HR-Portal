@@ -61,7 +61,7 @@ export const Layout: React.FC<LayoutProps> = ({
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Logo and Desktop Nav */}
             <div className="flex items-center gap-4">
@@ -361,7 +361,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-10">
+        <div className="w-full p-4 sm:p-6 lg:p-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -378,7 +378,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200/60 py-8">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
               <Globe className="w-4 h-4" />
