@@ -23,7 +23,9 @@ import {
   SystemUser, 
   AboutData, 
   DeductionRecord,
-  Company
+  Company,
+  AuditLog,
+  UserRole
 } from "../types";
 
 // Helper for error handling as per spec
@@ -296,5 +298,26 @@ export const saveAboutData = async (data: AboutData) => {
     await setDoc(doc(db, 'settings', 'about'), data);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, 'settings/about');
+  }
+};
+
+// --- Audit Logs ---
+export const logAudit = async (user: SystemUser, action: string, details: string, type: 'create' | 'update' | 'delete' | 'system') => {
+  const id = Math.random().toString(36).substr(2, 9);
+  const log: AuditLog = {
+    id,
+    timestamp: new Date().toISOString(),
+    userId: user.uid,
+    userName: user.name,
+    userRole: user.role,
+    action,
+    details,
+    type,
+    isCreator: user.role === UserRole.CREATOR || user.email === 'abdulkaderp3010@gmail.com'
+  };
+  try {
+    await setDoc(doc(db, 'audit_logs', id), log);
+  } catch (error) {
+    console.error("Failed to log audit:", error);
   }
 };

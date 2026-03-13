@@ -8,18 +8,24 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const DirhamIcon = ({ className }: { className?: string }) => (
+  <div className={cn("flex items-center justify-center font-black text-[10px] leading-none tracking-tighter", className)}>
+    AED
+  </div>
+);
+
 import { 
   Users, Calendar, UserPlus, LogOut, ArrowRight,
   Building2, CheckCircle, XCircle, Trash2, 
   AlertCircle, Eye, Edit, CheckSquare, 
-  Copy, FileText, DollarSign, CreditCard,
+  Copy, FileText, CreditCard,
   BarChart3, UserMinus, Wallet, Plane, X, Save, Plus,
   ChevronLeft, ChevronRight,
   Settings, Search, Bell, LogOut as SignOut, UserCog,
   Briefcase, HardHat, ShieldCheck, Download, Printer,
   MoreVertical, Check, X as CloseIcon, Filter, Shield, Key,
   Activity, LayoutGrid, ListFilter, ChevronDown, Globe, HelpCircle,
-  TrendingUp, Clock, ArrowUpRight, ArrowDownRight, BarChart2
+  TrendingUp, Clock, ArrowUpRight, ArrowDownRight, BarChart2, Phone
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { 
@@ -34,7 +40,9 @@ import {
   collection, 
   onSnapshot, 
   query, 
+  where,
   orderBy,
+  limit,
   doc,
   getDoc,
   deleteDoc
@@ -44,7 +52,7 @@ import { Login } from './components/Login';
 import { 
   Employee, AttendanceRecord, AttendanceStatus, StaffType, 
   LeaveRequest, LeaveStatus, OffboardingDetails, 
-  SystemUser, DeductionRecord, UserRole, SalaryStructure, Company
+  SystemUser, DeductionRecord, UserRole, SalaryStructure, Company, AuditLog
 } from './types';
 import { 
   saveEmployee, deleteEmployee, offboardEmployee, rehireEmployee,
@@ -53,7 +61,7 @@ import {
   saveDeduction, deleteDeduction,
   saveSystemUser, deleteSystemUser,
   addCompany, updateCompany, deleteCompany,
-  testConnection
+  testConnection, logAudit
 } from './services/storageService';
 import { DEFAULT_ABOUT_DATA, CREATOR_USER } from './constants';
 import SmartCommand from './components/SmartCommand';
@@ -728,7 +736,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
     );
 };
 
-const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onClose: () => void, users: SystemUser[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void, currentUser: SystemUser }) => {
+const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }: { onClose: () => void, users: SystemUser[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void, currentUser: SystemUser, onLog: any }) => {
     const [localUsers, setLocalUsers] = useState<SystemUser[]>(users);
     const [showAdd, setShowAdd] = useState(false);
     const [editingUser, setEditingUser] = useState<SystemUser | null>(null);
@@ -782,6 +790,7 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
             };
             console.log("Saving user to Firestore...");
             await saveSystemUser(userToSave);
+            onLog('User Created', `New system user ${userToSave.name} (${userToSave.email}) was created with role ${userToSave.role}.`, 'create');
             console.log("User saved to Firestore successfully.");
             setShowAdd(false);
             setNewUser({ 
@@ -819,6 +828,7 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
                 email: username.includes('@') ? username : `${username}@system.local`
             };
             await saveSystemUser(updatedUser);
+            onLog('User Updated', `System user ${updatedUser.name} (${updatedUser.email}) details were updated.`, 'update');
             setEditingUser(null);
         } catch (e: any) {
             alert(e.message);
@@ -847,6 +857,7 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
                     
                     // 2. Delete from Firestore
                     await deleteSystemUser(userToDelete.uid);
+                    onLog('User Deleted', `System user ${userToDelete.name} (${userToDelete.email}) was removed from the system.`, 'delete');
                 } catch (e: any) {
                     console.error("Delete error:", e);
                     alert("Error deleting user: " + (e.message || "Unknown error"));
@@ -1029,11 +1040,12 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
     );
 };
 
-const ManageCompaniesModal = ({ onClose, companies, openConfirm }: { onClose: () => void, companies: Company[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void }) => {
+const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onClose: () => void, companies: Company[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void, onLog: any }) => {
     const [formData, setFormData] = useState({
         name: '',
         address: '',
         email: '',
+        phone: '',
         logo: ''
     });
     const [isAdding, setIsAdding] = useState(false);
@@ -1041,20 +1053,26 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm }: { onClose: ()
     const handleAdd = async () => {
         if (!formData.name.trim()) return;
         await addCompany(formData);
-        setFormData({ name: '', address: '', email: '', logo: '' });
+        onLog('Company Added', `New company ${formData.name} was registered in the system.`, 'create');
+        setFormData({ name: '', address: '', email: '', phone: '', logo: '' });
         setIsAdding(false);
     };
 
     const handleUpdate = async (company: Company) => {
         await updateCompany(company);
+        onLog('Company Updated', `Details for company ${company.name} were updated.`, 'update');
     };
 
     const handleDelete = async (id: string) => {
+        const company = companies.find(c => c.id === id);
         openConfirm(
             "Delete Company",
             "Are you sure you want to delete this company? This action cannot be undone.",
             async () => {
                 await deleteCompany(id);
+                if (company) {
+                    onLog('Company Deleted', `Company ${company.name} was removed from the system.`, 'delete');
+                }
             }
         );
     };
@@ -1121,6 +1139,15 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm }: { onClose: ()
                                             placeholder="contact@company.com" 
                                             value={formData.email} 
                                             onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} 
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Contact Number</label>
+                                        <input 
+                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" 
+                                            placeholder="+971 50 123 4567" 
+                                            value={formData.phone} 
+                                            onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} 
                                         />
                                     </div>
                                 </div>
@@ -1213,6 +1240,14 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm }: { onClose: ()
                                                 className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30" 
                                                 value={c.email} 
                                                 onChange={e => handleUpdate({...c, email: e.target.value})} 
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-bold text-gray-400 uppercase">Phone</label>
+                                            <input 
+                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30" 
+                                                value={c.phone || ''} 
+                                                onChange={e => handleUpdate({...c, phone: e.target.value})} 
                                             />
                                         </div>
                                     </div>
@@ -1370,6 +1405,107 @@ const AboutView = () => {
     );
 };
 
+const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: () => void, logs: AuditLog[] }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={onClose}
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+                <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-brand-50 rounded-2xl">
+                            <Activity className="w-6 h-6 text-brand-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Log</h2>
+                            <p className="text-slate-400 text-sm font-bold">Real-time system activity and security trail</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={onClose}
+                        className="p-3 hover:bg-slate-50 rounded-2xl transition-all active:scale-95"
+                    >
+                        <X className="w-6 h-6 text-slate-400" />
+                    </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                    <div className="space-y-4">
+                        {logs.length > 0 ? (
+                            logs.map((log) => (
+                                <div key={log.id} className="group p-6 bg-slate-50 rounded-3xl border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-xl hover:shadow-brand-500/5 transition-all duration-300">
+                                    <div className="flex items-start gap-6">
+                                        <div className={cn(
+                                            "p-4 rounded-2xl shrink-0 transition-transform group-hover:scale-110 duration-300",
+                                            log.type === 'create' ? 'bg-emerald-100 text-emerald-600' :
+                                            log.type === 'delete' ? 'bg-red-100 text-red-600' :
+                                            log.type === 'update' ? 'bg-brand-100 text-brand-600' : 'bg-indigo-100 text-indigo-600'
+                                        )}>
+                                            {log.type === 'create' ? <UserPlus className="w-6 h-6" /> :
+                                             log.type === 'delete' ? <UserMinus className="w-6 h-6" /> :
+                                             log.type === 'update' ? <Edit className="w-6 h-6" /> : <Activity className="w-6 h-6" />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h4 className="text-lg font-black text-slate-900 tracking-tight">{log.action}</h4>
+                                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
+                                            </div>
+                                            <p className="text-slate-600 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
+                                            <div className="flex flex-wrap items-center gap-4">
+                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl">
+                                                    <div className="w-2 h-2 rounded-full bg-brand-500"></div>
+                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">User: {log.userName}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl">
+                                                    <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Role: {log.userRole}</span>
+                                                </div>
+                                                {log.isCreator && (
+                                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-100 rounded-xl">
+                                                        <ShieldCheck className="w-3 h-3 text-amber-600" />
+                                                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider">Creator Log</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="py-20 text-center">
+                                <Activity className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight">No audit records found</h3>
+                                <p className="text-slate-400 font-bold mt-2">System activity will appear here as it happens.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="p-8 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+                    <button 
+                        onClick={onClose}
+                        className="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl text-sm font-black hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+                    >
+                        Close Log
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -1382,6 +1518,8 @@ export default function App() {
   const [deductions, setDeductions] = useState<DeductionRecord[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [showAuditModal, setShowAuditModal] = useState(false);
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   
@@ -1419,7 +1557,7 @@ export default function App() {
             uid: firebaseUser.uid,
             email: firebaseUser.email || '',
             name: firebaseUser.displayName || 'New User',
-            role: isDefaultAdmin ? UserRole.ADMIN : UserRole.HR,
+            role: isDefaultAdmin ? UserRole.CREATOR : UserRole.HR,
             active: true,
             permissions: {
               canViewDashboard: true,
@@ -1446,6 +1584,38 @@ export default function App() {
     testConnection();
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!db || !user || !systemUser) return;
+    
+    let q;
+    const isCreator = systemUser.role === UserRole.CREATOR || user.email === "abdulkaderp3010@gmail.com";
+    
+    if (isCreator) {
+      q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(50));
+    } else {
+      // Admins can only see non-creator logs
+      q = query(
+        collection(db, 'audit_logs'), 
+        where('isCreator', '==', false),
+        orderBy('timestamp', 'desc'), 
+        limit(50)
+      );
+    }
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setAuditLogs(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as AuditLog)));
+    }, (error) => {
+      console.error("Audit Log fetch error:", error);
+    });
+    return () => unsubscribe();
+  }, [user, systemUser]);
+
+  const handleLogAction = async (action: string, details: string, type: 'create' | 'update' | 'delete' | 'system') => {
+    if (systemUser) {
+      await logAudit(systemUser, action, details, type);
+    }
+  };
 
   // 2. Data Listeners
   useEffect(() => {
@@ -1495,7 +1665,7 @@ export default function App() {
       { id: 'timesheet', label: 'Monthly Timesheet', icon: Calendar, permission: 'canViewTimesheet' },
       { id: 'deductions', label: 'Deductions', icon: Wallet, permission: 'canManagePayroll' },
       { id: 'leave', label: 'Leave Management', icon: FileText, permission: 'canManageLeaves' },
-      { id: 'payroll', label: 'Payroll Register', icon: DollarSign, permission: 'canViewPayroll' },
+      { id: 'payroll', label: 'Payroll Register', icon: DirhamIcon, permission: 'canViewPayroll' },
       { id: 'reports', label: 'Reports', icon: BarChart3, permission: 'canViewReports' },
       { id: 'about', label: 'About', icon: AlertCircle },
     ];
@@ -1517,6 +1687,7 @@ export default function App() {
   const handleOffboard = async (data: OffboardingDetails) => {
       if (showOffboarding) {
           await offboardEmployee(showOffboarding.id, data);
+          handleLogAction('Employee Offboarded', `Employee ${showOffboarding.name} (${showOffboarding.code}) was offboarded. Reason: ${data.reason}`, 'delete');
           setShowOffboarding(null);
       }
   };
@@ -1528,6 +1699,7 @@ export default function App() {
           async () => {
               try {
                   await deleteEmployee(e.id);
+                  handleLogAction('Employee Deleted', `Employee ${e.name} (${e.code}) was permanently removed from the system.`, 'delete');
               } catch (err: any) {
                   alert(err.message || "Error deleting employee");
               }
@@ -1540,6 +1712,7 @@ export default function App() {
       if (reason !== null) {
           try {
               await rehireEmployee(e.id, new Date().toISOString().split('T')[0], reason);
+              handleLogAction('Employee Rehired', `Employee ${e.name} (${e.code}) has rejoined the company.`, 'create');
           } catch (err: any) {
               alert(err.message);
           }
@@ -1583,6 +1756,8 @@ export default function App() {
           employees={employees} 
           attendance={attendance} 
           user={systemUser}
+          auditLogs={auditLogs}
+          setShowAuditModal={setShowAuditModal}
           onOpenUserManagement={() => setShowUserManagement(true)}
           onOpenManageCompanies={() => setShowManageCompanies(true)}
           onOpenOnboarding={() => setShowOnboarding(true)}
@@ -1637,6 +1812,7 @@ export default function App() {
           <OnboardingWizard companies={companies} onComplete={async (d) => { 
             const fullData = { ...d, id: Math.random().toString(36).substr(2, 9) } as Employee;
             await saveEmployee(fullData); 
+            handleLogAction('Employee Onboarded', `New employee ${fullData.name} (${fullData.code}) was added to the system.`, 'create');
             setShowOnboarding(false); 
           }} onCancel={() => setShowOnboarding(false)} />
         )}
@@ -1644,13 +1820,20 @@ export default function App() {
           <OffboardingWizard employee={showOffboarding} onComplete={handleOffboard} onCancel={() => setShowOffboarding(null)} />
         )}
         {showEdit && (
-          <EditEmployeeModal companies={companies} employee={showEdit} onSave={async (d) => { await saveEmployee(d); setShowEdit(null); }} onCancel={() => setShowEdit(null)} />
+          <EditEmployeeModal companies={companies} employee={showEdit} onSave={async (d) => { 
+            await saveEmployee(d); 
+            handleLogAction('Employee Updated', `Details for employee ${d.name} (${d.code}) were updated.`, 'update');
+            setShowEdit(null); 
+          }} onCancel={() => setShowEdit(null)} />
         )}
         {showUserManagement && (
-          <UserManagementModal onClose={() => setShowUserManagement(false)} users={systemUsers} openConfirm={openConfirm} currentUser={systemUser} />
+          <UserManagementModal onClose={() => setShowUserManagement(false)} users={systemUsers} openConfirm={openConfirm} currentUser={systemUser} onLog={handleLogAction} />
         )}
         {showManageCompanies && (
-          <ManageCompaniesModal onClose={() => setShowManageCompanies(false)} companies={companies} openConfirm={openConfirm} />
+          <ManageCompaniesModal onClose={() => setShowManageCompanies(false)} companies={companies} openConfirm={openConfirm} onLog={handleLogAction} />
+        )}
+        {showAuditModal && (
+          <AuditLogModal isOpen={showAuditModal} onClose={() => setShowAuditModal(false)} logs={auditLogs} />
         )}
         {showBulkImport && (
           <BulkImportModal onClose={() => setShowBulkImport(false)} onImport={(data) => {
@@ -1685,7 +1868,7 @@ export default function App() {
 
 // --- Dashboard View ---
 
-const DashboardView = ({ employees, attendance, user, onOpenUserManagement, onOpenManageCompanies, onOpenOnboarding, onUpdate }: any) => {
+const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditModal, onOpenUserManagement, onOpenManageCompanies, onOpenOnboarding, onUpdate }: any) => {
     // Stats Calculation
     const activeStaff = employees.filter((e:any) => e.active);
     const internalTeam = activeStaff.filter((e:any) => e.team === 'Internal Team').length;
@@ -1795,38 +1978,32 @@ const DashboardView = ({ employees, attendance, user, onOpenUserManagement, onOp
                             </div>
                             <h3 className="text-xl font-black text-slate-900 tracking-tight">System Activity</h3>
                         </div>
-                        <button className="text-xs font-bold text-brand-600 hover:underline">View Audit Log</button>
+                        <button 
+                            onClick={() => setShowAuditModal(true)}
+                            className="text-xs font-bold text-brand-600 hover:underline"
+                        >
+                            View Audit Log
+                        </button>
                     </div>
                     
-                    <div className="space-y-6 flex-1">
-                        <ActivityItem 
-                            icon={UserPlus} 
-                            title="New Employee Onboarded" 
-                            desc="Ahmed Hassan joined as Site Engineer" 
-                            time="2 hours ago" 
-                            color="emerald"
-                        />
-                        <ActivityItem 
-                            icon={FileText} 
-                            title="Leave Request Approved" 
-                            desc="John Doe's annual leave (14 days)" 
-                            time="5 hours ago" 
-                            color="brand"
-                        />
-                        <ActivityItem 
-                            icon={DollarSign} 
-                            title="Payroll Register Generated" 
-                            desc="March 2026 register for Al Reem General" 
-                            time="Yesterday" 
-                            color="indigo"
-                        />
-                        <ActivityItem 
-                            icon={AlertCircle} 
-                            title="Document Expiry Warning" 
-                            desc="5 Emirates IDs expiring in 30 days" 
-                            time="Yesterday" 
-                            color="orange"
-                        />
+                    <div className="space-y-6 flex-1 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
+                        {auditLogs.length > 0 ? (
+                            auditLogs.slice(0, 5).map((log) => (
+                                <ActivityItem 
+                                    key={log.id}
+                                    icon={log.type === 'create' ? UserPlus : log.type === 'delete' ? UserMinus : log.type === 'update' ? Edit : Activity} 
+                                    title={log.action} 
+                                    desc={log.details} 
+                                    time={new Date(log.timestamp).toLocaleString()} 
+                                    color={log.type === 'create' ? 'emerald' : log.type === 'delete' ? 'red' : log.type === 'update' ? 'brand' : 'indigo'}
+                                />
+                            ))
+                        ) : (
+                            <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10">
+                                <Activity className="w-12 h-12 mb-4 opacity-20" />
+                                <p className="text-sm font-bold">No recent activity</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -2155,14 +2332,14 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
 };
 
 const CompanyView = ({ companies, openConfirm }: { companies: Company[], openConfirm: any }) => {
-    const [formData, setFormData] = useState({ name: '', address: '', email: '', logo: '' });
+    const [formData, setFormData] = useState({ name: '', address: '', email: '', phone: '', logo: '' });
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
 
     const handleAdd = async () => {
         if (!formData.name.trim()) return;
         await addCompany(formData);
-        setFormData({ name: '', address: '', email: '', logo: '' });
+        setFormData({ name: '', address: '', email: '', phone: '', logo: '' });
         setIsAdding(false);
     };
 
@@ -2229,7 +2406,7 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                         <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-2">
                             <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Company Name</label>
                             <input 
@@ -2246,6 +2423,15 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                                 placeholder="contact@company.com" 
                                 value={formData.email} 
                                 onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Contact Number</label>
+                            <input 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                placeholder="+971 50 123 4567" 
+                                value={formData.phone} 
+                                onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
@@ -2332,6 +2518,12 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                                         value={company.email}
                                         onChange={e => updateCompany({ ...company, email: e.target.value })}
                                     />
+                                    <input 
+                                        className="w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
+                                        placeholder="Contact Number"
+                                        value={company.phone || ''}
+                                        onChange={e => updateCompany({ ...company, phone: e.target.value })}
+                                    />
                                     <div className="flex gap-2 pt-2">
                                         <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Cancel</button>
                                         <button onClick={() => handleUpdate(company)} className="flex-1 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-md shadow-brand-600/20">Save</button>
@@ -2346,6 +2538,12 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                                                 <FileText className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold truncate">{company.email || 'No email provided'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <div className="p-1.5 bg-slate-50 rounded-lg">
+                                                <Phone className="w-3.5 h-3.5" />
+                                            </div>
+                                            <span className="text-xs font-bold truncate">{company.phone || 'No contact provided'}</span>
                                         </div>
                                         <div className="flex items-center gap-3 text-slate-500">
                                             <div className="p-1.5 bg-slate-50 rounded-lg">
@@ -3225,7 +3423,7 @@ const ReportsView = ({ employees, attendance }: any) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                     { label: 'Active Staff', value: totalStaff, icon: Users, color: 'brand', delay: 0.1 },
-                    { label: 'Monthly Payroll', value: `AED ${totalSpent.toLocaleString()}`, icon: DollarSign, color: 'emerald', delay: 0.2 },
+                    { label: 'Monthly Payroll', value: `AED ${totalSpent.toLocaleString()}`, icon: DirhamIcon, color: 'emerald', delay: 0.2 },
                     { label: 'Late Arrivals', value: lateDays, icon: AlertCircle, color: 'orange', delay: 0.3 },
                     { label: 'Total Teams', value: teamData.length, icon: Briefcase, color: 'violet', delay: 0.4 },
                 ].map((stat, i) => (

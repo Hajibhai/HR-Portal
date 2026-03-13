@@ -112,6 +112,23 @@
         "name": { "type": "string" }
       },
       "required": ["name"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "System activity and audit trail",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userRole": { "type": "string" },
+        "action": { "type": "string" },
+        "details": { "type": "string" },
+        "type": { "type": "string", "enum": ["create", "update", "delete", "system"] },
+        "isCreator": { "type": "boolean" }
+      },
+      "required": ["id", "timestamp", "userId", "action"]
     }
   },
   "firestore": {
@@ -142,6 +159,10 @@
     "/settings/about": {
       "schema": "object",
       "description": "General application about data"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "System activity logs"
     }
   }
 }

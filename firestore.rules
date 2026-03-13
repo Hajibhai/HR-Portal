@@ -19,9 +19,23 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function isCreator() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "abdulkaderp3010@gmail.com" && request.auth.token.email_verified == true);
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
+
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated() && (
+        (resource.data.isCreator == true && isCreator()) ||
+        (resource.data.isCreator == false)
+      );
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
 
     match /users/{userId} {
       allow read: if isAuthenticated();

@@ -131,6 +131,7 @@ export interface Company {
     name: string;
     address: string;
     email: string;
+    phone?: string;
     logo?: string; // Base64
 }
 
@@ -189,4 +190,16 @@ export interface SystemUser {
     role: UserRole;
     active: boolean;
     permissions: UserPermissions;
+}
+
+export interface AuditLog {
+  id: string;
+  timestamp: string;
+  userId: string;
+  userName: string;
+  userRole: UserRole;
+  action: string;
+  details: string;
+  type: 'create' | 'update' | 'delete' | 'system';
+  isCreator: boolean;
 }
