@@ -812,9 +812,11 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
     const handleEdit = async () => {
         if (!editingUser) return;
         try {
+            const username = editingUser.username || editingUser.email || '';
             const updatedUser = {
                 ...editingUser,
-                email: editingUser.username.includes('@') ? editingUser.username : `${editingUser.username}@system.local`
+                username,
+                email: username.includes('@') ? username : `${username}@system.local`
             };
             await saveSystemUser(updatedUser);
             setEditingUser(null);
@@ -869,9 +871,11 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
                 <div className="p-6 max-h-[70vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="font-semibold text-gray-700">Active System Users</h3>
-                        <button onClick={() => { setShowAdd(true); setEditingUser(null); }} className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700">
-                            <Plus className="w-4 h-4" /> Add User
-                        </button>
+                        {(currentUser.role === UserRole.ADMIN || currentUser.role === UserRole.CREATOR || currentUser.email === CREATOR_USER.email) && (
+                            <button onClick={() => { setShowAdd(true); setEditingUser(null); }} className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700">
+                                <Plus className="w-4 h-4" /> Add User
+                            </button>
+                        )}
                     </div>
 
                     {showAdd && (
@@ -985,11 +989,11 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
                         {localUsers
                             .filter(u => {
                                 // Creator sees everyone
-                                if (currentUser.role === UserRole.CREATOR) {
+                                if (currentUser.role === UserRole.CREATOR || currentUser.email === CREATOR_USER.email) {
                                     return true;
                                 }
-                                // Others see everyone EXCEPT the Creator
-                                return u.role !== UserRole.CREATOR;
+                                // Others see everyone EXCEPT the Creator (by role or email)
+                                return u.role !== UserRole.CREATOR && u.email !== CREATOR_USER.email;
                             })
                             .map(u => (
                             <div key={u.uid || u.username} className="flex items-center justify-between p-3 border rounded-xl hover:bg-gray-50 transition-colors">
@@ -1017,8 +1021,8 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser }: { onC
                     </div>
                 </div>
                 
-                <div className="p-4 bg-gray-50 border-t text-center text-xs text-gray-500">
-                    System Creator account cannot be modified or deleted.
+                <div className="p-4 bg-gray-50 border-t text-center text-xs text-gray-500 font-medium">
+                    Only Admin can Create New User.
                 </div>
             </div>
         </div>
@@ -1485,6 +1489,7 @@ export default function App() {
   const navItems = useMemo(() => {
     const baseItems = [
       { id: 'dashboard', label: 'Dashboard', icon: BarChart3, permission: 'canViewDashboard' },
+      { id: 'company', label: 'Company', icon: Building2, permission: 'canViewDashboard' },
       { id: 'staff', label: 'Staff Directory', icon: Users, permission: 'canManageEmployees' },
       { id: 'ex-employees', label: 'Ex-Employees', icon: UserMinus, permission: 'canManageEmployees' }, 
       { id: 'timesheet', label: 'Monthly Timesheet', icon: Calendar, permission: 'canViewTimesheet' },
@@ -1582,6 +1587,12 @@ export default function App() {
           onOpenManageCompanies={() => setShowManageCompanies(true)}
           onOpenOnboarding={() => setShowOnboarding(true)}
           onUpdate={() => {}}
+        />
+      )}
+      {activeTab === 'company' && (
+        <CompanyView 
+          companies={companies} 
+          openConfirm={openConfirm}
         />
       )}
       {activeTab === 'staff' && (
@@ -1705,37 +1716,39 @@ const DashboardView = ({ employees, attendance, user, onOpenUserManagement, onOp
     return (
         <div className="space-y-8 pb-12">
             {/* Header Section */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
-                        <Activity className="w-4 h-4" />
-                        System Intelligence
+            {(user.role === UserRole.CREATOR || user.email === CREATOR_USER.email) && (
+                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
+                            <Activity className="w-4 h-4" />
+                            System Intelligence
+                        </div>
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
+                        <p className="text-slate-500 font-medium max-w-xl">
+                            Welcome back, <span className="text-slate-900 font-bold">{user.name}</span>. 
+                            The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
+                        </p>
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
-                    <p className="text-slate-500 font-medium max-w-xl">
-                        Welcome back, <span className="text-slate-900 font-bold">{user.name}</span>. 
-                        The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
-                    </p>
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-3">
-                    <button 
-                        onClick={onOpenOnboarding}
-                        className="flex-1 sm:flex-none bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
-                    >
-                        <UserPlus className="w-4 h-4" /> Onboard Staff
-                    </button>
-                    <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
-                        <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="Manage Companies">
-                            <Building2 className="w-5 h-5" />
+                    
+                    <div className="flex flex-wrap items-center gap-3">
+                        <button 
+                            onClick={onOpenOnboarding}
+                            className="flex-1 sm:flex-none bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                        >
+                            <UserPlus className="w-4 h-4" /> Onboard Staff
                         </button>
-                        <div className="w-px h-4 bg-slate-200"></div>
-                        <button onClick={onOpenUserManagement} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="System Users">
-                            <UserCog className="w-5 h-5" />
-                        </button>
+                        <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+                            <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="Manage Companies">
+                                <Building2 className="w-5 h-5" />
+                            </button>
+                            <div className="w-px h-4 bg-slate-200"></div>
+                            <button onClick={onOpenUserManagement} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="System Users">
+                                <UserCog className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Bento Grid Layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1772,101 +1785,6 @@ const DashboardView = ({ employees, attendance, user, onOpenUserManagement, onOp
                     icon={ShieldCheck} 
                     color="emerald"
                 />
-
-                {/* Main Analytics Chart */}
-                <div className="md:col-span-2 lg:col-span-3 bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm flex flex-col min-h-[400px]">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Workforce Growth</h3>
-                            <p className="text-sm text-slate-400 font-medium">Monthly active personnel trends</p>
-                        </div>
-                        <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl">
-                            <button className="px-3 py-1.5 bg-white text-brand-600 text-xs font-bold rounded-lg shadow-sm">6 Months</button>
-                            <button className="px-3 py-1.5 text-slate-400 text-xs font-bold hover:text-slate-600">1 Year</button>
-                        </div>
-                    </div>
-                    <div className="flex-1 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={growthData}>
-                                <defs>
-                                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis 
-                                    dataKey="month" 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}}
-                                    dy={10}
-                                />
-                                <YAxis 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}}
-                                />
-                                <Tooltip 
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
-                                    itemStyle={{ fontWeight: 'bold', fontSize: '14px' }}
-                                />
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="count" 
-                                    stroke="#0ea5e9" 
-                                    strokeWidth={4} 
-                                    fillOpacity={1} 
-                                    fill="url(#colorCount)" 
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* Department Distribution */}
-                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white flex flex-col min-h-[400px] relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
-                    <div className="relative z-10">
-                        <h3 className="text-xl font-black tracking-tight mb-1">Department Mix</h3>
-                        <p className="text-sm text-slate-400 font-medium mb-6">Distribution by function</p>
-                        
-                        <div className="h-48 w-full mb-6">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={deptStats}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                    >
-                                        {deptStats.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip 
-                                        contentStyle={{ borderRadius: '12px', border: 'none', color: '#000' }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        <div className="space-y-3">
-                            {deptStats.slice(0, 4).map((dept, idx) => (
-                                <div key={dept.name} className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }}></div>
-                                        <span className="text-xs font-bold text-slate-300 truncate max-w-[120px]">{dept.name}</span>
-                                    </div>
-                                    <span className="text-xs font-black">{dept.value}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
 
                 {/* Recent Activity Log */}
                 <div className="md:col-span-2 lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm flex flex-col">
@@ -2229,6 +2147,224 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                         >
                             Reset all filters
                         </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const CompanyView = ({ companies, openConfirm }: { companies: Company[], openConfirm: any }) => {
+    const [formData, setFormData] = useState({ name: '', address: '', email: '', logo: '' });
+    const [isAdding, setIsAdding] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+
+    const handleAdd = async () => {
+        if (!formData.name.trim()) return;
+        await addCompany(formData);
+        setFormData({ name: '', address: '', email: '', logo: '' });
+        setIsAdding(false);
+    };
+
+    const handleUpdate = async (company: Company) => {
+        await updateCompany(company);
+        setEditingId(null);
+    };
+
+    const handleDelete = async (id: string) => {
+        openConfirm(
+            "Delete Company",
+            "Are you sure you want to delete this company? This action cannot be undone.",
+            async () => {
+                await deleteCompany(id);
+            }
+        );
+    };
+
+    const handleLogoUpload = async (company: Company | null, e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (evt) => {
+            const base64 = evt.target?.result as string;
+            if (company) {
+                await updateCompany({ ...company, logo: base64 });
+            } else {
+                setFormData(prev => ({ ...prev, logo: base64 }));
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    return (
+        <div className="space-y-8 pb-12">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
+                        <Building2 className="w-4 h-4" />
+                        Organization Management
+                    </div>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Company Directory</h1>
+                    <p className="text-slate-500 font-medium max-w-xl">
+                        Manage your business entities, office locations, and corporate identities.
+                    </p>
+                </div>
+                
+                <button 
+                    onClick={() => setIsAdding(true)}
+                    className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                >
+                    <Plus className="w-4 h-4" /> Add Company
+                </button>
+            </div>
+
+            {isAdding && (
+                <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white rounded-[2.5rem] p-8 border border-brand-100 shadow-xl shadow-brand-900/5 space-y-6"
+                >
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Register New Company</h3>
+                        <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Company Name</label>
+                            <input 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                placeholder="Legal Entity Name" 
+                                value={formData.name} 
+                                onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Official Email</label>
+                            <input 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                placeholder="contact@company.com" 
+                                value={formData.email} 
+                                onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Office Address</label>
+                            <input 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                placeholder="Full Physical Address" 
+                                value={formData.address} 
+                                onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))} 
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                        <div className="flex items-center gap-4">
+                            <div className="relative group">
+                                <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={e => handleLogoUpload(null, e)}
+                                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                />
+                                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 group-hover:bg-slate-50 transition-all">
+                                    <Globe className="w-4 h-4" /> Upload Logo
+                                </div>
+                            </div>
+                            {formData.logo && (
+                                <div className="h-10 w-10 rounded-xl border border-slate-100 p-1 bg-white shadow-sm">
+                                    <img src={formData.logo} alt="Preview" className="h-full w-full object-contain" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={() => setIsAdding(false)} className="px-6 py-2.5 text-slate-500 font-bold text-sm hover:text-slate-700">Cancel</button>
+                            <button onClick={handleAdd} className="px-8 py-2.5 bg-brand-600 text-white rounded-xl font-black text-sm shadow-lg shadow-brand-600/20 hover:bg-brand-700 transition-all active:scale-95">Create Company</button>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {companies.map((company) => (
+                    <motion.div 
+                        layout
+                        key={company.id}
+                        className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-slate-200/20 transition-all group relative overflow-hidden"
+                    >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 transition-all group-hover:bg-brand-50/50"></div>
+                        
+                        <div className="relative z-10 flex flex-col h-full">
+                            <div className="flex items-start justify-between mb-6">
+                                <div className="h-16 w-16 bg-slate-50 rounded-2xl p-2 border border-slate-100 shadow-inner flex items-center justify-center overflow-hidden">
+                                    {company.logo ? (
+                                        <img src={company.logo} alt={company.name} className="max-h-full max-w-full object-contain" />
+                                    ) : (
+                                        <Building2 className="w-8 h-8 text-slate-300" />
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                                    <button 
+                                        onClick={() => setEditingId(company.id)}
+                                        className="p-2 hover:bg-brand-50 text-brand-600 rounded-xl transition-colors"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(company.id)}
+                                        className="p-2 hover:bg-red-50 text-red-600 rounded-xl transition-colors"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {editingId === company.id ? (
+                                <div className="space-y-4 animate-in fade-in duration-200">
+                                    <input 
+                                        className="w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
+                                        value={company.name}
+                                        onChange={e => updateCompany({ ...company, name: e.target.value })}
+                                    />
+                                    <input 
+                                        className="w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
+                                        value={company.email}
+                                        onChange={e => updateCompany({ ...company, email: e.target.value })}
+                                    />
+                                    <div className="flex gap-2 pt-2">
+                                        <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Cancel</button>
+                                        <button onClick={() => handleUpdate(company)} className="flex-1 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-md shadow-brand-600/20">Save</button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2">{company.name}</h3>
+                                    <div className="space-y-3 mt-auto">
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <div className="p-1.5 bg-slate-50 rounded-lg">
+                                                <FileText className="w-3.5 h-3.5" />
+                                            </div>
+                                            <span className="text-xs font-bold truncate">{company.email || 'No email provided'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <div className="p-1.5 bg-slate-50 rounded-lg">
+                                                <Building2 className="w-3.5 h-3.5" />
+                                            </div>
+                                            <span className="text-xs font-bold line-clamp-1">{company.address || 'No address provided'}</span>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                ))}
+
+                {companies.length === 0 && (
+                    <div className="col-span-full py-20 text-center bg-slate-50 rounded-[2.5rem] border border-dashed border-slate-200">
+                        <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-black text-slate-900 tracking-tight">No companies registered</h3>
+                        <p className="text-slate-400 font-medium mt-1">Start by adding your first business entity.</p>
                     </div>
                 )}
             </div>
