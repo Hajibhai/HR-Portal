@@ -126,15 +126,6 @@ export const Layout: React.FC<LayoutProps> = ({
                 <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
               </button>
 
-              <button 
-                onClick={onLogout}
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-all font-bold text-xs border border-red-100"
-                title="Sign Out"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Logout</span>
-              </button>
-
               <div className="h-8 w-px bg-slate-200 mx-1 hidden sm:block"></div>
 
               {/* User Profile Dropdown */}
