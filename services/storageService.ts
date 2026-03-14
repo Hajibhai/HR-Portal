@@ -8,7 +8,8 @@ import {
   deleteDoc, 
   query, 
   where, 
-  getDocFromServer 
+  getDocFromServer,
+  addDoc 
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { 
@@ -303,9 +304,7 @@ export const saveAboutData = async (data: AboutData) => {
 
 // --- Audit Logs ---
 export const logAudit = async (user: SystemUser, action: string, details: string, type: 'create' | 'update' | 'delete' | 'system') => {
-  const id = Math.random().toString(36).substr(2, 9);
-  const log: AuditLog = {
-    id,
+  const log: Omit<AuditLog, 'id'> = {
     timestamp: new Date().toISOString(),
     userId: user.uid,
     userName: user.name,
@@ -316,7 +315,7 @@ export const logAudit = async (user: SystemUser, action: string, details: string
     isCreator: user.role === UserRole.CREATOR || user.email === 'abdulkaderp3010@gmail.com'
   };
   try {
-    await setDoc(doc(db, 'audit_logs', id), log);
+    await addDoc(collection(db, 'audit_logs'), log);
   } catch (error) {
     console.error("Failed to log audit:", error);
   }

@@ -45,6 +45,14 @@ export interface EmployeeDocuments {
     labourCardExpiry?: string;
 }
 
+export interface DriveFile {
+    id: string;
+    name: string;
+    mimeType: string;
+    webViewLink: string;
+    iconLink?: string;
+}
+
 export interface Employee {
   id: string;
   code: string; // e.g., 10001
@@ -71,6 +79,8 @@ export interface Employee {
   // New Document Fields
   documents?: EmployeeDocuments;
   vacationScheduledDate?: string;
+  driveFiles?: DriveFile[];
+  driveFolderId?: string;
 }
 
 export enum AttendanceStatus {
@@ -133,6 +143,8 @@ export interface Company {
     email: string;
     phone?: string;
     logo?: string; // Base64
+    driveFiles?: DriveFile[];
+    driveFolderId?: string;
 }
 
 export interface DashboardStats {

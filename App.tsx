@@ -4,9 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from './utils';
 
 const DirhamIcon = ({ className }: { className?: string }) => (
   <div className={cn("flex items-center justify-center font-black text-[10px] leading-none tracking-tighter", className)}>
@@ -66,6 +64,7 @@ import {
 import { DEFAULT_ABOUT_DATA, CREATOR_USER } from './constants';
 import SmartCommand from './components/SmartCommand';
 import { Layout } from './components/Layout';
+import { GoogleDriveManager } from './components/GoogleDriveManager';
 
 // --- Constants & Helpers ---
 const LEGEND: any = {
@@ -379,6 +378,15 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                              <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passport Number</label><input type="text" value={data.documents?.passportNumber || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportNumber: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                              <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passport Expiry</label><input type="date" value={data.documents?.passportExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportExpiry: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                         </div>
+                    </div>
+                    {/* Google Drive Documents */}
+                    <div>
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Google Drive Documents</h3>
+                        <GoogleDriveManager 
+                            files={data.driveFiles || []}
+                            onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
+                            onRemoveFile={(fileId) => setData({ ...data, driveFiles: (data.driveFiles || []).filter(f => f.id !== fileId) })}
+                        />
                     </div>
                 </div>
                 <div className="p-4 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 flex justify-end gap-3">
@@ -738,6 +746,14 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
+                            </div>
+                            <div className="mt-8 pt-8 border-t dark:border-slate-800">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Google Drive Documents</h3>
+                                <GoogleDriveManager 
+                                    files={data.driveFiles || []}
+                                    onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
+                                    onRemoveFile={(fileId) => setData({ ...data, driveFiles: (data.driveFiles || []).filter(f => f.id !== fileId) })}
+                                />
                             </div>
                         </div>
                     )}
@@ -1895,6 +1911,7 @@ export default function App() {
         <CompanyView 
           companies={companies} 
           openConfirm={openConfirm}
+          onUpdate={updateCompany}
         />
       )}
       {activeTab === 'staff' && (
@@ -2698,7 +2715,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
     );
 };
 
-const CompanyView = ({ companies, openConfirm }: { companies: Company[], openConfirm: any }) => {
+const CompanyView = ({ companies, openConfirm, onUpdate }: { companies: Company[], openConfirm: any, onUpdate: (c: Company) => void }) => {
     const [formData, setFormData] = useState({ name: '', address: '', email: '', phone: '', logo: '' });
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -2918,6 +2935,19 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                                             </div>
                                             <span className="text-xs font-bold line-clamp-1">{company.address || 'No address provided'}</span>
                                         </div>
+                                    </div>
+                                    <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <GoogleDriveManager 
+                                            files={company.driveFiles || []}
+                                            onAddFile={(file) => {
+                                                const updated = { ...company, driveFiles: [...(company.driveFiles || []), file] };
+                                                onUpdate(updated);
+                                            }}
+                                            onRemoveFile={(fileId) => {
+                                                const updated = { ...company, driveFiles: (company.driveFiles || []).filter(f => f.id !== fileId) };
+                                                onUpdate(updated);
+                                            }}
+                                        />
                                     </div>
                                 </>
                             )}
