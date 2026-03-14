@@ -11,7 +11,7 @@ import {
   getDocFromServer,
   addDoc 
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { 
   Employee, 
   AttendanceRecord, 
@@ -30,7 +30,7 @@ import {
 } from "../types";
 
 // Helper for error handling as per spec
-enum OperationType {
+export enum OperationType {
   CREATE = 'create',
   UPDATE = 'update',
   DELETE = 'delete',
@@ -39,10 +39,46 @@ enum OperationType {
   WRITE = 'write',
 }
 
-const handleFirestoreError = (error: unknown, operationType: OperationType, path: string | null) => {
-  console.error(`Firestore Error [${operationType}] at ${path}:`, error);
-  // In a real app, we'd follow the JSON error spec here
-  throw error;
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId: string | undefined;
+    email: string | null | undefined;
+    emailVerified: boolean | undefined;
+    isAnonymous: boolean | undefined;
+    tenantId: string | null | undefined;
+    providerInfo: {
+      providerId: string;
+      displayName: string | null;
+      email: string | null;
+      photoUrl: string | null;
+    }[];
+  }
+}
+
+export const handleFirestoreError = (error: unknown, operationType: OperationType, path: string | null) => {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData.map(provider => ({
+        providerId: provider.providerId,
+        displayName: provider.displayName,
+        email: provider.email,
+        photoUrl: provider.photoURL
+      })) || []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
 };
 
 // Test connection on boot
@@ -56,10 +92,26 @@ export const testConnection = async () => {
   }
 };
 
+// Helper to remove undefined values before saving to Firestore
+const cleanData = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map(cleanData);
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.entries(obj).reduce((acc: any, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = cleanData(value);
+      }
+      return acc;
+    }, {});
+  }
+  return obj;
+};
+
 // --- Employees ---
 export const saveEmployee = async (employee: Employee) => {
   try {
-    await setDoc(doc(db, 'employees', employee.id), employee);
+    const cleaned = cleanData(employee);
+    await setDoc(doc(db, 'employees', employee.id), cleaned);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, `employees/${employee.id}`);
   }
@@ -75,11 +127,11 @@ export const deleteEmployee = async (id: string) => {
 
 export const offboardEmployee = async (id: string, details: OffboardingDetails) => {
   try {
-    await updateDoc(doc(db, 'employees', id), {
+    await updateDoc(doc(db, 'employees', id), cleanData({
       status: 'Inactive',
       active: false,
       offboardingDetails: details
-    });
+    }));
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `employees/${id}`);
   }
@@ -140,7 +192,7 @@ export const logAttendance = async (
         updatedBy: updatedBy || 'System',
         note: note
       };
-      await setDoc(recordRef, newRecord);
+      await setDoc(recordRef, cleanData(newRecord));
     } else {
       const updates: any = {
         status,
@@ -180,7 +232,7 @@ export const saveLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'statu
     createdBy: createdBy
   };
   try {
-    await setDoc(doc(db, 'leaves', id), newRequest);
+    await setDoc(doc(db, 'leaves', id), cleanData(newRequest));
     return newRequest;
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `leaves/${id}`);
@@ -232,7 +284,7 @@ export const saveDeduction = async (deduction: Omit<DeductionRecord, 'id'>) => {
   const id = Math.random().toString(36).substr(2, 9);
   const newRecord: DeductionRecord = { ...deduction, id };
   try {
-    await setDoc(doc(db, 'deductions', id), newRecord);
+    await setDoc(doc(db, 'deductions', id), cleanData(newRecord));
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `deductions/${id}`);
   }
@@ -254,7 +306,7 @@ export const addCompany = async (companyData: Omit<Company, 'id'>) => {
     ...companyData
   };
   try {
-    await setDoc(doc(db, 'companies', id), newCompany);
+    await setDoc(doc(db, 'companies', id), cleanData(newCompany));
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `companies/${id}`);
   }
@@ -262,7 +314,7 @@ export const addCompany = async (companyData: Omit<Company, 'id'>) => {
 
 export const updateCompany = async (company: Company) => {
   try {
-    await setDoc(doc(db, 'companies', company.id), company);
+    await setDoc(doc(db, 'companies', company.id), cleanData(company));
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `companies/${company.id}`);
   }
@@ -279,7 +331,7 @@ export const deleteCompany = async (id: string) => {
 // --- System Users ---
 export const saveSystemUser = async (user: SystemUser) => {
   try {
-    await setDoc(doc(db, 'users', user.uid), user);
+    await setDoc(doc(db, 'users', user.uid), cleanData(user));
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, `users/${user.uid}`);
   }
@@ -296,7 +348,7 @@ export const deleteSystemUser = async (uid: string) => {
 // --- About Data ---
 export const saveAboutData = async (data: AboutData) => {
   try {
-    await setDoc(doc(db, 'settings', 'about'), data);
+    await setDoc(doc(db, 'settings', 'about'), cleanData(data));
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, 'settings/about');
   }
@@ -315,7 +367,7 @@ export const logAudit = async (user: SystemUser, action: string, details: string
     isCreator: user.role === UserRole.CREATOR || user.email === 'abdulkaderp3010@gmail.com'
   };
   try {
-    await addDoc(collection(db, 'audit_logs'), log);
+    await addDoc(collection(db, 'audit_logs'), cleanData(log));
   } catch (error) {
     console.error("Failed to log audit:", error);
   }

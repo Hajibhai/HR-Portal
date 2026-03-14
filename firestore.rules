@@ -21,7 +21,13 @@ service cloud.firestore {
 
     function isCreator() {
       return isAuthenticated() && 
-        (request.auth.token.email == "abdulkaderp3010@gmail.com" && request.auth.token.email_verified == true);
+        (request.auth.token.email == "abdulkaderp3010@gmail.com");
+    }
+
+    function hasPermission(permission) {
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return isAuthenticated() && 
+        (isCreator() || (userDoc != null && userDoc.data.permissions[permission] == true));
     }
 
     // ===============================================================
@@ -40,54 +46,74 @@ service cloud.firestore {
              data.isCreator is bool;
     }
 
+    function isValidUser(data) {
+      return data.keys().hasAll(['name', 'role', 'permissions']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             (!('username' in data) || (data.username is string && data.username.size() < 100)) &&
+             data.role is string &&
+             data.permissions is map;
+    }
+
+    function isValidEmployee(data) {
+      return data.name is string && data.name.size() < 100 &&
+             data.code is string && data.code.size() < 20;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
 
     match /audit_logs/{logId} {
       allow read: if isAuthenticated() && (
-        (resource.data.isCreator == true && isCreator()) ||
-        (resource.data.isCreator == false)
+        isCreator() || 
+        (hasPermission('canManageSettings') || hasPermission('canManageUsers') || hasPermission('canManageEmployees'))
       );
       allow create: if isAuthenticated() && isValidAuditLog(request.resource.data);
       allow update, delete: if false;
     }
 
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      allow delete: if isAdmin();
+      allow read: if isOwner(userId) || hasPermission('canManageUsers');
+      allow create: if isAuthenticated() && 
+                    isValidUser(request.resource.data) &&
+                    (isOwner(userId) || hasPermission('canManageUsers')) &&
+                    (request.resource.data.role != 'Creator' || isCreator());
+      allow update: if isAuthenticated() && 
+                    isValidUser(request.resource.data) &&
+                    (isOwner(userId) || hasPermission('canManageUsers')) &&
+                    (request.resource.data.role == resource.data.role || hasPermission('canManageUsers')) &&
+                    (request.resource.data.permissions == resource.data.permissions || hasPermission('canManageUsers'));
+      allow delete: if hasPermission('canManageUsers') && resource.data.role != 'Creator';
     }
 
     match /employees/{employeeId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if hasPermission('canViewDirectory') || hasPermission('canManageEmployees');
+      allow write: if hasPermission('canManageEmployees') && isValidEmployee(request.resource.data);
     }
 
     match /attendance/{recordId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if hasPermission('canViewTimesheet') || hasPermission('canManageAttendance');
+      allow write: if hasPermission('canManageAttendance');
     }
 
     match /leaves/{leaveId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated(); // Users can apply for leaves
+      allow read: if hasPermission('canManageLeaves');
+      allow write: if hasPermission('canManageLeaves') || isAuthenticated(); // Users can apply for leaves
     }
 
     match /deductions/{deductionId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if hasPermission('canViewPayroll') || hasPermission('canManagePayroll');
+      allow write: if hasPermission('canManagePayroll');
     }
 
     match /companies/{companyId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow write: if hasPermission('canManageSettings');
     }
 
     match /settings/about {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if hasPermission('canManageSettings');
     }
   }
 }

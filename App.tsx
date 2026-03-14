@@ -23,7 +23,8 @@ import {
   Briefcase, HardHat, ShieldCheck, Download, Printer,
   MoreVertical, Check, X as CloseIcon, Filter, Shield, Key,
   Activity, LayoutGrid, ListFilter, ChevronDown, Globe, HelpCircle,
-  TrendingUp, Clock, ArrowUpRight, ArrowDownRight, BarChart2, Phone
+  TrendingUp, Clock, ArrowUpRight, ArrowDownRight, BarChart2, Phone,
+  ShieldAlert
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { 
@@ -59,7 +60,7 @@ import {
   saveDeduction, deleteDeduction,
   saveSystemUser, deleteSystemUser,
   addCompany, updateCompany, deleteCompany,
-  testConnection, logAudit
+  testConnection, logAudit, handleFirestoreError, OperationType
 } from './services/storageService';
 import { DEFAULT_ABOUT_DATA, CREATOR_USER } from './constants';
 import SmartCommand from './components/SmartCommand';
@@ -114,6 +115,124 @@ const calculatePayroll = (employee: Employee, attendance: AttendanceRecord[], de
 };
 
 // --- Modals ---
+
+const CopyAttendanceModal = ({ isOpen, onClose, onCopy, currentMonth }: any) => {
+    const [sourceDate, setSourceDate] = useState('');
+    const [targetStartDate, setTargetStartDate] = useState('');
+    const [targetEndDate, setTargetEndDate] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    if (!isOpen) return null;
+
+    const handleCopy = async () => {
+        if (!sourceDate || !targetStartDate || !targetEndDate) {
+            alert("Please fill in all dates.");
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            await onCopy(sourceDate, targetStartDate, targetEndDate);
+            onClose();
+        } catch (error) {
+            console.error("Copy error:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white dark:border-slate-800"
+            >
+                <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                    <div>
+                        <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Copy Attendance</h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">Replicate attendance patterns across dates</p>
+                    </div>
+                    <button onClick={onClose} className="p-3 hover:bg-white dark:hover:bg-slate-700 rounded-2xl transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 shadow-sm hover:shadow-md"><X className="w-5 h-5" /></button>
+                </div>
+
+                <div className="p-8 space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Source Date (Copy From)</label>
+                        <div className="relative">
+                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input 
+                                type="date" 
+                                value={sourceDate}
+                                onChange={(e) => setSourceDate(e.target.value)}
+                                className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Target Start Date</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input 
+                                    type="date" 
+                                    value={targetStartDate}
+                                    onChange={(e) => setTargetStartDate(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Target End Date</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input 
+                                    type="date" 
+                                    value={targetEndDate}
+                                    onChange={(e) => setTargetEndDate(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/30 flex gap-3">
+                        <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+                        <p className="text-xs text-amber-700 dark:text-amber-300 font-medium leading-relaxed">
+                            This will overwrite any existing attendance records in the target date range. This action cannot be undone.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="p-8 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+                    <button 
+                        onClick={onClose} 
+                        className="px-6 py-3 text-slate-500 dark:text-slate-400 font-bold text-sm hover:text-slate-700 dark:hover:text-white transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        disabled={isSubmitting}
+                        onClick={handleCopy} 
+                        className="px-8 py-3 bg-brand-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-brand-600/20 hover:bg-brand-700 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Copying...
+                            </>
+                        ) : (
+                            <>
+                                <Copy className="w-4 h-4" />
+                                Start Copying
+                            </>
+                        )}
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
 
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, type = 'danger' }: any) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -379,9 +498,9 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                              <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passport Expiry</label><input type="date" value={data.documents?.passportExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportExpiry: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                         </div>
                     </div>
-                    {/* Google Drive Documents */}
+                    {/* Linked Documents */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Google Drive Documents</h3>
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Linked Documents</h3>
                         <GoogleDriveManager 
                             files={data.driveFiles || []}
                             onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
@@ -748,7 +867,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                 </div>
                             </div>
                             <div className="mt-8 pt-8 border-t dark:border-slate-800">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Google Drive Documents</h3>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Linked Documents</h3>
                                 <GoogleDriveManager 
                                     files={data.driveFiles || []}
                                     onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
@@ -1653,6 +1772,7 @@ export default function App() {
           const newProfile: SystemUser = {
             uid: firebaseUser.uid,
             email: firebaseUser.email || '',
+            username: firebaseUser.email?.split('@')[0] || firebaseUser.uid,
             name: firebaseUser.displayName || 'New User',
             role: isDefaultAdmin ? UserRole.CREATOR : UserRole.HR,
             active: true,
@@ -1686,8 +1806,15 @@ export default function App() {
     if (!db || !user || !systemUser) return;
     
     let q;
-    const isCreator = systemUser.role === UserRole.CREATOR || user.email === "abdulkaderp3010@gmail.com";
+    const isCreator = systemUser?.role === UserRole.CREATOR || user?.email === "abdulkaderp3010@gmail.com";
     
+    const canViewAudit = isCreator || systemUser.permissions.canManageSettings || systemUser.permissions.canManageUsers || systemUser.permissions.canManageEmployees;
+    
+    if (!canViewAudit) {
+      setIsAuthReady(true);
+      return;
+    }
+
     if (isCreator) {
       q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(50));
     } else {
@@ -1703,7 +1830,7 @@ export default function App() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setAuditLogs(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as AuditLog)));
     }, (error) => {
-      console.error("Audit Log fetch error:", error);
+      handleFirestoreError(error, OperationType.LIST, 'audit_logs');
     });
     return () => unsubscribe();
   }, [user, systemUser]);
@@ -1717,30 +1844,43 @@ export default function App() {
   // 2. Data Listeners
   useEffect(() => {
     if (!isAuthReady || !user) return;
+    const isCreator = systemUser?.role === UserRole.CREATOR || user?.email === "abdulkaderp3010@gmail.com";
 
-    const unsubEmployees = onSnapshot(collection(db, 'employees'), (snap) => {
+    const unsubEmployees = (systemUser?.permissions?.canViewDirectory || systemUser?.permissions?.canManageEmployees || isCreator) ? onSnapshot(collection(db, 'employees'), (snap) => {
       setEmployees(snap.docs.map(d => d.data() as Employee));
-    });
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'employees');
+    }) : () => {};
 
-    const unsubAttendance = onSnapshot(collection(db, 'attendance'), (snap) => {
+    const unsubAttendance = (systemUser?.permissions?.canViewTimesheet || systemUser?.permissions?.canManageAttendance || isCreator) ? onSnapshot(collection(db, 'attendance'), (snap) => {
       setAttendance(snap.docs.map(d => d.data() as AttendanceRecord));
-    });
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'attendance');
+    }) : () => {};
 
-    const unsubLeaves = onSnapshot(collection(db, 'leaves'), (snap) => {
+    const unsubLeaves = (systemUser?.permissions?.canManageLeaves || isCreator) ? onSnapshot(collection(db, 'leaves'), (snap) => {
       setLeaveRequests(snap.docs.map(d => d.data() as LeaveRequest));
-    });
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'leaves');
+    }) : () => {};
 
-    const unsubDeductions = onSnapshot(collection(db, 'deductions'), (snap) => {
+    const unsubDeductions = (systemUser?.permissions?.canViewPayroll || systemUser?.permissions?.canManagePayroll || isCreator) ? onSnapshot(collection(db, 'deductions'), (snap) => {
       setDeductions(snap.docs.map(d => d.data() as DeductionRecord));
-    });
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'deductions');
+    }) : () => {};
 
     const unsubCompanies = onSnapshot(collection(db, 'companies'), (snap) => {
       setCompanies(snap.docs.map(d => d.data() as Company));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'companies');
     });
 
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
+    const unsubUsers = (systemUser?.permissions?.canManageUsers || isCreator) ? onSnapshot(collection(db, 'users'), (snap) => {
       setSystemUsers(snap.docs.map(d => d.data() as SystemUser));
-    });
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'users');
+    }) : () => {};
 
     return () => {
       unsubEmployees();
@@ -1750,7 +1890,7 @@ export default function App() {
       unsubCompanies();
       unsubUsers();
     };
-  }, [isAuthReady, user]);
+  }, [isAuthReady, user, systemUser]);
 
   // Handlers
   const navItems = useMemo(() => {
@@ -1912,6 +2052,7 @@ export default function App() {
           companies={companies} 
           openConfirm={openConfirm}
           onUpdate={updateCompany}
+          user={systemUser}
         />
       )}
       {activeTab === 'staff' && (
@@ -1920,6 +2061,7 @@ export default function App() {
           onAdd={() => setShowOnboarding(true)} 
           onEdit={(e: Employee) => setShowEdit(e)} 
           onOffboard={(e: Employee) => setShowOffboarding(e)}
+          user={systemUser}
         />
       )}
       {activeTab === 'ex-employees' && (
@@ -1929,10 +2071,11 @@ export default function App() {
           onDelete={handleDeleteEmployee}
           onRejoin={handleRejoinEmployee}
           readOnly={true}
+          user={systemUser}
         />
       )}
       {activeTab === 'timesheet' && (
-        <TimesheetView employees={employees.filter(e => e.active)} attendance={attendance} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} currentUser={systemUser} />
+        <TimesheetView employees={employees.filter(e => e.active)} attendance={attendance} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} user={systemUser} />
       )}
       {activeTab === 'deductions' && (
         <DeductionsView employees={employees} deductions={deductions} openConfirm={openConfirm} />
@@ -1941,7 +2084,7 @@ export default function App() {
         <LeaveManagementView employees={employees} leaveRequests={leaveRequests} user={systemUser} />
       )}
       {activeTab === 'payroll' && (
-        <PayrollRegisterView employees={employees.filter(e => e.active)} attendance={attendance} deductions={deductions} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
+        <PayrollRegisterView employees={employees.filter(e => e.active)} attendance={attendance} deductions={deductions} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} user={systemUser} />
       )}
       {activeTab === 'reports' && (
         <ReportsView employees={employees} attendance={attendance} />
@@ -2034,6 +2177,12 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
     const internalTeam = activeStaff.filter((e:any) => e.team === 'Internal Team').length;
     const externalTeam = activeStaff.filter((e:any) => e.team === 'External Team').length;
     const officeStaff = activeStaff.filter((e:any) => e.team === 'Office Staff' || e.type === StaffType.OFFICE).length;
+
+    const canManageUsers = user?.permissions?.canManageUsers;
+    const canManageSettings = user?.permissions?.canManageSettings;
+    const canManageEmployees = user?.permissions?.canManageEmployees;
+    const canManageAttendance = user?.permissions?.canManageAttendance;
+    const canManagePayroll = user?.permissions?.canManagePayroll;
     
     // Chart Data: Staff by Department
     const deptStats = useMemo(() => {
@@ -2197,7 +2346,7 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                             <h3 className="text-xl font-black tracking-tight">Quick Operations</h3>
                             <div className="relative">
                                 <button 
-                                    onClick={() => (user.role === UserRole.CREATOR || user.role === UserRole.ADMIN) && setShowQuickAdminMenu(!showQuickAdminMenu)}
+                                    onClick={() => (user.role === UserRole.CREATOR || canManageUsers || canManageSettings) && setShowQuickAdminMenu(!showQuickAdminMenu)}
                                     className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition-all"
                                 >
                                     <LayoutGrid className="w-5 h-5" />
@@ -2206,18 +2355,22 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                                     <>
                                         <div className="fixed inset-0 z-10" onClick={() => setShowQuickAdminMenu(false)}></div>
                                         <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-20 text-slate-900 dark:text-white">
-                                            <button 
-                                                onClick={() => { onOpenUserManagement(); setShowQuickAdminMenu(false); }}
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
-                                            >
-                                                <UserCog className="w-4 h-4" /> System User Management
-                                            </button>
-                                            <button 
-                                                onClick={() => { onOpenManageCompanies(); setShowQuickAdminMenu(false); }}
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
-                                            >
-                                                <Building2 className="w-4 h-4" /> Manage Companies
-                                            </button>
+                                            {(user.role === UserRole.CREATOR || canManageUsers) && (
+                                                <button 
+                                                    onClick={() => { onOpenUserManagement(); setShowQuickAdminMenu(false); }}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
+                                                >
+                                                    <UserCog className="w-4 h-4" /> System User Management
+                                                </button>
+                                            )}
+                                            {(user.role === UserRole.CREATOR || canManageSettings) && (
+                                                <button 
+                                                    onClick={() => { onOpenManageCompanies(); setShowQuickAdminMenu(false); }}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
+                                                >
+                                                    <Building2 className="w-4 h-4" /> Manage Companies
+                                                </button>
+                                            )}
                                         </div>
                                     </>
                                 )}
@@ -2242,6 +2395,56 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Workforce Distribution Chart */}
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Workforce Distribution</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Headcount breakdown by department</p>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-1 rounded-xl">
+                        <button className="px-4 py-1.5 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-[10px] font-bold rounded-lg shadow-sm">Chart</button>
+                        <button className="px-4 py-1.5 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded-lg">Detailed List</button>
+                    </div>
+                </div>
+                <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={deptStats}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                            <XAxis 
+                                dataKey="name" 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                dy={10}
+                            />
+                            <YAxis 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                            />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: '#0f172a', 
+                                    border: 'none', 
+                                    borderRadius: '16px',
+                                    color: '#fff',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold',
+                                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
+                                }}
+                                cursor={{ fill: '#f8fafc' }}
+                            />
+                            <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                                {deptStats.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} fillOpacity={0.8} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
         </div>
@@ -2307,6 +2510,22 @@ const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: {
     onToggleDarkMode: () => void,
     onPasswordReset: () => void 
 }) => {
+    const canManageSettings = user?.permissions?.canManageSettings;
+    
+    if (!canManageSettings && user.role !== UserRole.CREATOR) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8">
+                <div className="w-20 h-20 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-6">
+                    <ShieldAlert className="w-10 h-10 text-red-600 dark:text-red-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h2>
+                <p className="text-slate-500 dark:text-slate-400 max-w-md">
+                    You do not have permission to access system settings. Please contact your administrator if you believe this is an error.
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center gap-4 mb-2">
@@ -2528,10 +2747,11 @@ const DashboardStatCard = ({ title, value, icon: Icon, color, index }: any) => {
 
 // --- Sub Views ---
 
-const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly }: any) => {
+const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly, user }: any) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [companyFilter, setCompanyFilter] = useState('All');
     const [deptFilter, setDeptFilter] = useState('All');
+    const canManageEmployees = user?.permissions?.canManageEmployees;
 
     const companies = useMemo(() => ['All', ...Array.from(new Set(employees.map((e: any) => e.company)))], [employees]);
     const departments = useMemo(() => ['All', ...Array.from(new Set(employees.map((e: any) => e.department)))], [employees]);
@@ -2578,7 +2798,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                         {departments.map(d => <option key={d} value={d} className="dark:bg-slate-900">{d}</option>)}
                     </select>
 
-                    {!readOnly && (
+                    {!readOnly && canManageEmployees && (
                         <button 
                             onClick={onAdd} 
                             className="flex-1 lg:flex-none bg-brand-600 text-white px-8 py-3.5 rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-brand-700 shadow-xl shadow-brand-500/20 transition-all active:scale-95"
@@ -2652,15 +2872,17 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                         </td>
                                         <td className="p-6">
                                             <div className="flex justify-end gap-2">
-                                                <button 
-                                                    onClick={() => onEdit(e)} 
-                                                    className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
-                                                    title="Edit Record"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </button>
+                                                {canManageEmployees && (
+                                                    <button 
+                                                        onClick={() => onEdit(e)} 
+                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
+                                                        title="Edit Record"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                                 {e.active ? (
-                                                    !readOnly && (
+                                                    !readOnly && canManageEmployees && (
                                                         <button 
                                                             onClick={() => onOffboard(e)} 
                                                             className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-red-600 dark:text-red-400 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/30 active:scale-90"
@@ -2670,15 +2892,17 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                                         </button>
                                                     )
                                                 ) : (
-                                                    <button 
-                                                        onClick={() => onRejoin(e)} 
-                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-emerald-600 dark:text-emerald-400 rounded-xl transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 active:scale-90"
-                                                        title="Rejoin"
-                                                    >
-                                                        <UserPlus className="w-4 h-4" />
-                                                    </button>
+                                                    canManageEmployees && (
+                                                        <button 
+                                                            onClick={() => onRejoin(e)} 
+                                                            className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-emerald-600 dark:text-emerald-400 rounded-xl transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 active:scale-90"
+                                                            title="Rejoin"
+                                                        >
+                                                            <UserPlus className="w-4 h-4" />
+                                                        </button>
+                                                    )
                                                 )}
-                                                {!readOnly && (
+                                                {!readOnly && canManageEmployees && (
                                                     <button 
                                                         onClick={() => onDelete(e)} 
                                                         className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800 active:scale-90"
@@ -2715,10 +2939,11 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
     );
 };
 
-const CompanyView = ({ companies, openConfirm, onUpdate }: { companies: Company[], openConfirm: any, onUpdate: (c: Company) => void }) => {
+const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Company[], openConfirm: any, onUpdate: (c: Company) => void, user: SystemUser }) => {
     const [formData, setFormData] = useState({ name: '', address: '', email: '', phone: '', logo: '' });
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const canManageSettings = user?.permissions?.canManageSettings;
 
     const handleAdd = async () => {
         if (!formData.name.trim()) return;
@@ -2771,12 +2996,14 @@ const CompanyView = ({ companies, openConfirm, onUpdate }: { companies: Company[
                     </p>
                 </div>
                 
-                <button 
-                    onClick={() => setIsAdding(true)}
-                    className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
-                >
-                    <Plus className="w-4 h-4" /> Add Company
-                </button>
+                {canManageSettings && (
+                    <button 
+                        onClick={() => setIsAdding(true)}
+                        className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                    >
+                        <Plus className="w-4 h-4" /> Add Company
+                    </button>
+                )}
             </div>
 
             {isAdding && (
@@ -2875,18 +3102,22 @@ const CompanyView = ({ companies, openConfirm, onUpdate }: { companies: Company[
                                     )}
                                 </div>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
-                                    <button 
-                                        onClick={() => setEditingId(company.id)}
-                                        className="p-2 hover:bg-brand-50 dark:hover:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-xl transition-colors"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDelete(company.id)}
-                                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl transition-colors"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
+                                    {canManageSettings && (
+                                        <>
+                                            <button 
+                                                onClick={() => setEditingId(company.id)}
+                                                className="p-2 hover:bg-brand-50 dark:hover:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-xl transition-colors"
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDelete(company.id)}
+                                                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl transition-colors"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
@@ -2967,12 +3198,14 @@ const CompanyView = ({ companies, openConfirm, onUpdate }: { companies: Company[
     );
 };
 
-const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, currentUser }: any) => {
+const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, user }: any) => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const daysInMonth = new Date(year, month, 0).getDate();
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingCell, setEditingCell] = useState<{empId: string, date: string} | null>(null);
+    const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
+    const canManageAttendance = user?.permissions?.canManageAttendance;
 
     const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
     const fullYear = year.toString();
@@ -2994,7 +3227,7 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
             date,
             0,
             undefined,
-            currentUser?.username || 'System',
+            user?.username || 'System',
             'Manual Update'
         );
         setEditingCell(null);
@@ -3007,8 +3240,49 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
         );
     }, [employees, searchTerm]);
 
+    const handleCopyAttendance = async (sourceDate: string, targetStartDate: string, targetEndDate: string) => {
+        const start = new Date(targetStartDate);
+        const end = new Date(targetEndDate);
+        
+        // Get all attendance records for the source date
+        const sourceRecords = attendance.filter((r: AttendanceRecord) => r.date === sourceDate);
+        
+        if (sourceRecords.length === 0) {
+            alert("No attendance records found for the source date.");
+            return;
+        }
+
+        const datesToCopy: string[] = [];
+        let current = new Date(start);
+        while (current <= end) {
+            datesToCopy.push(current.toISOString().split('T')[0]);
+            current.setDate(current.getDate() + 1);
+        }
+
+        for (const targetDate of datesToCopy) {
+            for (const record of sourceRecords) {
+                await logAttendance(
+                    record.employeeId,
+                    record.status,
+                    targetDate,
+                    record.overtimeHours || 0,
+                    undefined,
+                    user?.username || 'System',
+                    `Copied from ${sourceDate}`
+                );
+            }
+        }
+        setIsCopyModalOpen(false);
+    };
+
     return (
         <div className="space-y-6">
+            <CopyAttendanceModal 
+                isOpen={isCopyModalOpen}
+                onClose={() => setIsCopyModalOpen(false)}
+                onCopy={handleCopyAttendance}
+                currentMonth={selectedMonth}
+            />
             <div className="glass-card dark:bg-slate-900/80 p-6 rounded-3xl border border-white dark:border-slate-800 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
@@ -3057,6 +3331,15 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
                             className="pl-11 pr-4 py-2.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white dark:placeholder:text-slate-600"
                         />
                     </div>
+                    {canManageAttendance && (
+                        <button 
+                            onClick={() => setIsCopyModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white rounded-2xl text-sm font-black hover:bg-brand-700 transition-all active:scale-95 shadow-lg shadow-brand-600/20"
+                        >
+                            <Copy className="w-4 h-4" />
+                            <span className="hidden sm:inline">Copy Attendance</span>
+                        </button>
+                    )}
                     <button className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-sm">
                         <Download className="w-5 h-5" />
                     </button>
@@ -3181,9 +3464,10 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
     );
 };
 
-const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
+const DeductionsView = ({ employees, deductions, openConfirm, user }: any) => {
     const [newItem, setNewItem] = useState<Partial<DeductionRecord>>({ type: 'Salary Advance', date: new Date().toISOString().split('T')[0] });
     const [searchTerm, setSearchTerm] = useState('');
+    const canManagePayroll = user?.permissions?.canManagePayroll;
 
     const handleAdd = async () => {
         if(newItem.employeeId && newItem.amount && newItem.date) {
@@ -3402,6 +3686,7 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
     const [showNew, setShowNew] = useState(false);
     const [newReq, setNewReq] = useState({ employeeId: '', type: AttendanceStatus.ANNUAL_LEAVE, startDate: '', endDate: '', reason: '' });
     const [searchTerm, setSearchTerm] = useState('');
+    const canManageLeaves = user?.permissions?.canManageLeaves;
 
     const handleSave = async () => {
         if(newReq.employeeId && newReq.startDate && newReq.endDate) {
@@ -3445,12 +3730,14 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                             className="pl-11 pr-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm dark:text-white dark:placeholder:text-slate-600"
                         />
                     </div>
-                    <button 
-                        onClick={() => setShowNew(true)} 
-                        className="neo-button bg-brand-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-200 dark:shadow-none"
-                    >
-                        <Plus className="w-5 h-5" /> New Request
-                    </button>
+                    {canManageLeaves && (
+                        <button 
+                            onClick={() => setShowNew(true)} 
+                            className="neo-button bg-brand-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-200 dark:shadow-none"
+                        >
+                            <Plus className="w-5 h-5" /> New Request
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -3652,8 +3939,9 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
     );
 };
 
-const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth, onMonthChange }: any) => {
+const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth, onMonthChange, user }: any) => {
      const [searchTerm, setSearchTerm] = useState('');
+     const canManagePayroll = user?.permissions?.canManagePayroll;
 
      const filteredEmployees = useMemo(() => {
         return employees.filter((e: Employee) => 

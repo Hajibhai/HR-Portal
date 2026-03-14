@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, ExternalLink, Plus, X, Loader2, Globe } from 'lucide-react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { FileText, ExternalLink, Plus, X, Link as LinkIcon } from 'lucide-react';
 import { DriveFile } from '../types';
 import { cn } from '../utils';
 
@@ -16,82 +17,94 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
     onRemoveFile,
     title = "Linked Documents"
 }) => {
-    const [isPickerOpen, setIsPickerOpen] = useState(false);
-    const [driveFiles, setDriveFiles] = useState<DriveFile[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [newFileName, setNewFileName] = useState('');
+    const [newFileUrl, setNewFileUrl] = useState('');
 
-    useEffect(() => {
-        checkAuth();
-    }, []);
+    const handleAddLink = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newFileName || !newFileUrl) return;
 
-    const checkAuth = async () => {
-        try {
-            const res = await fetch('/api/drive/files');
-            if (res.ok) {
-                setIsAuthenticated(true);
-            }
-        } catch (e) {
-            console.error("Auth check failed", e);
-        }
+        const newFile: DriveFile = {
+            id: Math.random().toString(36).substr(2, 9),
+            name: newFileName,
+            mimeType: 'application/octet-stream', // Generic
+            webViewLink: newFileUrl.startsWith('http') ? newFileUrl : `https://${newFileUrl}`,
+            iconLink: 'https://ssl.gstatic.com/docs/doclist/images/icon_10_generic_list.png'
+        };
+
+        onAddFile(newFile);
+        setNewFileName('');
+        setNewFileUrl('');
+        setIsAddModalOpen(false);
     };
 
-    const handleConnect = async () => {
-        try {
-            const res = await fetch('/api/auth/google/url');
-            const { url } = await res.json();
-            const authWindow = window.open(url, 'google_oauth', 'width=600,height=700');
-            
-            const handleMessage = (event: MessageEvent) => {
-                if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-                    setIsAuthenticated(true);
-                    window.removeEventListener('message', handleMessage);
-                }
-            };
-            window.addEventListener('message', handleMessage);
-        } catch (e) {
-            console.error("Failed to get auth URL", e);
-        }
-    };
-
-    const fetchDriveFiles = async () => {
-        setIsLoading(true);
-        try {
-            const res = await fetch('/api/drive/files');
-            if (res.ok) {
-                const data = await res.json();
-                setDriveFiles(data);
-                setIsPickerOpen(true);
-            } else if (res.status === 401) {
-                setIsAuthenticated(false);
-                handleConnect();
-            }
-        } catch (e) {
-            console.error("Failed to fetch drive files", e);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const modalContent = isAddModalOpen ? (
+        <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[9999] p-4"
+            onClick={() => setIsAddModalOpen(false)}
+        >
+            <div 
+                className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="p-5 border-b dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Add Document Link</h3>
+                    <button 
+                        onClick={() => setIsAddModalOpen(false)}
+                        className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
+                    >
+                        <X className="w-5 h-5 text-slate-400" />
+                    </button>
+                </div>
+                <form onSubmit={handleAddLink} className="p-6 space-y-5">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Document Name</label>
+                        <input 
+                            type="text"
+                            required
+                            autoFocus
+                            placeholder="e.g., Trade License, Passport Copy"
+                            value={newFileName}
+                            onChange={(e) => setNewFileName(e.target.value)}
+                            className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Google Drive Share Link</label>
+                        <div className="relative">
+                            <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input 
+                                type="text"
+                                required
+                                placeholder="Paste the share link here..."
+                                value={newFileUrl}
+                                onChange={(e) => setNewFileUrl(e.target.value)}
+                                className="w-full p-4 pl-12 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                            />
+                        </div>
+                    </div>
+                    <button 
+                        type="submit"
+                        className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-sm font-bold transition-all shadow-xl shadow-brand-600/20 active:scale-[0.98]"
+                    >
+                        Add Document
+                    </button>
+                </form>
+            </div>
+        </div>
+    ) : null;
 
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{title}</h4>
-                {!isAuthenticated ? (
-                    <button 
-                        onClick={handleConnect}
-                        className="flex items-center gap-2 text-[10px] font-bold text-brand-600 hover:text-brand-700 transition-colors"
-                    >
-                        <Globe className="w-3 h-3" /> Connect Google Drive
-                    </button>
-                ) : (
-                    <button 
-                        onClick={fetchDriveFiles}
-                        className="flex items-center gap-1 text-[10px] font-bold text-brand-600 hover:text-brand-700 transition-colors"
-                    >
-                        <Plus className="w-3 h-3" /> Link File
-                    </button>
-                )}
+                <button 
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="flex items-center gap-1 text-[10px] font-bold text-brand-600 hover:text-brand-700 transition-colors"
+                >
+                    <Plus className="w-3 h-3" /> Add Link
+                </button>
             </div>
 
             <div className="grid grid-cols-1 gap-2">
@@ -130,39 +143,7 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
                 )}
             </div>
 
-            {isPickerOpen && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
-                        <div className="p-4 border-b dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Select from Google Drive</h3>
-                            <button onClick={() => setIsPickerOpen(false)}><X className="w-4 h-4 text-slate-400" /></button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                            {driveFiles.map(file => {
-                                const isLinked = files.some(f => f.id === file.id);
-                                return (
-                                    <button 
-                                        key={file.id}
-                                        disabled={isLinked}
-                                        onClick={() => {
-                                            onAddFile(file);
-                                            setIsPickerOpen(false);
-                                        }}
-                                        className={cn(
-                                            "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all",
-                                            isLinked ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-50 dark:hover:bg-slate-800"
-                                        )}
-                                    >
-                                        <img src={file.iconLink} alt="" className="w-4 h-4" />
-                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">{file.name}</span>
-                                        {isLinked && <span className="ml-auto text-[8px] font-bold text-slate-400 uppercase">Linked</span>}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )}
+            {isAddModalOpen && createPortal(modalContent, document.body)}
         </div>
     );
 };
