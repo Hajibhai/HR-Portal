@@ -47,7 +47,7 @@ import {
   getDoc,
   deleteDoc
 } from 'firebase/firestore';
-import { auth, db, loginWithGoogle, loginWithEmail, registerWithEmail, logout, adminCreateUser, adminDeleteUser } from './firebase';
+import { auth, db, loginWithGoogle, loginWithEmail, registerWithEmail, logout, resetPassword, adminCreateUser, adminDeleteUser } from './firebase';
 import { Login } from './components/Login';
 import { 
   Employee, AttendanceRecord, AttendanceStatus, StaffType, 
@@ -135,26 +135,26 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, type = 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70]">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200 border border-transparent dark:border-slate-800">
         <div className="flex items-center gap-3 mb-4">
-          <div className={`p-3 rounded-full ${type === 'danger' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`}>
+          <div className={`p-3 rounded-full ${type === 'danger' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'}`}>
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
         </div>
-        <p className="text-gray-600 mb-8">{message}</p>
+        <p className="text-gray-600 dark:text-slate-400 mb-8">{message}</p>
         <div className="flex justify-end gap-3">
           <button 
             disabled={isSubmitting}
             onClick={onClose} 
-            className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium disabled:opacity-50"
+            className="px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg font-medium disabled:opacity-50 transition-colors"
           >
             Cancel
           </button>
           <button 
             disabled={isSubmitting}
             onClick={handleConfirm} 
-            className={`px-4 py-2 text-white rounded-lg font-medium flex items-center gap-2 ${type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-600 hover:bg-amber-700'} disabled:opacity-50`}
+            className={`px-4 py-2 text-white rounded-lg font-medium flex items-center gap-2 ${type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-600 hover:bg-amber-700'} disabled:opacity-50 transition-colors`}
           >
             {isSubmitting ? (
               <>
@@ -186,78 +186,78 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent dark:border-slate-800">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Offboard: {employee.name}</h2>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Offboard: {employee.name}</h2>
                          <div className="flex gap-2 mt-2">
                             {[1, 2, 3, 4].map(i => (
-                                <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${i <= step ? 'bg-red-600' : 'bg-gray-200'}`} />
+                                <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${i <= step ? 'bg-red-600' : 'bg-gray-200 dark:bg-slate-700'}`} />
                             ))}
                         </div>
                     </div>
-                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5" /></button>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
                 </div>
                 
                 <div className="p-8 overflow-y-auto flex-1">
                     {step === 1 && (
                          <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                             <h3 className="text-lg font-semibold text-gray-800">Exit Details</h3>
+                             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Exit Details</h3>
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                  <div className="space-y-2">
-                                     <label className="text-sm font-medium text-gray-700">Exit Type</label>
-                                     <select className="w-full p-3 border rounded-xl" value={details.type} onChange={e => setDetails({...details, type: e.target.value as any})}>
+                                     <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Exit Type</label>
+                                     <select className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.type} onChange={e => setDetails({...details, type: e.target.value as any})}>
                                          <option>Resignation</option><option>Termination</option><option>End of Contract</option><option>Absconding</option>
                                      </select>
                                  </div>
                                  <div className="space-y-2">
-                                     <label className="text-sm font-medium text-gray-700">Last Working Day</label>
-                                     <input type="date" className="w-full p-3 border rounded-xl" value={details.exitDate} onChange={e => setDetails({...details, exitDate: e.target.value})} />
+                                     <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Last Working Day</label>
+                                     <input type="date" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.exitDate} onChange={e => setDetails({...details, exitDate: e.target.value})} />
                                  </div>
                                  <div className="col-span-2 space-y-2">
-                                     <label className="text-sm font-medium text-gray-700">Reason</label>
-                                     <textarea className="w-full p-3 border rounded-xl" rows={3} value={details.reason} onChange={e => setDetails({...details, reason: e.target.value})} />
+                                     <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Reason</label>
+                                     <textarea className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" rows={3} value={details.reason} onChange={e => setDetails({...details, reason: e.target.value})} />
                                  </div>
                              </div>
                          </div>
                     )}
                     {step === 2 && (
                         <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                             <h3 className="text-lg font-semibold text-gray-800">Financial Settlement</h3>
+                             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Financial Settlement</h3>
                              <div className="grid grid-cols-2 gap-5">
-                                 <div className="space-y-2"><label className="text-sm">Gratuity</label><input type="number" className="w-full p-3 border rounded-xl" value={details.gratuity} onChange={e => setDetails({...details, gratuity: parseFloat(e.target.value)})} /></div>
-                                 <div className="space-y-2"><label className="text-sm">Leave Encashment</label><input type="number" className="w-full p-3 border rounded-xl" value={details.leaveEncashment} onChange={e => setDetails({...details, leaveEncashment: parseFloat(e.target.value)})} /></div>
-                                 <div className="space-y-2"><label className="text-sm">Pending Salary</label><input type="number" className="w-full p-3 border rounded-xl" value={details.salaryDues} onChange={e => setDetails({...details, salaryDues: parseFloat(e.target.value)})} /></div>
-                                 <div className="space-y-2"><label className="text-sm">Deductions</label><input type="number" className="w-full p-3 border rounded-xl text-red-600" value={details.deductions} onChange={e => setDetails({...details, deductions: parseFloat(e.target.value)})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Gratuity</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.gratuity} onChange={e => setDetails({...details, gratuity: parseFloat(e.target.value)})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Leave Encashment</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.leaveEncashment} onChange={e => setDetails({...details, leaveEncashment: parseFloat(e.target.value)})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Pending Salary</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.salaryDues} onChange={e => setDetails({...details, salaryDues: parseFloat(e.target.value)})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Deductions</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-red-600 dark:text-red-400" value={details.deductions} onChange={e => setDetails({...details, deductions: parseFloat(e.target.value)})} /></div>
                              </div>
-                             <div className="p-4 bg-gray-50 rounded-xl flex justify-between items-center">
-                                 <span className="font-semibold text-gray-700">Net Payable Amount</span>
-                                 <span className="text-2xl font-bold text-green-700">AED {details.netSettlement.toLocaleString()}</span>
+                             <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl flex justify-between items-center">
+                                 <span className="font-semibold text-gray-700 dark:text-slate-300">Net Payable Amount</span>
+                                 <span className="text-2xl font-bold text-green-700 dark:text-green-400">AED {details.netSettlement.toLocaleString()}</span>
                              </div>
                         </div>
                     )}
                     {step === 3 && (
                          <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                             <h3 className="text-lg font-semibold text-gray-800">Assets & Clearance</h3>
-                             <div className="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-gray-50" onClick={() => setDetails({...details, assetsReturned: !details.assetsReturned})}>
-                                 <div className={`w-6 h-6 rounded border flex items-center justify-center ${details.assetsReturned ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+                             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Assets & Clearance</h3>
+                             <div className="flex items-center gap-4 p-4 border dark:border-slate-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setDetails({...details, assetsReturned: !details.assetsReturned})}>
+                                 <div className={`w-6 h-6 rounded border flex items-center justify-center ${details.assetsReturned ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-slate-600'}`}>
                                      {details.assetsReturned && <Check className="w-4 h-4 text-white" />}
                                  </div>
-                                 <span>All company assets returned (Laptop, Sim, Uniform, Tools)</span>
+                                 <span className="text-gray-900 dark:text-white">All company assets returned (Laptop, Sim, Uniform, Tools)</span>
                              </div>
                              <div className="space-y-2">
-                                 <label className="text-sm font-medium text-gray-700">Additional Notes</label>
-                                 <textarea className="w-full p-3 border rounded-xl" rows={4} value={details.notes} onChange={e => setDetails({...details, notes: e.target.value})} placeholder="Clearance details..." />
+                                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Additional Notes</label>
+                                 <textarea className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" rows={4} value={details.notes} onChange={e => setDetails({...details, notes: e.target.value})} placeholder="Clearance details..." />
                              </div>
                          </div>
                     )}
                     {step === 4 && (
                         <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300 text-center py-8">
-                             <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                             <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
                                  <LogOut className="w-10 h-10" />
                              </div>
-                             <h3 className="text-2xl font-bold text-gray-900">Ready to Offboard?</h3>
-                             <p className="text-gray-500 max-w-md mx-auto">
+                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Ready to Offboard?</h3>
+                             <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto">
                                  You are about to mark <strong>{employee.name}</strong> as inactive. 
                                  Final settlement amount: <strong>AED {details.netSettlement.toLocaleString()}</strong>.
                              </p>
@@ -265,12 +265,12 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
                     )}
                 </div>
 
-                <div className="p-6 border-t border-gray-100 flex justify-between bg-gray-50">
-                    {step > 1 ? <button onClick={() => setStep(s => s - 1)} className="px-6 py-2.5 text-gray-600 font-medium hover:bg-gray-200 rounded-xl">Back</button> : <div></div>}
+                <div className="p-6 border-t border-gray-100 dark:border-slate-800 flex justify-between bg-gray-50 dark:bg-slate-800/50">
+                    {step > 1 ? <button onClick={() => setStep(s => s - 1)} className="px-6 py-2.5 text-gray-600 dark:text-slate-300 font-medium hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors">Back</button> : <div></div>}
                     {step < 4 ? (
-                        <button onClick={() => setStep(s => s + 1)} className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200">Next Step</button>
+                        <button onClick={() => setStep(s => s + 1)} className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 dark:shadow-none transition-colors">Next Step</button>
                     ) : (
-                        <button onClick={() => onComplete(details)} className="px-8 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 flex items-center gap-2">
+                        <button onClick={() => onComplete(details)} className="px-8 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 dark:shadow-none flex items-center gap-2 transition-colors">
                             Confirm & Offboard
                         </button>
                     )}
@@ -284,22 +284,22 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
     const [data, setData] = useState<Employee>(employee);
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
-                    <h2 className="text-lg font-bold text-gray-900">Edit Employee</h2>
-                    <button onClick={onCancel}><X className="w-5 h-5 text-gray-500" /></button>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent dark:border-slate-800">
+                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">Edit Employee</h2>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors"><X className="w-5 h-5 text-gray-500 dark:text-slate-400" /></button>
                 </div>
                 <div className="p-6 overflow-y-auto space-y-6">
                     {/* Basic Info */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Personal Details</h3>
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Personal Details</h3>
                         <div className="grid grid-cols-2 gap-4">
                              <div className="col-span-2 flex items-center gap-4 mb-4">
-                                <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 overflow-hidden">
+                                <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden">
                                     {data.profileImage ? (
                                         <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                     ) : (
-                                        <Users className="w-8 h-8 text-slate-300" />
+                                        <Users className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-2">
@@ -321,7 +321,7 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                                     />
                                     <label 
                                         htmlFor="edit-profile-upload"
-                                        className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer transition-all"
+                                        className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-all"
                                     >
                                         Change Photo
                                     </label>
@@ -335,12 +335,12 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                                     )}
                                 </div>
                              </div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Code</label><input disabled type="text" value={data.code} className="w-full p-2 border rounded-lg mt-1 bg-gray-100 text-gray-500" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Name</label><input type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Designation</label><input type="text" value={data.designation} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Department</label><input type="text" value={data.department} onChange={e => setData({...data, department: e.target.value})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div className="col-span-2"><label className="text-xs font-semibold text-gray-500 uppercase">Company</label>
-                                 <select value={data.company} onChange={e => setData({...data, company: e.target.value})} className="w-full p-2 border rounded-lg mt-1">
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Code</label><input disabled type="text" value={data.code} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Name</label><input type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Designation</label><input type="text" value={data.designation} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Department</label><input type="text" value={data.department} onChange={e => setData({...data, department: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div className="col-span-2"><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Company</label>
+                                 <select value={data.company} onChange={e => setData({...data, company: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
                                      <option value="">Select Company</option>
                                      {companies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                  </select>
@@ -350,40 +350,40 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
 
                     {/* Salary Info */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Salary Structure (AED)</h3>
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Salary Structure (AED)</h3>
                         <div className="grid grid-cols-3 gap-4">
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Basic</label><input type="number" value={data.salary.basic} onChange={e => setData({...data, salary: {...data.salary, basic: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Housing</label><input type="number" value={data.salary.housing} onChange={e => setData({...data, salary: {...data.salary, housing: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Transport</label><input type="number" value={data.salary.transport} onChange={e => setData({...data, salary: {...data.salary, transport: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Other</label><input type="number" value={data.salary.other} onChange={e => setData({...data, salary: {...data.salary, other: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Air Ticket</label><input type="number" value={data.salary.airTicket} onChange={e => setData({...data, salary: {...data.salary, airTicket: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Leave Salary</label><input type="number" value={data.salary.leaveSalary} onChange={e => setData({...data, salary: {...data.salary, leaveSalary: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Basic</label><input type="number" value={data.salary.basic} onChange={e => setData({...data, salary: {...data.salary, basic: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Housing</label><input type="number" value={data.salary.housing} onChange={e => setData({...data, salary: {...data.salary, housing: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Transport</label><input type="number" value={data.salary.transport} onChange={e => setData({...data, salary: {...data.salary, transport: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Other</label><input type="number" value={data.salary.other} onChange={e => setData({...data, salary: {...data.salary, other: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Air Ticket</label><input type="number" value={data.salary.airTicket} onChange={e => setData({...data, salary: {...data.salary, airTicket: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Leave Salary</label><input type="number" value={data.salary.leaveSalary} onChange={e => setData({...data, salary: {...data.salary, leaveSalary: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                         </div>
                     </div>
 
                     {/* Banking */}
                      <div>
-                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Banking Details</h3>
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Banking Details</h3>
                         <div className="grid grid-cols-2 gap-4">
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Bank Name</label><input type="text" value={data.bankName || ''} onChange={e => setData({...data, bankName: e.target.value})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">IBAN / Account</label><input type="text" value={data.iban || ''} onChange={e => setData({...data, iban: e.target.value})} className="w-full p-2 border rounded-lg mt-1" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Bank Name</label><input type="text" value={data.bankName || ''} onChange={e => setData({...data, bankName: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">IBAN / Account</label><input type="text" value={data.iban || ''} onChange={e => setData({...data, iban: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                         </div>
                     </div>
 
                     {/* Documents */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Documents & Identification</h3>
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Documents & Identification</h3>
                         <div className="grid grid-cols-2 gap-4">
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Emirates ID</label><input type="text" value={data.documents?.emiratesId || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesId: e.target.value}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">EID Expiry</label><input type="date" value={data.documents?.emiratesIdExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesIdExpiry: e.target.value}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Passport Number</label><input type="text" value={data.documents?.passportNumber || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportNumber: e.target.value}})} className="w-full p-2 border rounded-lg mt-1" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Passport Expiry</label><input type="date" value={data.documents?.passportExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportExpiry: e.target.value}})} className="w-full p-2 border rounded-lg mt-1" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Emirates ID</label><input type="text" value={data.documents?.emiratesId || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesId: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">EID Expiry</label><input type="date" value={data.documents?.emiratesIdExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesIdExpiry: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passport Number</label><input type="text" value={data.documents?.passportNumber || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportNumber: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passport Expiry</label><input type="date" value={data.documents?.passportExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportExpiry: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                         </div>
                     </div>
                 </div>
-                <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
-                    <button onClick={onCancel} className="px-4 py-2 bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
-                    <button onClick={() => onSave(data)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium">Save Changes</button>
+                <div className="p-4 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 flex justify-end gap-3">
+                    <button onClick={onCancel} className="px-4 py-2 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg text-sm font-medium text-gray-700 dark:text-slate-200 transition-colors">Cancel</button>
+                    <button onClick={() => onSave(data)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -426,37 +426,37 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="p-6 border-b flex justify-between items-center bg-white">
-                    <h2 className="text-xl font-bold text-gray-900">Onboard New Employee</h2>
-                    <button onClick={onCancel} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                        <X className="w-5 h-5 text-gray-500" />
+                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Onboard New Employee</h2>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                        <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
                     </button>
                 </div>
 
                 {/* Stepper */}
-                <div className="px-8 py-6 bg-gray-50/50 border-b">
+                <div className="px-8 py-6 bg-gray-50/50 dark:bg-slate-800/50 border-b dark:border-slate-800">
                     <div className="flex items-center justify-between max-w-2xl mx-auto relative">
                         {/* Connecting Lines */}
-                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
+                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
                         
                         {steps.map((s, idx) => (
-                            <div key={s.id} className="relative z-10 flex items-center gap-3 bg-gray-50/50 px-2">
+                            <div key={s.id} className="relative z-10 flex items-center gap-3 bg-gray-50/50 dark:bg-slate-800/50 px-2">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                                     step === s.id 
-                                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' 
+                                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-900/30' 
                                     : step > s.id 
-                                    ? 'bg-indigo-100 text-indigo-600' 
-                                    : 'bg-white border-2 border-gray-200 text-gray-400'
+                                    ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' 
+                                    : 'bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500'
                                 }`}>
                                     {step > s.id ? <CheckCircle className="w-5 h-5" /> : s.id}
                                 </div>
-                                <span className={`text-sm font-bold ${step === s.id ? 'text-gray-900' : 'text-gray-400'}`}>
+                                <span className={`text-sm font-bold ${step === s.id ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-slate-500'}`}>
                                     {s.name}
                                 </span>
                                 {idx < steps.length - 1 && (
-                                    <div className={`w-12 h-0.5 ${step > s.id ? 'bg-indigo-600' : 'bg-gray-200'}`}></div>
+                                    <div className={`w-12 h-0.5 ${step > s.id ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-slate-700'}`}></div>
                                 )}
                             </div>
                         ))}
@@ -467,16 +467,16 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                 <div className="p-8 max-h-[60vh] overflow-y-auto">
                     {step === 1 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900">Personal Information</h3>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Personal Information</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1.5 col-span-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Profile Image</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Profile Image</label>
                                     <div className="flex items-center gap-4">
-                                        <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 overflow-hidden">
+                                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden">
                                             {data.profileImage ? (
                                                 <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                             ) : (
-                                                <Users className="w-8 h-8 text-slate-300" />
+                                                <Users className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                             )}
                                         </div>
                                         <div className="flex flex-col gap-2">
@@ -498,59 +498,59 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                             />
                                             <label 
                                                 htmlFor="profile-upload"
-                                                className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-100 transition-colors"
+                                                className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                                             >
                                                 Upload Photo
                                             </label>
-                                            <p className="text-[10px] text-slate-400">JPG, PNG or GIF. Max 1MB.</p>
+                                            <p className="text-[10px] text-slate-400 dark:text-slate-500">JPG, PNG or GIF. Max 1MB.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Employee Code *</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Employee Code *</label>
                                     <input 
                                         placeholder="e.g. 1001" 
                                         value={data.code||''} 
                                         onChange={e=>setData({...data, code:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Full Name *</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Full Name *</label>
                                     <input 
                                         placeholder="John Doe" 
                                         value={data.name||''} 
                                         onChange={e=>setData({...data, name:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Company</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Company</label>
                                     <select 
                                         value={data.company||''} 
                                         onChange={e=>setData({...data, company:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white"
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                                     >
                                         <option value="">Select Company</option>
                                         {companies.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Joining Date *</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Joining Date *</label>
                                     <input 
                                         type="date" 
                                         value={data.joiningDate||''} 
                                         onChange={e=>setData({...data, joiningDate:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Mobile Number</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Mobile Number</label>
                                     <input 
                                         placeholder="e.g. +971 ..." 
                                         value={data.mobileNumber||''} 
                                         onChange={e=>setData({...data, mobileNumber:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                             </div>
@@ -559,32 +559,32 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
 
                     {step === 2 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900">Role & Work Details</h3>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Role & Work Details</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Designation</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Designation</label>
                                     <input 
                                         placeholder="e.g. Driver" 
                                         value={data.designation||''} 
                                         onChange={e=>setData({...data, designation:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Department</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Department</label>
                                     <input 
                                         placeholder="e.g. Transport" 
                                         value={data.department||''} 
                                         onChange={e=>setData({...data, department:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Team</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Team</label>
                                     <select 
                                         value={data.team||''} 
                                         onChange={e=>setData({...data, team:e.target.value as any})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white"
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                                     >
                                         <option value="Internal Team">Internal Team</option>
                                         <option value="External Team">External Team</option>
@@ -592,11 +592,11 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Staff Type *</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Staff Type *</label>
                                     <select 
                                         value={data.type||''} 
                                         onChange={e=>setData({...data, type:e.target.value as any})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white"
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                                     >
                                         <option value={StaffType.OFFICE}>{StaffType.OFFICE}</option>
                                         <option value={StaffType.WORKER}>{StaffType.WORKER}</option>
@@ -604,12 +604,12 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Work Location</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Work Location</label>
                                     <input 
                                         placeholder="e.g. Dubai" 
                                         value={data.workLocation||''} 
                                         onChange={e=>setData({...data, workLocation:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                             </div>
@@ -618,80 +618,80 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
 
                     {step === 3 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900">Salary & Banking</h3>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Salary & Banking</h3>
                             <div className="grid grid-cols-3 gap-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Basic *</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Basic *</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.basic} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, basic:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Housing</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Housing</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.housing} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, housing:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Transport</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Transport</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.transport} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, transport:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Air Ticket</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Air Ticket</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.airTicket} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, airTicket:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Leave Salary</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Leave Salary</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.leaveSalary} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, leaveSalary:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Other</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Other</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.other} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, other:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-6 pt-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Bank Name</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Bank Name</label>
                                     <input 
                                         placeholder="e.g. Emirates NBD" 
                                         value={data.bankName||''} 
                                         onChange={e=>setData({...data, bankName:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">IBAN / Acct No.</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">IBAN / Acct No.</label>
                                     <input 
                                         placeholder="AE00 0000 0000 0000 0000 000" 
                                         value={data.iban||''} 
                                         onChange={e=>setData({...data, iban:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                             </div>
@@ -700,42 +700,42 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
 
                     {step === 4 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900">Documents & Identification</h3>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Documents & Identification</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Emirates ID Number</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Emirates ID Number</label>
                                     <input 
                                         placeholder="784-..." 
                                         value={data.documents?.emiratesId||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, emiratesId:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">EID Expiry</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">EID Expiry</label>
                                     <input 
                                         type="date" 
                                         value={data.documents?.emiratesIdExpiry||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, emiratesIdExpiry:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Passport Number</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Passport Number</label>
                                     <input 
                                         placeholder="e.g. N1234567" 
                                         value={data.documents?.passportNumber||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, passportNumber:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Passport Expiry</label>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Passport Expiry</label>
                                     <input 
                                         type="date" 
                                         value={data.documents?.passportExpiry||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, passportExpiry:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
                                 </div>
                             </div>
@@ -744,12 +744,12 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
+                <div className="p-6 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center">
                     <button 
                         onClick={prevStep} 
                         disabled={step === 1}
                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                            step === 1 ? 'opacity-0 pointer-events-none' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                            step === 1 ? 'opacity-0 pointer-events-none' : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
                         }`}
                     >
                         Back
@@ -759,14 +759,14 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                         <button 
                             onClick={nextStep} 
                             disabled={!isStepValid()}
-                            className="px-8 py-2.5 bg-[#1e293b] text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-all disabled:opacity-50 shadow-lg shadow-slate-200"
+                            className="px-8 py-2.5 bg-[#1e293b] dark:bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 dark:hover:bg-indigo-700 transition-all disabled:opacity-50 shadow-lg shadow-slate-200 dark:shadow-none"
                         >
                             Next Step <ArrowRight className="w-4 h-4" />
                         </button>
                     ) : (
                         <button 
                             onClick={() => onComplete(data as Employee)} 
-                            className="px-8 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
+                            className="px-8 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none"
                         >
                             Complete Onboarding <CheckCircle className="w-4 h-4" />
                         </button>
@@ -909,20 +909,20 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
                             <Shield className="w-5 h-5" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-800">System User Management</h2>
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white">System User Management</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5" /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 dark:text-slate-400" /></button>
                 </div>
                 
                 <div className="p-6 max-h-[70vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-semibold text-gray-700">Active System Users</h3>
+                        <h3 className="font-semibold text-gray-700 dark:text-slate-300">Active System Users</h3>
                         {(currentUser.role === UserRole.ADMIN || currentUser.role === UserRole.CREATOR || currentUser.email === CREATOR_USER.email) && (
                             <button onClick={() => { setShowAdd(true); setEditingUser(null); }} className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700">
                                 <Plus className="w-4 h-4" /> Add User
@@ -931,24 +931,24 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                     </div>
 
                     {showAdd && (
-                        <div className="mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-100 space-y-3">
+                        <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/30 space-y-3">
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Full Name</label>
-                                    <input className="w-full p-2 border rounded-lg text-sm" placeholder="Full Name" value={newUser.name} onChange={e=>setNewUser({...newUser, name: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Full Name</label>
+                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Full Name" value={newUser.name} onChange={e=>setNewUser({...newUser, name: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Username / Email</label>
-                                    <input className="w-full p-2 border rounded-lg text-sm" placeholder="Username" value={newUser.username} onChange={e=>setNewUser({...newUser, username: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Username / Email</label>
+                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Username" value={newUser.username} onChange={e=>setNewUser({...newUser, username: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Password</label>
-                                    <input className="w-full p-2 border rounded-lg text-sm" type="password" placeholder="Password" value={newUser.password} onChange={e=>setNewUser({...newUser, password: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Password</label>
+                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" type="password" placeholder="Password" value={newUser.password} onChange={e=>setNewUser({...newUser, password: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Role</label>
+                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Role</label>
                                     <input 
-                                        className="w-full p-2 border rounded-lg text-sm" 
+                                        className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                         placeholder="Enter Role Manually" 
                                         value={newUser.role} 
                                         onChange={e=>setNewUser({...newUser, role: e.target.value})} 
@@ -957,10 +957,10 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                             </div>
 
                             <div className="space-y-2 mt-4">
-                                <label className="text-[10px] font-bold text-indigo-600 uppercase">Permissions</label>
+                                <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Permissions</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {Object.keys(newUser.permissions).map(perm => (
-                                        <label key={perm} className="flex items-center gap-2 p-2 border rounded-lg bg-white cursor-pointer hover:bg-indigo-100/30">
+                                        <label key={perm} className="flex items-center gap-2 p-2 border dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 cursor-pointer hover:bg-indigo-100/30 dark:hover:bg-indigo-900/30">
                                             <input 
                                                 type="checkbox" 
                                                 checked={(newUser.permissions as any)[perm]} 
@@ -970,39 +970,39 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                                                 })}
                                                 className="w-4 h-4 text-indigo-600 rounded"
                                             />
-                                            <span className="text-[10px] font-medium text-gray-700 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
+                                            <span className="text-[10px] font-medium text-gray-700 dark:text-slate-300 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
 
                             <div className="flex justify-end gap-2 mt-4">
-                                <button onClick={() => setShowAdd(false)} className="px-3 py-1.5 text-gray-600 text-sm font-medium">Cancel</button>
+                                <button onClick={() => setShowAdd(false)} className="px-3 py-1.5 text-gray-600 dark:text-slate-400 text-sm font-medium">Cancel</button>
                                 <button onClick={handleAdd} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-bold">Save User</button>
                             </div>
                         </div>
                     )}
 
                     {editingUser && (
-                        <div className="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-100 space-y-3">
-                            <h4 className="text-sm font-bold text-orange-800">Editing: {editingUser.name}</h4>
+                        <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-100 dark:border-orange-900/30 space-y-3">
+                            <h4 className="text-sm font-bold text-orange-800 dark:text-orange-400">Editing: {editingUser.name}</h4>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Full Name</label>
-                                    <input className="w-full p-2 border rounded-lg text-sm" placeholder="Full Name" value={editingUser.name} onChange={e=>setEditingUser({...editingUser, name: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Full Name</label>
+                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Full Name" value={editingUser.name} onChange={e=>setEditingUser({...editingUser, name: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Username / Email</label>
-                                    <input className="w-full p-2 border rounded-lg text-sm" placeholder="Username" value={editingUser.email || editingUser.username || ''} onChange={e=>setEditingUser({...editingUser, email: e.target.value, username: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Username / Email</label>
+                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Username" value={editingUser.email || editingUser.username || ''} onChange={e=>setEditingUser({...editingUser, email: e.target.value, username: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Password</label>
-                                    <input className="w-full p-2 border rounded-lg text-sm" type="password" placeholder="Password" value={editingUser.password || ''} onChange={e=>setEditingUser({...editingUser, password: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Password</label>
+                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" type="password" placeholder="Password" value={editingUser.password || ''} onChange={e=>setEditingUser({...editingUser, password: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Role</label>
+                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Role</label>
                                     <input 
-                                        className="w-full p-2 border rounded-lg text-sm" 
+                                        className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                         placeholder="Enter Role Manually" 
                                         value={editingUser.role} 
                                         onChange={e=>setEditingUser({...editingUser, role: e.target.value as any})} 
@@ -1011,10 +1011,10 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                             </div>
                             
                             <div className="space-y-2 mt-4">
-                                <label className="text-[10px] font-bold text-orange-600 uppercase">Permissions</label>
+                                <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Permissions</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {Object.keys(editingUser.permissions).map(perm => (
-                                        <label key={perm} className="flex items-center gap-2 p-2 border rounded-lg bg-white cursor-pointer hover:bg-orange-100/30">
+                                        <label key={perm} className="flex items-center gap-2 p-2 border dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 cursor-pointer hover:bg-orange-100/30 dark:hover:bg-orange-900/30">
                                             <input 
                                                 type="checkbox" 
                                                 checked={(editingUser.permissions as any)[perm]} 
@@ -1024,14 +1024,14 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                                                 })}
                                                 className="w-4 h-4 text-orange-600 rounded"
                                             />
-                                            <span className="text-[10px] font-medium text-gray-700 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
+                                            <span className="text-[10px] font-medium text-gray-700 dark:text-slate-300 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
 
                             <div className="flex justify-end gap-2 mt-4">
-                                <button onClick={() => setEditingUser(null)} className="px-3 py-1.5 text-gray-600 text-sm font-medium">Cancel</button>
+                                <button onClick={() => setEditingUser(null)} className="px-3 py-1.5 text-gray-600 dark:text-slate-400 text-sm font-medium">Cancel</button>
                                 <button onClick={handleEdit} className="px-3 py-1.5 bg-orange-600 text-white rounded-lg text-sm font-bold">Update User</button>
                             </div>
                         </div>
@@ -1048,22 +1048,22 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                                 return u.role !== UserRole.CREATOR && u.email !== CREATOR_USER.email;
                             })
                             .map(u => (
-                            <div key={u.uid || u.username} className="flex items-center justify-between p-3 border rounded-xl hover:bg-gray-50 transition-colors">
+                            <div key={u.uid || u.username} className="flex items-center justify-between p-3 border dark:border-slate-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xs">
+                                    <div className="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-gray-500 dark:text-slate-400 font-bold text-xs">
                                         {u.name.charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-800 text-sm">{u.name} <span className="text-gray-400 font-normal">({u.email || u.username})</span></p>
-                                        <p className="text-xs text-indigo-600 font-semibold uppercase">{u.role}</p>
+                                        <p className="font-medium text-gray-800 dark:text-white text-sm">{u.name} <span className="text-gray-400 dark:text-slate-500 font-normal">({u.email || u.username})</span></p>
+                                        <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">{u.role}</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={() => { setEditingUser(u); setShowAdd(false); }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                                    <button onClick={() => { setEditingUser(u); setShowAdd(false); }} className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors">
                                         <Edit className="w-4 h-4" />
                                     </button>
                                     {u.email !== CREATOR_USER.username && (
-                                        <button onClick={() => handleDelete(u)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                        <button onClick={() => handleDelete(u)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     )}
@@ -1073,7 +1073,7 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                     </div>
                 </div>
                 
-                <div className="p-4 bg-gray-50 border-t text-center text-xs text-gray-500 font-medium">
+                <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border-t dark:border-slate-800 text-center text-xs text-gray-500 dark:text-slate-400 font-medium">
                     Only Admin can Create New User.
                 </div>
             </div>
@@ -1135,26 +1135,26 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
                             <Building2 className="w-5 h-5" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-800">Manage Companies</h2>
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white">Manage Companies</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5" /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 dark:text-slate-400" /></button>
                 </div>
                 
                 <div className="p-6 space-y-6 overflow-y-auto">
                     {/* Add New Company Form */}
-                    <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 space-y-4">
+                    <div className="bg-indigo-50/50 dark:bg-indigo-900/10 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/30 space-y-4">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-bold text-indigo-900">Add New Company</h3>
+                            <h3 className="text-sm font-bold text-indigo-900 dark:text-indigo-400">Add New Company</h3>
                             {!isAdding && (
                                 <button 
                                     onClick={() => setIsAdding(true)}
-                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+                                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                                 >
                                     + Create New
                                 </button>
@@ -1165,27 +1165,27 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Company Name</label>
+                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Company Name</label>
                                         <input 
-                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" 
+                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                             placeholder="e.g. Acme Corp" 
                                             value={formData.name} 
                                             onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} 
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Email Address</label>
+                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Email Address</label>
                                         <input 
-                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" 
+                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                             placeholder="contact@company.com" 
                                             value={formData.email} 
                                             onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} 
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Contact Number</label>
+                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Contact Number</label>
                                         <input 
-                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" 
+                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                             placeholder="+971 50 123 4567" 
                                             value={formData.phone} 
                                             onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} 
@@ -1193,9 +1193,9 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Office Address</label>
+                                    <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Office Address</label>
                                     <input 
-                                        className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" 
+                                        className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                         placeholder="123 Business St, Suite 100" 
                                         value={formData.address} 
                                         onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))} 
@@ -1210,18 +1210,18 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                                 onChange={e => handleLogoUpload(null, e)}
                                                 className="absolute inset-0 opacity-0 cursor-pointer"
                                             />
-                                            <button className="px-3 py-1.5 bg-white border rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50">
+                                            <button className="px-3 py-1.5 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700">
                                                 Upload Logo
                                             </button>
                                         </div>
                                         {formData.logo && (
-                                            <img src={formData.logo} alt="Preview" className="h-8 w-8 object-contain rounded border bg-white" />
+                                            <img src={formData.logo} alt="Preview" className="h-8 w-8 object-contain rounded border dark:border-slate-700 bg-white dark:bg-slate-800" />
                                         )}
                                     </div>
                                     <div className="flex gap-2">
                                         <button 
                                             onClick={() => setIsAdding(false)}
-                                            className="px-4 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg"
+                                            className="px-4 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
                                         >
                                             Cancel
                                         </button>
@@ -1242,19 +1242,19 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Registered Companies ({companies.length})</h3>
                         <div className="grid gap-4">
                             {companies.map(c => (
-                                <div key={c.id} className="p-4 border rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow space-y-4 relative group">
+                                <div key={c.id} className="p-4 border dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 shadow-sm hover:shadow-md dark:hover:shadow-none transition-shadow space-y-4 relative group">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
                                             {c.logo ? (
-                                                <img src={c.logo} alt={c.name} className="h-10 w-10 object-contain rounded-lg border p-1 bg-gray-50" />
+                                                <img src={c.logo} alt={c.name} className="h-10 w-10 object-contain rounded-lg border dark:border-slate-800 p-1 bg-gray-50 dark:bg-slate-800" />
                                             ) : (
-                                                <div className="h-10 w-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-lg">
+                                                <div className="h-10 w-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg">
                                                     {c.name.charAt(0)}
                                                 </div>
                                             )}
                                             <div>
-                                                <h3 className="font-bold text-gray-800 text-sm">{c.name}</h3>
-                                                <p className="text-[10px] text-gray-400">ID: {c.id}</p>
+                                                <h3 className="font-bold text-gray-800 dark:text-white text-sm">{c.name}</h3>
+                                                <p className="text-[10px] text-gray-400 dark:text-slate-500">ID: {c.id}</p>
                                             </div>
                                         </div>
                                         <button 
@@ -1344,31 +1344,31 @@ const BulkImportModal = ({ onClose, onImport }: { onClose: () => void, onImport:
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
                             <Download className="w-5 h-5" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-800">Bulk Import Employees</h2>
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white">Bulk Import Employees</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5" /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 dark:text-slate-400" /></button>
                 </div>
                 
                 <div className="p-8 text-center space-y-4">
-                    <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 hover:border-indigo-300 transition-colors cursor-pointer relative">
+                    <div className="border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-2xl p-8 hover:border-indigo-300 dark:hover:border-indigo-500 transition-colors cursor-pointer relative">
                         <input type="file" accept=".xlsx, .xls, .csv" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                         <div className="flex flex-col items-center gap-3">
-                            <div className="p-4 bg-indigo-50 rounded-full text-indigo-600">
+                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400">
                                 <FileText className="w-8 h-8" />
                             </div>
                             <div>
-                                <p className="font-bold text-gray-700">Click to upload or drag and drop</p>
-                                <p className="text-sm text-gray-500">Excel or CSV files only</p>
+                                <p className="font-bold text-gray-700 dark:text-slate-200">Click to upload or drag and drop</p>
+                                <p className="text-sm text-gray-500 dark:text-slate-400">Excel or CSV files only</p>
                             </div>
                         </div>
                     </div>
-                    <p className="text-xs text-gray-400">Make sure your file follows the standard template format.</p>
+                    <p className="text-xs text-gray-400 dark:text-slate-500">Make sure your file follows the standard template format.</p>
                 </div>
             </div>
         </div>
@@ -1380,12 +1380,12 @@ const BulkImportModal = ({ onClose, onImport }: { onClose: () => void, onImport:
 const AboutView = () => {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                 <div className="h-32 bg-gradient-to-r from-indigo-600 to-blue-600"></div>
                 <div className="px-8 pb-8">
                     <div className="relative flex justify-between items-end -mt-12 mb-6">
-                        <div className="p-1 bg-white rounded-2xl shadow-lg">
-                            <div className="w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center text-indigo-600">
+                        <div className="p-1 bg-white dark:bg-slate-900 rounded-2xl shadow-lg">
+                            <div className="w-24 h-24 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                                 <Users className="w-12 h-12" />
                             </div>
                         </div>
@@ -1393,31 +1393,31 @@ const AboutView = () => {
                     
                     <div className="space-y-4">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">{DEFAULT_ABOUT_DATA.name}</h2>
-                            <p className="text-indigo-600 font-medium">{DEFAULT_ABOUT_DATA.title}</p>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{DEFAULT_ABOUT_DATA.name}</h2>
+                            <p className="text-indigo-600 dark:text-indigo-400 font-medium">{DEFAULT_ABOUT_DATA.title}</p>
                         </div>
                         
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                             {DEFAULT_ABOUT_DATA.bio}
                         </p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                                <div className="p-2 bg-white rounded-lg shadow-sm text-gray-400">
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
+                                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm text-gray-400 dark:text-slate-500">
                                     <FileText className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-gray-400 uppercase font-bold">Email</p>
-                                    <p className="text-sm font-medium text-gray-700">{DEFAULT_ABOUT_DATA.email}</p>
+                                    <p className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold">Email</p>
+                                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{DEFAULT_ABOUT_DATA.email}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                                <div className="p-2 bg-white rounded-lg shadow-sm text-gray-400">
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
+                                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm text-gray-400 dark:text-slate-500">
                                     <AlertCircle className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-gray-400 uppercase font-bold">Support</p>
-                                    <p className="text-sm font-medium text-gray-700">{DEFAULT_ABOUT_DATA.contactInfo}</p>
+                                    <p className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold">Support</p>
+                                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{DEFAULT_ABOUT_DATA.contactInfo}</p>
                                 </div>
                             </div>
                         </div>
@@ -1425,7 +1425,7 @@ const AboutView = () => {
                 </div>
             </div>
 
-            <div className="bg-indigo-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+            <div className="bg-indigo-900 dark:bg-indigo-950 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
                 <div className="relative z-10">
                     <h3 className="text-xl font-bold mb-2">Al Reem DMS Enterprise</h3>
                     <p className="text-indigo-100 mb-6 max-w-lg">
@@ -1462,23 +1462,23 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-white dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]"
             >
-                <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-brand-50 rounded-2xl">
-                            <Activity className="w-6 h-6 text-brand-600" />
+                        <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-2xl">
+                            <Activity className="w-6 h-6 text-brand-600 dark:text-brand-400" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Log</h2>
-                            <p className="text-slate-400 text-sm font-bold">Real-time system activity and security trail</p>
+                            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">System Audit Log</h2>
+                            <p className="text-slate-400 dark:text-slate-500 text-sm font-bold">Real-time system activity and security trail</p>
                         </div>
                     </div>
                     <button 
                         onClick={onClose}
-                        className="p-3 hover:bg-slate-50 rounded-2xl transition-all active:scale-95"
+                        className="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-95"
                     >
-                        <X className="w-6 h-6 text-slate-400" />
+                        <X className="w-6 h-6 text-slate-400 dark:text-slate-500" />
                     </button>
                 </div>
 
@@ -1486,13 +1486,13 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                     <div className="space-y-4">
                         {logs.length > 0 ? (
                             logs.map((log) => (
-                                <div key={log.id} className="group p-6 bg-slate-50 rounded-3xl border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-xl hover:shadow-brand-500/5 transition-all duration-300">
+                                <div key={log.id} className="group p-6 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-900/30 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xl hover:shadow-brand-500/5 dark:hover:shadow-none transition-all duration-300">
                                     <div className="flex items-start gap-6">
                                         <div className={cn(
                                             "p-4 rounded-2xl shrink-0 transition-transform group-hover:scale-110 duration-300",
-                                            log.type === 'create' ? 'bg-emerald-100 text-emerald-600' :
-                                            log.type === 'delete' ? 'bg-red-100 text-red-600' :
-                                            log.type === 'update' ? 'bg-brand-100 text-brand-600' : 'bg-indigo-100 text-indigo-600'
+                                            log.type === 'create' ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' :
+                                            log.type === 'delete' ? 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400' :
+                                            log.type === 'update' ? 'bg-brand-100 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400' : 'bg-indigo-100 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400'
                                         )}>
                                             {log.type === 'create' ? <UserPlus className="w-6 h-6" /> :
                                              log.type === 'delete' ? <UserMinus className="w-6 h-6" /> :
@@ -1500,23 +1500,23 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-2">
-                                                <h4 className="text-lg font-black text-slate-900 tracking-tight">{log.action}</h4>
-                                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
+                                                <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{log.action}</h4>
+                                                <span className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
                                             </div>
-                                            <p className="text-slate-600 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
+                                            <p className="text-slate-600 dark:text-slate-300 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
                                             <div className="flex flex-wrap items-center gap-4">
-                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl">
+                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
                                                     <div className="w-2 h-2 rounded-full bg-brand-500"></div>
-                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">User: {log.userName}</span>
+                                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">User: {log.userName}</span>
                                                 </div>
-                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl">
+                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
                                                     <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Role: {log.userRole}</span>
+                                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role: {log.userRole}</span>
                                                 </div>
                                                 {log.isCreator && (
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-100 rounded-xl">
-                                                        <ShieldCheck className="w-3 h-3 text-amber-600" />
-                                                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider">Creator Log</span>
+                                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl">
+                                                        <ShieldCheck className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                                                        <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider">Creator Log</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -1526,20 +1526,20 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                             ))
                         ) : (
                             <div className="py-20 text-center">
-                                <Activity className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-                                <h3 className="text-xl font-black text-slate-900 tracking-tight">No audit records found</h3>
-                                <p className="text-slate-400 font-bold mt-2">System activity will appear here as it happens.</p>
+                                <Activity className="w-16 h-16 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">No audit records found</h3>
+                                <p className="text-slate-400 dark:text-slate-500 font-bold mt-2">System activity will appear here as it happens.</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div className="p-8 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+                <div className="p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex justify-end">
                     <button 
                         onClick={onClose}
-                        className="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl text-sm font-black hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+                        className="px-8 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-sm font-black hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 shadow-sm"
                     >
-                        Close Log
+                        Close Logs
                     </button>
                 </div>
             </motion.div>
@@ -1564,6 +1564,45 @@ export default function App() {
   const [showAuditModal, setShowAuditModal] = useState(false);
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    if (systemUser?.theme) {
+      setIsDarkMode(systemUser.theme === 'dark');
+    }
+  }, [systemUser?.theme]);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const handleToggleDarkMode = async () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    if (systemUser) {
+      const updatedUser = { ...systemUser, theme: (newMode ? 'dark' : 'light') as 'light' | 'dark' };
+      await saveSystemUser(updatedUser);
+      setSystemUser(updatedUser);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!user?.email) return;
+    try {
+      await resetPassword(user.email);
+      openConfirm('Password Reset', `A password reset email has been sent to ${user.email}. Please check your inbox.`, () => {}, 'warning');
+    } catch (error: any) {
+      openConfirm('Error', `Failed to send reset email: ${error.message}`, () => {}, 'danger');
+    }
+  };
   
   // View States
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -1897,7 +1936,12 @@ export default function App() {
         <ProfileView user={systemUser} />
       )}
       {activeTab === 'settings' && (
-        <SettingsView user={systemUser} />
+        <SettingsView 
+          user={systemUser} 
+          isDarkMode={isDarkMode}
+          onToggleDarkMode={handleToggleDarkMode}
+          onPasswordReset={handlePasswordReset}
+        />
       )}
       {activeTab === 'help' && (
         <HelpCenterView />
@@ -2015,17 +2059,20 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
         <div className="space-y-8 pb-12">
             {/* Header Section */}
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
-                        <Activity className="w-4 h-4" />
-                        System Intelligence
+                {user.role === UserRole.CREATOR && (
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
+                            <Activity className="w-4 h-4" />
+                            System Intelligence
+                        </div>
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Executive Dashboard</h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl">
+                            Welcome back, <span className="text-slate-900 dark:text-white font-bold">{user.name}</span>. 
+                            The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
+                        </p>
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
-                    <p className="text-slate-500 font-medium max-w-xl">
-                        Welcome back, <span className="text-slate-900 font-bold">{user.name}</span>. 
-                        The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
-                    </p>
-                </div>
+                )}
+                {user.role !== UserRole.CREATOR && <div className="flex-1"></div>}
                 
                 <div className="flex flex-wrap items-center gap-3">
                     {(user.role === UserRole.CREATOR || user.role === UserRole.ADMIN || user.role === UserRole.HR) && (
@@ -2037,12 +2084,12 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                         </button>
                     )}
                     {(user.role === UserRole.CREATOR || user.role === UserRole.ADMIN) && (
-                        <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
-                            <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="Manage Companies">
+                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-400 transition-all" title="Manage Companies">
                                 <Building2 className="w-5 h-5" />
                             </button>
-                            <div className="w-px h-4 bg-slate-200"></div>
-                            <button onClick={onOpenUserManagement} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="System Users">
+                            <div className="w-px h-4 bg-slate-200 dark:bg-slate-800"></div>
+                            <button onClick={onOpenUserManagement} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-400 transition-all" title="System Users">
                                 <UserCog className="w-5 h-5" />
                             </button>
                         </div>
@@ -2087,13 +2134,13 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                 />
 
                 {/* Recent Activity Log */}
-                <div className="md:col-span-2 lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm flex flex-col">
+                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-brand-50 rounded-2xl">
+                            <div className="p-2.5 bg-brand-50 dark:bg-brand-900/20 rounded-2xl">
                                 <Activity className="w-5 h-5 text-brand-600" />
                             </div>
-                            <h3 className="text-xl font-black text-slate-900 tracking-tight">System Activity</h3>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">System Activity</h3>
                         </div>
                         <button 
                             onClick={() => setShowAuditModal(true)}
@@ -2125,7 +2172,7 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                 </div>
 
                 {/* Quick Actions & Access */}
-                <div className="md:col-span-2 lg:col-span-2 bg-brand-600 rounded-[2.5rem] p-8 text-white flex flex-col relative overflow-hidden group">
+                <div className="md:col-span-2 lg:col-span-2 bg-brand-600 dark:bg-brand-700 rounded-[2.5rem] p-8 text-white flex flex-col relative overflow-hidden group">
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mb-20 transition-transform duration-700 group-hover:scale-110"></div>
                     
                     <div className="relative z-10 flex flex-col h-full">
@@ -2141,16 +2188,16 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                                 {showQuickAdminMenu && (
                                     <>
                                         <div className="fixed inset-0 z-10" onClick={() => setShowQuickAdminMenu(false)}></div>
-                                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-20 text-slate-900">
+                                        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-20 text-slate-900 dark:text-white">
                                             <button 
                                                 onClick={() => { onOpenUserManagement(); setShowQuickAdminMenu(false); }}
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-brand-600 transition-all"
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
                                             >
                                                 <UserCog className="w-4 h-4" /> System User Management
                                             </button>
                                             <button 
                                                 onClick={() => { onOpenManageCompanies(); setShowQuickAdminMenu(false); }}
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-brand-600 transition-all"
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
                                             >
                                                 <Building2 className="w-4 h-4" /> Manage Companies
                                             </button>
@@ -2188,46 +2235,46 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
 const ProfileView = ({ user }: { user: SystemUser }) => {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm overflow-hidden relative">
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-32 bg-brand-600"></div>
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="w-32 h-32 bg-white rounded-3xl flex items-center justify-center text-4xl font-black text-brand-600 shadow-xl border-4 border-white mb-4">
+                    <div className="w-32 h-32 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center text-4xl font-black text-brand-600 shadow-xl border-4 border-white dark:border-slate-700 mb-4">
                         {user.name.charAt(0)}
                     </div>
-                    <h2 className="text-2xl font-black text-slate-900">{user.name}</h2>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">{user.name}</h2>
                     <p className="text-brand-600 font-bold uppercase tracking-widest text-xs mt-1">{user.role}</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-12">
-                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</p>
-                            <p className="text-sm font-bold text-slate-900">{user.email}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{user.email}</p>
                         </div>
-                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Username</p>
-                            <p className="text-sm font-bold text-slate-900">{user.username || 'Not set'}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{user.username || 'Not set'}</p>
                         </div>
-                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Account Status</p>
                             <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                                <p className="text-sm font-bold text-slate-900">{user.active ? 'Active' : 'Inactive'}</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">{user.active ? 'Active' : 'Inactive'}</p>
                             </div>
                         </div>
-                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">User ID</p>
-                            <p className="text-xs font-mono text-slate-500">{user.uid}</p>
+                            <p className="text-xs font-mono text-slate-500 dark:text-slate-400">{user.uid}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
-                <h3 className="text-lg font-black text-slate-900 mb-6">Your Permissions</h3>
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-6">Your Permissions</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Object.entries(user.permissions).map(([key, value]) => (
-                        <div key={key} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                            {value ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-slate-300" />}
-                            <span className="text-xs font-bold text-slate-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <div key={key} className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            {value ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-slate-300 dark:text-slate-600" />}
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                         </div>
                     ))}
                 </div>
@@ -2237,7 +2284,12 @@ const ProfileView = ({ user }: { user: SystemUser }) => {
 };
 
 // --- Settings View ---
-const SettingsView = ({ user }: { user: SystemUser }) => {
+const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: { 
+    user: SystemUser, 
+    isDarkMode: boolean, 
+    onToggleDarkMode: () => void,
+    onPasswordReset: () => void 
+}) => {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center gap-4 mb-2">
@@ -2245,53 +2297,68 @@ const SettingsView = ({ user }: { user: SystemUser }) => {
                     <Settings className="w-6 h-6 text-brand-600" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Accountant Settings</h2>
-                    <p className="text-slate-500 font-medium">Manage your system preferences and security</p>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight dark:text-white">Accountant Settings</h2>
+                    <p className="text-slate-500 font-medium dark:text-slate-400">Manage your system preferences and security</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6">
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
-                    <h3 className="text-lg font-black text-slate-900 mb-6">Security</h3>
+                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                    <h3 className="text-lg font-black text-slate-900 mb-6 dark:text-white">Security</h3>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                             <div>
-                                <p className="text-sm font-bold text-slate-900">Change Password</p>
-                                <p className="text-xs text-slate-500">Update your account password regularly</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">Change Password</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Update your account password regularly</p>
                             </div>
-                            <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-brand-600 hover:bg-slate-50 transition-all">Update</button>
+                            <button 
+                                onClick={onPasswordReset}
+                                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-brand-600 hover:bg-slate-50 transition-all dark:bg-slate-900 dark:border-slate-700 dark:text-brand-400"
+                            >
+                                Update
+                            </button>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                             <div>
-                                <p className="text-sm font-bold text-slate-900">Two-Factor Authentication</p>
-                                <p className="text-xs text-slate-500">Add an extra layer of security to your account</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">Two-Factor Authentication</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Add an extra layer of security to your account</p>
                             </div>
-                            <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer">
+                            <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer dark:bg-slate-700">
                                 <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
-                    <h3 className="text-lg font-black text-slate-900 mb-6">System Preferences</h3>
+                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                    <h3 className="text-lg font-black text-slate-900 mb-6 dark:text-white">System Preferences</h3>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                             <div>
-                                <p className="text-sm font-bold text-slate-900">Email Notifications</p>
-                                <p className="text-xs text-slate-500">Receive system alerts via email</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">Email Notifications</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Receive system alerts via email</p>
                             </div>
                             <div className="w-12 h-6 bg-brand-600 rounded-full relative cursor-pointer">
                                 <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                             <div>
-                                <p className="text-sm font-bold text-slate-900">Dark Mode</p>
-                                <p className="text-xs text-slate-500">Switch between light and dark themes</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">Dark Mode</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Switch between light and dark themes</p>
                             </div>
-                            <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer">
-                                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                            <div 
+                                onClick={onToggleDarkMode}
+                                className={cn(
+                                    "w-12 h-6 rounded-full relative cursor-pointer transition-all duration-300",
+                                    isDarkMode ? "bg-brand-600" : "bg-slate-200 dark:bg-slate-700"
+                                )}
+                            >
+                                <motion.div 
+                                    animate={{ x: isDarkMode ? 24 : 0 }}
+                                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                    className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"
+                                />
                             </div>
                         </div>
                     </div>
@@ -2314,23 +2381,23 @@ const HelpCenterView = () => {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center gap-4 mb-2">
-                <div className="p-3 bg-brand-50 rounded-2xl">
+                <div className="p-3 bg-brand-50 rounded-2xl dark:bg-brand-900/20">
                     <HelpCircle className="w-6 h-6 text-brand-600" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Help Center</h2>
-                    <p className="text-slate-500 font-medium">Instructions and guides for Al Reem DMS</p>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Help Center</h2>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">Instructions and guides for Al Reem DMS</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6">
                 {instructions.map((item, idx) => (
-                    <div key={idx} className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
-                        <h3 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-3">
-                            <span className="w-8 h-8 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-sm">{idx + 1}</span>
+                    <div key={idx} className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm">
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-3">
+                            <span className="w-8 h-8 bg-brand-50 dark:bg-brand-900/20 text-brand-600 rounded-xl flex items-center justify-center text-sm">{idx + 1}</span>
                             {item.title}
                         </h3>
-                        <p className="text-slate-600 leading-relaxed font-medium pl-11">
+                        <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium pl-11">
                             {item.content}
                         </p>
                     </div>
@@ -2350,16 +2417,16 @@ const HelpCenterView = () => {
 
 const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) => {
     const colors: any = {
-        brand: "bg-brand-50 text-brand-600 border-brand-100 shadow-brand-500/5",
-        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/5",
-        orange: "bg-orange-50 text-orange-600 border-orange-100 shadow-orange-500/5",
-        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100 shadow-indigo-500/5",
+        brand: "bg-brand-50 text-brand-600 border-brand-100 shadow-brand-500/5 dark:bg-brand-900/20 dark:text-brand-400 dark:border-brand-900/30",
+        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/5 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30",
+        orange: "bg-orange-50 text-orange-600 border-orange-100 shadow-orange-500/5 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-900/30",
+        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100 shadow-indigo-500/5 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30",
     };
 
     return (
         <motion.div 
             whileHover={{ y: -5 }}
-            className="bg-white p-8 rounded-[2.5rem] border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[200px] transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 group"
+            className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col justify-between min-h-[200px] transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-black/50 group"
         >
             <div className="flex justify-between items-start">
                 <div className={cn("p-3.5 rounded-2xl transition-all duration-500 group-hover:rotate-6", colors[color])}>
@@ -2367,7 +2434,7 @@ const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) =>
                 </div>
             </div>
             <div>
-                <span className="text-4xl font-black text-slate-900 tracking-tighter">{value}</span>
+                <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{value}</span>
                 <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">{title}</p>
             </div>
         </motion.div>
@@ -2376,10 +2443,10 @@ const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) =>
 
 const ActivityItem = ({ icon: Icon, title, desc, time, color }: any) => {
     const colors: any = {
-        brand: "bg-brand-50 text-brand-600",
-        emerald: "bg-emerald-50 text-emerald-600",
-        orange: "bg-orange-50 text-orange-600",
-        indigo: "bg-indigo-50 text-indigo-600",
+        brand: "bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-400",
+        emerald: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
+        orange: "bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400",
+        indigo: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400",
     };
 
     return (
@@ -2389,12 +2456,12 @@ const ActivityItem = ({ icon: Icon, title, desc, time, color }: any) => {
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-sm font-bold text-slate-900 truncate">{title}</h4>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{title}</h4>
                     <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap uppercase tracking-widest">{time}</span>
                 </div>
-                <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{desc}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">{desc}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-600 transition-colors self-center" />
+            <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-700 group-hover:text-brand-600 transition-colors self-center" />
         </div>
     );
 };
@@ -2465,15 +2532,15 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
     return (
         <div className="space-y-6">
             {/* Advanced Filter Bar */}
-            <div className="bg-white/70 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row gap-4 items-center">
+            <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none flex flex-col lg:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                     <input 
                         type="text" 
                         placeholder="Search personnel by name or ID..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-11 pr-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm w-full outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
+                        className="pl-11 pr-4 py-3.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm w-full outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium dark:text-white dark:placeholder:text-slate-500"
                     />
                 </div>
                 
@@ -2481,17 +2548,17 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                     <select 
                         value={companyFilter}
                         onChange={(e) => setCompanyFilter(e.target.value)}
-                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
+                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
                     >
-                        {companies.map(c => <option key={c} value={c}>{c}</option>)}
+                        {companies.map(c => <option key={c} value={c} className="dark:bg-slate-900">{c}</option>)}
                     </select>
 
                     <select 
                         value={deptFilter}
                         onChange={(e) => setDeptFilter(e.target.value)}
-                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
+                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
                     >
-                        {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                        {departments.map(d => <option key={d} value={d} className="dark:bg-slate-900">{d}</option>)}
                     </select>
 
                     {!readOnly && (
@@ -2505,19 +2572,19 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                 </div>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden border border-white shadow-2xl shadow-slate-200/60">
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden border border-white dark:border-slate-800 shadow-2xl shadow-slate-200/60 dark:shadow-none">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/80 border-b border-slate-100">
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Personnel Details</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Department & Role</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Organization</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Actions</th>
+                            <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800">
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Personnel Details</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Department & Role</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Organization</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Status</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                             <AnimatePresence mode="popLayout">
                                 {filteredEmployees.map((e: Employee) => (
                                     <motion.tr 
@@ -2530,7 +2597,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                     >
                                         <td className="p-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 font-black border border-slate-200 group-hover:bg-white group-hover:border-brand-200 group-hover:text-brand-600 transition-all duration-300 overflow-hidden">
+                                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 dark:text-slate-400 font-black border border-slate-200 dark:border-slate-700 group-hover:bg-white dark:group-hover:bg-slate-900 group-hover:border-brand-200 dark:group-hover:border-brand-900/30 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-all duration-300 overflow-hidden">
                                                     {e.profileImage ? (
                                                         <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                     ) : (
@@ -2538,17 +2605,17 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-black text-slate-900 text-base">{e.name}</div>
-                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{e.code}</div>
+                                                    <div className="font-black text-slate-900 dark:text-white text-base">{e.name}</div>
+                                                    <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{e.code}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="p-6">
-                                            <div className="text-sm font-black text-slate-700">{e.designation}</div>
-                                            <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{e.team}</div>
+                                            <div className="text-sm font-black text-slate-700 dark:text-slate-300">{e.designation}</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-0.5">{e.team}</div>
                                         </td>
                                         <td className="p-6">
-                                            <span className="text-xs font-black text-slate-600 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200/60">
+                                            <span className="text-xs font-black text-slate-600 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700">
                                                 {e.company}
                                             </span>
                                         </td>
@@ -2560,7 +2627,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                                 )}></div>
                                                 <span className={cn(
                                                     "text-[10px] font-black uppercase tracking-widest",
-                                                    e.active ? 'text-emerald-600' : 'text-red-600'
+                                                    e.active ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
                                                 )}>
                                                     {e.status}
                                                 </span>
@@ -2570,7 +2637,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                             <div className="flex justify-end gap-2">
                                                 <button 
                                                     onClick={() => onEdit(e)} 
-                                                    className="p-2.5 hover:bg-white hover:shadow-lg text-brand-600 rounded-xl transition-all border border-transparent hover:border-brand-100 active:scale-90"
+                                                    className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
                                                     title="Edit Record"
                                                 >
                                                     <Edit className="w-4 h-4" />
@@ -2579,7 +2646,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                                     !readOnly && (
                                                         <button 
                                                             onClick={() => onOffboard(e)} 
-                                                            className="p-2.5 hover:bg-white hover:shadow-lg text-red-600 rounded-xl transition-all border border-transparent hover:border-red-100 active:scale-90"
+                                                            className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-red-600 dark:text-red-400 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/30 active:scale-90"
                                                             title="Offboard"
                                                         >
                                                             <LogOut className="w-4 h-4" />
@@ -2588,7 +2655,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                                 ) : (
                                                     <button 
                                                         onClick={() => onRejoin(e)} 
-                                                        className="p-2.5 hover:bg-white hover:shadow-lg text-emerald-600 rounded-xl transition-all border border-transparent hover:border-emerald-100 active:scale-90"
+                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-emerald-600 dark:text-emerald-400 rounded-xl transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 active:scale-90"
                                                         title="Rejoin"
                                                     >
                                                         <UserPlus className="w-4 h-4" />
@@ -2597,7 +2664,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                                 {!readOnly && (
                                                     <button 
                                                         onClick={() => onDelete(e)} 
-                                                        className="p-2.5 hover:bg-white hover:shadow-lg text-slate-400 hover:text-red-600 rounded-xl transition-all border border-transparent hover:border-slate-100 active:scale-90"
+                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800 active:scale-90"
                                                         title="Delete"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
@@ -2613,14 +2680,14 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                 </div>
                 {filteredEmployees.length === 0 && (
                     <div className="p-32 text-center">
-                        <div className="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-slate-100 shadow-inner">
-                            <Users className="w-10 h-10 text-slate-300" />
+                        <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-slate-700 shadow-inner">
+                            <Users className="w-10 h-10 text-slate-300 dark:text-slate-600" />
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">No personnel found</h3>
-                        <p className="text-slate-400 font-medium max-w-xs mx-auto mt-2">We couldn't find any records matching your current search or filter criteria.</p>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">No personnel found</h3>
+                        <p className="text-slate-400 dark:text-slate-500 font-medium max-w-xs mx-auto mt-2">We couldn't find any records matching your current search or filter criteria.</p>
                         <button 
                             onClick={() => { setSearchTerm(''); setCompanyFilter('All'); setDeptFilter('All'); }}
-                            className="mt-6 text-sm font-black text-brand-600 hover:underline"
+                            className="mt-6 text-sm font-black text-brand-600 dark:text-brand-400 hover:underline"
                         >
                             Reset all filters
                         </button>
@@ -2681,8 +2748,8 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                         <Building2 className="w-4 h-4" />
                         Organization Management
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Company Directory</h1>
-                    <p className="text-slate-500 font-medium max-w-xl">
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Company Directory</h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl">
                         Manage your business entities, office locations, and corporate identities.
                     </p>
                 </div>
@@ -2699,45 +2766,45 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-[2.5rem] p-8 border border-brand-100 shadow-xl shadow-brand-900/5 space-y-6"
+                    className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-brand-100 dark:border-brand-900 shadow-xl shadow-brand-900/5 dark:shadow-none space-y-6"
                 >
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Register New Company</h3>
-                        <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Register New Company</h3>
+                        <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400 dark:text-slate-500" /></button>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Company Name</label>
+                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Company Name</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
                                 placeholder="Legal Entity Name" 
                                 value={formData.name} 
                                 onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Official Email</label>
+                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Official Email</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
                                 placeholder="contact@company.com" 
                                 value={formData.email} 
                                 onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Contact Number</label>
+                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Contact Number</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
                                 placeholder="+971 50 123 4567" 
                                 value={formData.phone} 
                                 onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Office Address</label>
+                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Office Address</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
                                 placeholder="Full Physical Address" 
                                 value={formData.address} 
                                 onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))} 
@@ -2745,7 +2812,7 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800">
                         <div className="flex items-center gap-4">
                             <div className="relative group">
                                 <input 
@@ -2754,18 +2821,18 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                                     onChange={e => handleLogoUpload(null, e)}
                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                 />
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 group-hover:bg-slate-50 transition-all">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-all">
                                     <Globe className="w-4 h-4" /> Upload Logo
                                 </div>
                             </div>
                             {formData.logo && (
-                                <div className="h-10 w-10 rounded-xl border border-slate-100 p-1 bg-white shadow-sm">
+                                <div className="h-10 w-10 rounded-xl border border-slate-100 dark:border-slate-800 p-1 bg-white dark:bg-slate-900 shadow-sm">
                                     <img src={formData.logo} alt="Preview" className="h-full w-full object-contain" />
                                 </div>
                             )}
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={() => setIsAdding(false)} className="px-6 py-2.5 text-slate-500 font-bold text-sm hover:text-slate-700">Cancel</button>
+                            <button onClick={() => setIsAdding(false)} className="px-6 py-2.5 text-slate-500 dark:text-slate-400 font-bold text-sm hover:text-slate-700 dark:hover:text-white">Cancel</button>
                             <button onClick={handleAdd} className="px-8 py-2.5 bg-brand-600 text-white rounded-xl font-black text-sm shadow-lg shadow-brand-600/20 hover:bg-brand-700 transition-all active:scale-95">Create Company</button>
                         </div>
                     </div>
@@ -2777,29 +2844,29 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                     <motion.div 
                         layout
                         key={company.id}
-                        className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-slate-200/20 transition-all group relative overflow-hidden"
+                        className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-black/50 transition-all group relative overflow-hidden"
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 transition-all group-hover:bg-brand-50/50"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 dark:bg-slate-800 rounded-full -mr-16 -mt-16 transition-all group-hover:bg-brand-50/50 dark:group-hover:bg-brand-900/20"></div>
                         
                         <div className="relative z-10 flex flex-col h-full">
                             <div className="flex items-start justify-between mb-6">
-                                <div className="h-16 w-16 bg-slate-50 rounded-2xl p-2 border border-slate-100 shadow-inner flex items-center justify-center overflow-hidden">
+                                <div className="h-16 w-16 bg-slate-50 dark:bg-slate-800 rounded-2xl p-2 border border-slate-100 dark:border-slate-700 shadow-inner flex items-center justify-center overflow-hidden">
                                     {company.logo ? (
                                         <img src={company.logo} alt={company.name} className="max-h-full max-w-full object-contain" />
                                     ) : (
-                                        <Building2 className="w-8 h-8 text-slate-300" />
+                                        <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                     )}
                                 </div>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                                     <button 
                                         onClick={() => setEditingId(company.id)}
-                                        className="p-2 hover:bg-brand-50 text-brand-600 rounded-xl transition-colors"
+                                        className="p-2 hover:bg-brand-50 dark:hover:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-xl transition-colors"
                                     >
                                         <Edit className="w-4 h-4" />
                                     </button>
                                     <button 
                                         onClick={() => handleDelete(company.id)}
-                                        className="p-2 hover:bg-red-50 text-red-600 rounded-xl transition-colors"
+                                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl transition-colors"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
@@ -2809,44 +2876,44 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                             {editingId === company.id ? (
                                 <div className="space-y-4 animate-in fade-in duration-200">
                                     <input 
-                                        className="w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
+                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
                                         value={company.name}
                                         onChange={e => updateCompany({ ...company, name: e.target.value })}
                                     />
                                     <input 
-                                        className="w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
+                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
                                         value={company.email}
                                         onChange={e => updateCompany({ ...company, email: e.target.value })}
                                     />
                                     <input 
-                                        className="w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
+                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
                                         placeholder="Contact Number"
                                         value={company.phone || ''}
                                         onChange={e => updateCompany({ ...company, phone: e.target.value })}
                                     />
                                     <div className="flex gap-2 pt-2">
-                                        <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Cancel</button>
+                                        <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-bold">Cancel</button>
                                         <button onClick={() => handleUpdate(company)} className="flex-1 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-md shadow-brand-600/20">Save</button>
                                     </div>
                                 </div>
                             ) : (
                                 <>
-                                    <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2">{company.name}</h3>
+                                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-2">{company.name}</h3>
                                     <div className="space-y-3 mt-auto">
-                                        <div className="flex items-center gap-3 text-slate-500">
-                                            <div className="p-1.5 bg-slate-50 rounded-lg">
+                                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+                                            <div className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
                                                 <FileText className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold truncate">{company.email || 'No email provided'}</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-slate-500">
-                                            <div className="p-1.5 bg-slate-50 rounded-lg">
+                                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+                                            <div className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
                                                 <Phone className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold truncate">{company.phone || 'No contact provided'}</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-slate-500">
-                                            <div className="p-1.5 bg-slate-50 rounded-lg">
+                                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+                                            <div className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
                                                 <Building2 className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold line-clamp-1">{company.address || 'No address provided'}</span>
@@ -2859,10 +2926,10 @@ const CompanyView = ({ companies, openConfirm }: { companies: Company[], openCon
                 ))}
 
                 {companies.length === 0 && (
-                    <div className="col-span-full py-20 text-center bg-slate-50 rounded-[2.5rem] border border-dashed border-slate-200">
-                        <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-black text-slate-900 tracking-tight">No companies registered</h3>
-                        <p className="text-slate-400 font-medium mt-1">Start by adding your first business entity.</p>
+                    <div className="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-700">
+                        <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">No companies registered</h3>
+                        <p className="text-slate-400 dark:text-slate-500 font-medium mt-1">Start by adding your first business entity.</p>
                     </div>
                 )}
             </div>
@@ -2912,25 +2979,25 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
 
     return (
         <div className="space-y-6">
-            <div className="glass-card p-6 rounded-3xl border border-white shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="glass-card dark:bg-slate-900/80 p-6 rounded-3xl border border-white dark:border-slate-800 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
                         <button 
                             onClick={handlePrevMonth} 
-                            className="p-2 hover:bg-white hover:shadow-sm rounded-xl text-slate-600 transition-all active:scale-95"
+                            className="p-2 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl text-slate-600 dark:text-slate-400 transition-all active:scale-95"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <div className="px-4 text-center min-w-[140px] flex flex-col items-center">
-                            <div className="text-sm font-bold text-slate-900">{monthName}</div>
-                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                            <div className="text-sm font-bold text-slate-900 dark:text-white">{monthName}</div>
+                            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1">
                                 {fullYear}
                                 <img src="https://flagcdn.com/w20/ae.png" alt="UAE" className="w-3 h-2 rounded-sm" referrerPolicy="no-referrer" />
                             </div>
                         </div>
                         <button 
                             onClick={handleNextMonth} 
-                            className="p-2 hover:bg-white hover:shadow-sm rounded-xl text-slate-600 transition-all active:scale-95"
+                            className="p-2 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl text-slate-600 dark:text-slate-400 transition-all active:scale-95"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>
@@ -2941,7 +3008,7 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
                             <div key={status} className={cn(
                                 "px-3 py-1 rounded-full text-[10px] font-bold border transition-all hover:scale-105 cursor-default",
                                 meta.color.replace('text-', 'text-').replace('bg-', 'bg-'),
-                                "border-slate-100"
+                                "border-slate-100 dark:border-slate-800"
                             )}>
                                 {meta.code}: {meta.label}
                             </div>
@@ -2951,65 +3018,65 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
 
                 <div className="flex items-center gap-3">
                     <div className="relative flex-1 sm:flex-none">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                         <input 
                             type="text" 
                             placeholder="Search staff..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-4 py-2.5 bg-slate-100/50 border-none rounded-2xl text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+                            className="pl-11 pr-4 py-2.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white dark:placeholder:text-slate-600"
                         />
                     </div>
-                    <button className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
+                    <button className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-sm">
                         <Download className="w-5 h-5" />
                     </button>
                 </div>
             </div>
 
-            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
+            <div className="glass-card dark:bg-slate-900/80 rounded-3xl overflow-hidden border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
                 <div className="overflow-x-auto">
                     <table className="w-full text-center border-collapse text-[11px]">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="p-4 text-left bg-slate-50/80 backdrop-blur-sm sticky left-0 z-20 border-r border-slate-100 min-w-[180px]">
-                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Employee Name</span>
+                            <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                                <th className="p-4 text-left bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm sticky left-0 z-20 border-r border-slate-100 dark:border-slate-800 min-w-[180px]">
+                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Employee Name</span>
                                 </th>
-                                <th className="p-4 font-bold text-slate-500 border-r border-slate-100 uppercase tracking-widest text-[10px]">Leave</th>
-                                <th className="p-4 font-bold text-brand-600 border-r border-slate-100 uppercase tracking-widest text-[10px]">OT</th>
+                                <th className="p-4 font-bold text-slate-500 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800 uppercase tracking-widest text-[10px]">Leave</th>
+                                <th className="p-4 font-bold text-brand-600 dark:text-brand-400 border-r border-slate-100 dark:border-slate-800 uppercase tracking-widest text-[10px]">OT</th>
                                 {days.map(d => {
                                     const date = new Date(year, month - 1, d);
                                     const dayName = date.toLocaleString('default', { weekday: 'narrow' });
                                     const isSunday = date.getDay() === 0;
                                     return (
                                         <th key={d} className={cn(
-                                            "p-2 w-10 border-r border-slate-50 min-w-[36px]",
-                                            isSunday ? 'bg-red-50/30 text-red-500' : 'text-slate-600'
+                                            "p-2 w-10 border-r border-slate-50 dark:border-slate-800 min-w-[36px]",
+                                            isSunday ? 'bg-red-50/30 dark:bg-red-900/20 text-red-500 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'
                                         )}>
                                             <div className="font-bold text-sm">{d}</div>
                                             <div className="text-[9px] font-bold uppercase opacity-60">{dayName}</div>
                                         </th>
                                     );
                                 })}
-                                <th className="p-4 font-bold text-slate-900 bg-slate-50/80 backdrop-blur-sm sticky right-0 z-20 border-l border-slate-100 uppercase tracking-widest text-[10px]">Total</th>
+                                <th className="p-4 font-bold text-slate-900 dark:text-white bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm sticky right-0 z-20 border-l border-slate-100 dark:border-slate-800 uppercase tracking-widest text-[10px]">Total</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                             {filteredEmployees.map((e: Employee, idx: number) => (
-                                <tr key={e.id} className="hover:bg-brand-50/20 transition-colors group">
-                                    <td className="p-4 text-left border-r border-slate-100 sticky left-0 bg-white/90 backdrop-blur-sm z-10 group-hover:bg-brand-50/50 transition-colors">
+                                <tr key={e.id} className="hover:bg-brand-50/20 dark:hover:bg-brand-900/10 transition-colors group">
+                                    <td className="p-4 text-left border-r border-slate-100 dark:border-slate-800 sticky left-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm z-10 group-hover:bg-brand-50/50 dark:group-hover:bg-brand-900/20 transition-colors">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-200 overflow-hidden">
+                                            <div className="w-7 h-7 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 overflow-hidden">
                                                 {e.profileImage ? (
                                                     <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                 ) : (
                                                     e.name.charAt(0)
                                                 )}
                                             </div>
-                                            <span className="font-bold text-slate-900 truncate max-w-[120px]">{e.name}</span>
+                                            <span className="font-bold text-slate-900 dark:text-white truncate max-w-[120px]">{e.name}</span>
                                         </div>
                                     </td>
-                                    <td className="p-4 border-r border-slate-50 font-bold text-slate-500">{e.leaveBalance}</td>
-                                    <td className="p-4 border-r border-slate-50 font-bold text-brand-600">
+                                    <td className="p-4 border-r border-slate-50 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-400">{e.leaveBalance}</td>
+                                    <td className="p-4 border-r border-slate-50 dark:border-slate-800 font-bold text-brand-600 dark:text-brand-400">
                                         {attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth)).reduce((sum, r) => sum + (r.overtimeHours || 0), 0)}
                                     </td>
                                     {days.map(d => {
@@ -3019,21 +3086,21 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
                                         const isSunday = new Date(year, month - 1, d).getDay() === 0;
                                         return (
                                             <td key={d} className={cn(
-                                                "border-r border-slate-50 p-2 font-bold transition-all relative",
-                                                meta.code ? meta.color : isSunday ? 'bg-red-50/20 text-red-200' : 'text-slate-200 group-hover:text-slate-300'
+                                                "border-r border-slate-50 dark:border-slate-800 p-2 font-bold transition-all relative",
+                                                meta.code ? meta.color : isSunday ? 'bg-red-50/20 dark:bg-red-900/10 text-red-200 dark:text-red-900/50' : 'text-slate-200 dark:text-slate-700 group-hover:text-slate-300 dark:group-hover:text-slate-600'
                                             )}>
                                                 <button 
                                                     onClick={() => setEditingCell({ empId: e.id, date: dateStr })}
                                                     className={cn(
                                                         "w-6 h-6 flex items-center justify-center rounded-lg mx-auto transition-transform hover:scale-110 active:scale-90",
-                                                        meta.code && "bg-white shadow-sm border border-slate-100"
+                                                        meta.code && "bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700"
                                                     )}
                                                 >
                                                     {meta.code || (isSunday ? 'S' : '-')}
                                                 </button>
 
                                                 {editingCell?.empId === e.id && editingCell?.date === dateStr && (
-                                                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-2 grid grid-cols-4 gap-1 min-w-[160px]">
+                                                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-50 p-2 grid grid-cols-4 gap-1 min-w-[160px]">
                                                         {Object.entries(LEGEND).map(([status, m]: any) => (
                                                             <button
                                                                 key={status}
@@ -3050,7 +3117,7 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
                                                         ))}
                                                         <button 
                                                             onClick={() => setEditingCell(null)}
-                                                            className="col-span-4 mt-1 py-1 text-[9px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest"
+                                                            className="col-span-4 mt-1 py-1 text-[9px] font-bold text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 uppercase tracking-widest"
                                                         >
                                                             Cancel
                                                         </button>
@@ -3059,10 +3126,10 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
                                             </td>
                                         );
                                     })}
-                                    <td className="p-4 font-bold text-slate-900 bg-white/90 backdrop-blur-sm sticky right-0 z-10 border-l border-slate-100 group-hover:bg-brand-50/50 transition-colors">
+                                    <td className="p-4 font-bold text-slate-900 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm sticky right-0 z-10 border-l border-slate-100 dark:border-slate-800 group-hover:bg-brand-50/50 dark:group-hover:bg-brand-900/20 transition-colors">
                                         <div className="flex flex-col items-center">
-                                            <span className="text-brand-600">{attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth) && r.status === AttendanceStatus.PRESENT).length}P</span>
-                                            <span className="text-[9px] text-slate-400 font-bold">DAYS</span>
+                                            <span className="text-brand-600 dark:text-brand-400">{attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth) && r.status === AttendanceStatus.PRESENT).length}P</span>
+                                            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold">DAYS</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -3072,11 +3139,11 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, cu
                 </div>
                 {filteredEmployees.length === 0 && (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                            <Calendar className="w-8 h-8 text-slate-300" />
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
+                            <Calendar className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900">No records found</h3>
-                        <p className="text-slate-500 max-w-xs mx-auto mt-1">Try searching for a different staff member or changing the month.</p>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No records found</h3>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1">Try searching for a different staff member or changing the month.</p>
                     </div>
                 )}
             </div>
@@ -3112,77 +3179,77 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Deductions & Penalties</h2>
-                    <p className="text-slate-500 text-sm mt-1">Manage employee advances, fines, and asset damages.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Deductions & Penalties</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage employee advances, fines, and asset damages.</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 transition-colors" />
                         <input 
                             type="text"
                             placeholder="Search deductions..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
+                            className="pl-11 pr-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm dark:text-white dark:placeholder:text-slate-600"
                         />
                     </div>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-2xl border border-brand-100">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 rounded-2xl border border-brand-100 dark:border-brand-900/30">
                         <AlertCircle className="w-4 h-4" />
                         <span className="text-xs font-bold uppercase tracking-wider">Financial Records</span>
                     </div>
                 </div>
             </div>
 
-            <div className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/50">
+            <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600">
+                    <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/30 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-400">
                         <Plus className="w-6 h-6" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800">Record New Transaction</h3>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Record New Transaction</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Staff Member</label>
+                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Staff Member</label>
                         <select 
-                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
                             value={newItem.employeeId || ''} 
                             onChange={e => setNewItem({...newItem, employeeId: e.target.value})}
                         >
                             <option value="">Select Employee</option>
-                            {employees.map((e:any)=><option key={e.id} value={e.id}>{e.name}</option>)}
+                            {employees.map((e:any)=><option key={e.id} value={e.id} className="dark:bg-slate-900">{e.name}</option>)}
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Date</label>
+                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Date</label>
                         <input 
                             type="date" 
-                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
                             value={newItem.date || ''} 
                             onChange={e => setNewItem({...newItem, date: e.target.value})} 
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Category</label>
+                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Category</label>
                         <select 
-                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
                             value={newItem.type} 
                             onChange={e => setNewItem({...newItem, type: e.target.value as any})}
                         >
-                            <option>Salary Advance</option>
-                            <option>Fine Amount</option>
-                            <option>Damage Material/Asset</option>
-                            <option>Loan Amount</option>
-                            <option>Other</option>
+                            <option className="dark:bg-slate-900">Salary Advance</option>
+                            <option className="dark:bg-slate-900">Fine Amount</option>
+                            <option className="dark:bg-slate-900">Damage Material/Asset</option>
+                            <option className="dark:bg-slate-900">Loan Amount</option>
+                            <option className="dark:bg-slate-900">Other</option>
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Amount (AED)</label>
+                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Amount (AED)</label>
                         <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">AED</span>
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs font-bold">AED</span>
                             <input 
                                 type="number" 
-                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all font-bold text-slate-900" 
+                                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all font-bold text-slate-900 dark:text-white" 
                                 placeholder="0.00" 
                                 value={newItem.amount || ''} 
                                 onChange={e => setNewItem({...newItem, amount: Number(e.target.value)})} 
@@ -3190,10 +3257,10 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Notes</label>
+                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Notes</label>
                         <div className="flex gap-2">
                             <input 
-                                className="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                className="flex-1 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white dark:placeholder:text-slate-600" 
                                 placeholder="Reason..." 
                                 value={newItem.note || ''} 
                                 onChange={e => setNewItem({...newItem, note: e.target.value})} 
@@ -3201,7 +3268,7 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
                             <button 
                                 onClick={handleAdd}
                                 disabled={!newItem.employeeId || !newItem.amount}
-                                className="p-3 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-all active:scale-95 shadow-lg shadow-brand-200 disabled:opacity-50 disabled:scale-100"
+                                className="p-3 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-all active:scale-95 shadow-lg shadow-brand-200 dark:shadow-none disabled:opacity-50 disabled:scale-100"
                             >
                                 <Check className="w-5 h-5" />
                             </button>
@@ -3210,20 +3277,20 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
                 </div>
             </div>
 
-            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
+            <div className="glass-card dark:bg-slate-900/80 rounded-3xl overflow-hidden border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Employee</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Note</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Date</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Employee</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Type</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Amount</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Note</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                             <AnimatePresence mode="popLayout">
                                 {filteredDeductions.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((d: DeductionRecord) => {
                                     const emp = employees.find((e:any) => e.id === d.employeeId);
@@ -3234,39 +3301,39 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
-                                            className="hover:bg-slate-50/50 transition-colors group"
+                                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group"
                                         >
                                             <td className="p-5">
-                                                <div className="text-sm font-bold text-slate-900">{new Date(d.date).toLocaleDateString()}</div>
+                                                <div className="text-sm font-bold text-slate-900 dark:text-white">{new Date(d.date).toLocaleDateString()}</div>
                                             </td>
                                             <td className="p-5">
                                                 <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 border border-brand-100 overflow-hidden">
+                                            <div className="w-8 h-8 bg-brand-50 dark:bg-brand-900/20 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900/30 overflow-hidden">
                                                 {emp?.profileImage ? (
                                                     <img src={emp.profileImage} alt={emp.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                 ) : (
                                                     emp?.name?.charAt(0) || '?'
                                                 )}
                                             </div>
-                                                    <div className="text-sm font-bold text-slate-700">{emp?.name || 'Unknown'}</div>
+                                                    <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{emp?.name || 'Unknown'}</div>
                                                 </div>
                                             </td>
                                             <td className="p-5">
                                                 <span className={cn(
                                                     "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-                                                    d.type === 'Fine Amount' ? 'bg-red-50 text-red-600 border-red-100' :
-                                                    d.type === 'Salary Advance' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                                    d.type === 'Loan Amount' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                    'bg-slate-50 text-slate-600 border-slate-100'
+                                                    d.type === 'Fine Amount' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/30' :
+                                                    d.type === 'Salary Advance' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30' :
+                                                    d.type === 'Loan Amount' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30' :
+                                                    'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700'
                                                 )}>
                                                     {d.type}
                                                 </span>
                                             </td>
                                             <td className="p-5">
-                                                <div className="text-sm font-bold text-red-600">AED {d.amount.toFixed(2)}</div>
+                                                <div className="text-sm font-bold text-red-600 dark:text-red-400">AED {d.amount.toFixed(2)}</div>
                                             </td>
                                             <td className="p-5">
-                                                <div className="text-sm text-slate-500 italic max-w-xs truncate">{d.note || '-'}</div>
+                                                <div className="text-sm text-slate-500 dark:text-slate-400 italic max-w-xs truncate">{d.note || '-'}</div>
                                             </td>
                                             <td className="p-5">
                                                 <div className="flex justify-end">
@@ -3274,7 +3341,7 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
                                                         onClick={() => openConfirm("Delete Deduction", "Are you sure you want to remove this record?", async () => {
                                                             await deleteDeduction(d.id!);
                                                         })}
-                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                        className="p-2 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -3289,11 +3356,11 @@ const DeductionsView = ({ employees, deductions, openConfirm }: any) => {
                 </div>
                 {deductions.length === 0 && (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                            <CreditCard className="w-8 h-8 text-slate-300" />
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
+                            <CreditCard className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900">No transactions yet</h3>
-                        <p className="text-slate-500 max-w-xs mx-auto mt-1">Add deductions or penalties to see them listed here.</p>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No transactions yet</h3>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1">Add deductions or penalties to see them listed here.</p>
                     </div>
                 )}
             </div>
@@ -3334,23 +3401,23 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Leave Management</h2>
-                    <p className="text-slate-500 text-sm mt-1">Review and approve employee time-off requests.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Leave Management</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review and approve employee time-off requests.</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 transition-colors" />
                         <input 
                             type="text"
                             placeholder="Search requests..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
+                            className="pl-11 pr-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm dark:text-white dark:placeholder:text-slate-600"
                         />
                     </div>
                     <button 
                         onClick={() => setShowNew(true)} 
-                        className="neo-button bg-brand-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-200"
+                        className="neo-button bg-brand-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-200 dark:shadow-none"
                     >
                         <Plus className="w-5 h-5" /> New Request
                     </button>
@@ -3365,58 +3432,58 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="glass-card p-8 rounded-3xl border-2 border-brand-100 shadow-xl mb-8">
-                            <h4 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-brand-600" />
+                        <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border-2 border-brand-100 dark:border-brand-900/30 shadow-xl mb-8">
+                            <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-brand-600 dark:text-brand-400" />
                                 Create New Leave Request
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Employee</label>
+                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Employee</label>
                                     <select 
-                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
                                         value={newReq.employeeId} 
                                         onChange={e=>setNewReq({...newReq, employeeId:e.target.value})}
                                     >
                                         <option value="">Select Staff Member</option>
-                                        {employees.map((e:any)=><option key={e.id} value={e.id}>{e.name}</option>)}
+                                        {employees.map((e:any)=><option key={e.id} value={e.id} className="dark:bg-slate-900">{e.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Leave Type</label>
+                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Leave Type</label>
                                     <select 
-                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
                                         value={newReq.type} 
                                         onChange={e=>setNewReq({...newReq, type:e.target.value as any})}
                                     >
-                                        <option value={AttendanceStatus.ANNUAL_LEAVE}>Annual Leave</option>
-                                        <option value={AttendanceStatus.SICK_LEAVE}>Sick Leave</option>
-                                        <option value={AttendanceStatus.EMERGENCY_LEAVE}>Emergency Leave</option>
-                                        <option value={AttendanceStatus.UNPAID_LEAVE}>Unpaid Leave</option>
+                                        <option value={AttendanceStatus.ANNUAL_LEAVE} className="dark:bg-slate-900">Annual Leave</option>
+                                        <option value={AttendanceStatus.SICK_LEAVE} className="dark:bg-slate-900">Sick Leave</option>
+                                        <option value={AttendanceStatus.EMERGENCY_LEAVE} className="dark:bg-slate-900">Emergency Leave</option>
+                                        <option value={AttendanceStatus.UNPAID_LEAVE} className="dark:bg-slate-900">Unpaid Leave</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
+                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Start Date</label>
                                     <input 
                                         type="date" 
-                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
                                         value={newReq.startDate} 
                                         onChange={e=>setNewReq({...newReq, startDate:e.target.value})} 
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">End Date</label>
+                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">End Date</label>
                                     <input 
                                         type="date" 
-                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
+                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
                                         value={newReq.endDate} 
                                         onChange={e=>setNewReq({...newReq, endDate:e.target.value})} 
                                     />
                                 </div>
                                 <div className="space-y-2 lg:col-span-4">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Reason / Description</label>
+                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Reason / Description</label>
                                     <textarea 
-                                        className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all min-h-[100px]" 
+                                        className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all min-h-[100px] dark:text-white dark:placeholder:text-slate-600" 
                                         placeholder="Briefly explain the reason for leave..." 
                                         value={newReq.reason} 
                                         onChange={e=>setNewReq({...newReq, reason:e.target.value})} 
@@ -3426,13 +3493,13 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                             <div className="flex justify-end gap-3">
                                 <button 
                                     onClick={() => setShowNew(false)} 
-                                    className="px-6 py-2.5 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all"
+                                    className="px-6 py-2.5 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     onClick={handleSave} 
-                                    className="neo-button bg-brand-600 text-white px-8 py-2.5 rounded-2xl font-bold shadow-lg shadow-brand-200"
+                                    className="neo-button bg-brand-600 text-white px-8 py-2.5 rounded-2xl font-bold shadow-lg shadow-brand-200 dark:shadow-none"
                                 >
                                     Submit Request
                                 </button>
@@ -3442,19 +3509,19 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                 )}
             </AnimatePresence>
 
-            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
+            <div className="glass-card dark:bg-slate-900/80 rounded-3xl overflow-hidden border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Employee</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Period</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Employee</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Type</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Period</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Status</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                             <AnimatePresence mode="popLayout">
                                 {filteredRequests.sort((a:any, b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((req: LeaveRequest) => {
                                     const emp = employees.find((e:any) => e.id === req.employeeId);
@@ -3465,11 +3532,11 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
-                                            className="hover:bg-slate-50/50 transition-colors group"
+                                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group"
                                         >
                                             <td className="p-5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[12px] font-bold text-slate-500 border border-slate-200 overflow-hidden">
+                                                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-[12px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 overflow-hidden">
                                                         {emp?.profileImage ? (
                                                             <img src={emp.profileImage} alt={emp.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                         ) : (
@@ -3477,31 +3544,31 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <div className="text-sm font-bold text-slate-900">{emp?.name || 'Unknown'}</div>
-                                                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{emp?.role || '-'}</div>
+                                                        <div className="text-sm font-bold text-slate-900 dark:text-white">{emp?.name || 'Unknown'}</div>
+                                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{emp?.role || '-'}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="p-5">
-                                                <div className="text-sm font-bold text-slate-700">{req.type}</div>
-                                                <div className="text-[10px] text-slate-400 italic truncate max-w-[150px]">{req.reason || 'No reason provided'}</div>
+                                                <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{req.type}</div>
+                                                <div className="text-[10px] text-slate-400 dark:text-slate-500 italic truncate max-w-[150px]">{req.reason || 'No reason provided'}</div>
                                             </td>
                                             <td className="p-5">
-                                                <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
+                                                <div className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400">
                                                     <span>{new Date(req.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
-                                                    <ArrowRight className="w-3 h-3 text-slate-300" />
+                                                    <ArrowRight className="w-3 h-3 text-slate-300 dark:text-slate-600" />
                                                     <span>{new Date(req.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
                                                 </div>
-                                                <div className="text-[10px] text-slate-400 font-bold">
+                                                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">
                                                     {Math.ceil((new Date(req.endDate).getTime() - new Date(req.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} Days
                                                 </div>
                                             </td>
                                             <td className="p-5">
                                                 <span className={cn(
                                                     "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-                                                    req.status === LeaveStatus.APPROVED ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                    req.status === LeaveStatus.REJECTED ? 'bg-red-50 text-red-600 border-red-100' :
-                                                    'bg-orange-50 text-orange-600 border-orange-100'
+                                                    req.status === LeaveStatus.APPROVED ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30' :
+                                                    req.status === LeaveStatus.REJECTED ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/30' :
+                                                    'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-900/30'
                                                 )}>
                                                     {req.status}
                                                 </span>
@@ -3512,14 +3579,14 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                                                         <>
                                                             <button 
                                                                 onClick={() => handleStatus(req.id!, LeaveStatus.APPROVED)}
-                                                                className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                                                                className="p-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all"
                                                                 title="Approve"
                                                             >
                                                                 <Check className="w-5 h-5" />
                                                             </button>
                                                             <button 
                                                                 onClick={() => handleStatus(req.id!, LeaveStatus.REJECTED)}
-                                                                className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                                className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
                                                                 title="Reject"
                                                             >
                                                                 <X className="w-5 h-5" />
@@ -3527,7 +3594,7 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                                                         </>
                                                     )}
                                                     <button 
-                                                        className="p-2 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+                                                        className="p-2 text-slate-300 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
                                                         title="View Details"
                                                     >
                                                         <Eye className="w-5 h-5" />
@@ -3543,11 +3610,11 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
                 </div>
                 {leaveRequests.length === 0 && (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                            <Calendar className="w-8 h-8 text-slate-300" />
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
+                            <Calendar className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900">No leave requests</h3>
-                        <p className="text-slate-500 max-w-xs mx-auto mt-1">All caught up! No pending leave requests to review.</p>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No leave requests</h3>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1">All caught up! No pending leave requests to review.</p>
                     </div>
                 )}
             </div>
@@ -3574,85 +3641,85 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <div>
-                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Payroll Register</h2>
-                    <p className="text-slate-500 text-sm mt-1">Monthly salary breakdown and net pay calculations.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Payroll Register</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Monthly salary breakdown and net pay calculations.</p>
                  </div>
                  <div className="flex items-center gap-3">
                      <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 transition-colors" />
                         <input 
                             type="text"
                             placeholder="Search staff..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
+                            className="pl-11 pr-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm dark:text-white dark:placeholder:text-slate-600"
                         />
                     </div>
                      <div className="relative group">
-                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
+                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-600 transition-colors" />
                          <input 
                             type="month" 
                             value={selectedMonth} 
                             onChange={e=>onMonthChange(e.target.value)} 
-                            className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm" 
+                            className="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm" 
                          />
                      </div>
                      <button 
                         onClick={handleExport} 
-                        className="neo-button bg-white text-slate-700 px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 border border-slate-200 shadow-sm hover:bg-slate-50"
+                        className="neo-button bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                      >
                          <Download className="w-4 h-4" /> Export
                      </button>
                  </div>
              </div>
              
-             <div className="glass-card rounded-3xl border border-white shadow-xl shadow-slate-200/50 overflow-hidden">
+             <div className="glass-card dark:bg-slate-900/80 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
                  <div className="overflow-x-auto">
                      <table className="w-full text-left border-collapse">
                          <thead>
-                             <tr className="bg-slate-50/50 border-b border-slate-100">
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest sticky left-0 bg-white/80 backdrop-blur-md z-10">Employee</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Basic</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Housing</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Transport</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Other</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Gross</th>
-                                 <th className="p-5 text-[10px] font-bold text-red-400 uppercase tracking-widest text-right">Unpaid</th>
-                                 <th className="p-5 text-[10px] font-bold text-red-400 uppercase tracking-widest text-right">Deductions</th>
-                                 <th className="p-5 text-[10px] font-bold text-emerald-400 uppercase tracking-widest text-right">OT Pay</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-900 uppercase tracking-widest text-right">Net Salary</th>
+                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest sticky left-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">Employee</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Basic</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Housing</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Transport</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Other</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Gross</th>
+                                 <th className="p-5 text-[10px] font-bold text-red-400 dark:text-red-500 uppercase tracking-widest text-right">Unpaid</th>
+                                 <th className="p-5 text-[10px] font-bold text-red-400 dark:text-red-500 uppercase tracking-widest text-right">Deductions</th>
+                                 <th className="p-5 text-[10px] font-bold text-emerald-400 dark:text-emerald-500 uppercase tracking-widest text-right">OT Pay</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-widest text-right">Net Salary</th>
                              </tr>
                          </thead>
-                         <tbody className="divide-y divide-slate-50">
+                         <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                              {filteredEmployees.map((e:Employee) => {
                                  const monthRecs = attendance.filter((r:any) => r.employeeId === e.id && r.date.startsWith(selectedMonth));
                                  const monthDeds = deductions.filter((d:any) => d.employeeId === e.id && d.date.startsWith(selectedMonth));
                                  const p = calculatePayroll(e, monthRecs, monthDeds);
                                  
                                  return (
-                                     <tr key={e.id} className="hover:bg-slate-50/50 transition-colors group">
-                                         <td className="p-5 sticky left-0 bg-white group-hover:bg-slate-50/50 transition-colors z-10 border-r border-slate-100">
+                                     <tr key={e.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
+                                         <td className="p-5 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50/50 dark:group-hover:bg-slate-800/50 transition-colors z-10 border-r border-slate-100 dark:border-slate-800">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 overflow-hidden">
+                                                <div className="w-8 h-8 bg-brand-50 dark:bg-brand-900/20 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 dark:text-brand-400 overflow-hidden">
                                                     {e.profileImage ? (
                                                         <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                     ) : (
                                                         e.name.charAt(0)
                                                     )}
                                                 </div>
-                                                <div className="text-sm font-bold text-slate-900">{e.name}</div>
+                                                <div className="text-sm font-bold text-slate-900 dark:text-white">{e.name}</div>
                                             </div>
                                          </td>
-                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.basic.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.housing.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.transport.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.other.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-slate-900">{p.grossSalary.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-red-500">{p.totalUnpaidDays}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-red-600">-{p.totalDeductions.toFixed(0)}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-emerald-600">+{p.otAmount.toFixed(0)}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.basic.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.housing.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.transport.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.other.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-slate-900 dark:text-white">{p.grossSalary.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-red-500 dark:text-red-400">{p.totalUnpaidDays}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-red-600 dark:text-red-400">-{p.totalDeductions.toFixed(0)}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">+{p.otAmount.toFixed(0)}</td>
                                          <td className="p-5 text-right">
-                                            <div className="inline-block px-4 py-1.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-black border border-brand-100">
+                                            <div className="inline-block px-4 py-1.5 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 rounded-xl text-sm font-black border border-brand-100 dark:border-brand-900/30">
                                                 {p.netSalary.toFixed(0)}
                                             </div>
                                          </td>
@@ -3667,7 +3734,7 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
      );
 };
 
-const ReportsView = ({ employees, attendance }: any) => {
+const ReportsView = ({ employees, attendance, isDarkMode }: any) => {
     const activeStaff = useMemo(() => employees.filter((e: any) => e.active), [employees]);
     
     const totalStaff = activeStaff.length;
@@ -3707,11 +3774,11 @@ const ReportsView = ({ employees, attendance }: any) => {
                 className="flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">Analytics & Reports</h2>
-                    <p className="text-slate-500 font-medium">Real-time workforce intelligence and distribution.</p>
+                    <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Analytics & Reports</h2>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">Real-time workforce intelligence and distribution.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
+                    <button className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2">
                         <Download className="w-4 h-4" /> Export Data
                     </button>
                     <button className="px-4 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2">
@@ -3732,21 +3799,21 @@ const ReportsView = ({ employees, attendance }: any) => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: stat.delay }}
-                        className="glass-card p-6 rounded-3xl border border-white shadow-xl shadow-slate-200/40 group hover:scale-[1.02] transition-all"
+                        className="glass-card dark:bg-slate-900/80 p-6 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none group hover:scale-[1.02] transition-all"
                     >
                         <div className="flex items-center gap-4">
                             <div className={cn(
                                 "w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12",
-                                stat.color === 'brand' ? 'bg-brand-50 text-brand-600' :
-                                stat.color === 'emerald' ? 'bg-emerald-50 text-emerald-600' :
-                                stat.color === 'orange' ? 'bg-orange-50 text-orange-600' :
-                                'bg-violet-50 text-violet-600'
+                                stat.color === 'brand' ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400' :
+                                stat.color === 'emerald' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' :
+                                stat.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400' :
+                                'bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400'
                             )}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</div>
-                                <div className="text-xl font-black text-slate-900">{stat.value}</div>
+                                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{stat.label}</div>
+                                <div className="text-xl font-black text-slate-900 dark:text-white">{stat.value}</div>
                             </div>
                         </div>
                     </motion.div>
@@ -3758,34 +3825,40 @@ const ReportsView = ({ employees, attendance }: any) => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="lg:col-span-2 glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40"
+                    className="lg:col-span-2 glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none"
                 >
                     <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-lg font-bold text-slate-900">Staff Distribution by Company</h3>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Staff Distribution by Company</h3>
                         <div className="flex items-center gap-2">
                             <div className="w-3 h-3 bg-brand-500 rounded-full"></div>
-                            <span className="text-xs font-bold text-slate-500">Active Employees</span>
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Active Employees</span>
                         </div>
                     </div>
                     <div className="h-[350px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={companyData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
                                 <XAxis 
                                     dataKey="name" 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                    tick={{ fill: isDarkMode ? '#64748b' : '#94a3b8', fontSize: 10, fontWeight: 600 }}
                                     dy={10}
                                 />
                                 <YAxis 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                    tick={{ fill: isDarkMode ? '#64748b' : '#94a3b8', fontSize: 10, fontWeight: 600 }}
                                 />
                                 <Tooltip 
-                                    cursor={{ fill: '#f8fafc' }}
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ fill: isDarkMode ? '#1e293b' : '#f8fafc' }}
+                                    contentStyle={{ 
+                                        borderRadius: '16px', 
+                                        border: 'none', 
+                                        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+                                        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+                                        color: isDarkMode ? '#ffffff' : '#000000'
+                                    }}
                                 />
                                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                                     {companyData.map((entry, index) => (
@@ -3801,9 +3874,9 @@ const ReportsView = ({ employees, attendance }: any) => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 }}
-                    className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40"
+                    className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none"
                 >
-                    <h3 className="text-lg font-bold text-slate-900 mb-8">Team Composition</h3>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-8">Team Composition</h3>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -3821,12 +3894,18 @@ const ReportsView = ({ employees, attendance }: any) => {
                                     ))}
                                 </Pie>
                                 <Tooltip 
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                    contentStyle={{ 
+                                        borderRadius: '16px', 
+                                        border: 'none', 
+                                        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+                                        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+                                        color: isDarkMode ? '#ffffff' : '#000000'
+                                    }}
                                 />
                                 <Legend 
                                     verticalAlign="bottom" 
                                     iconType="circle"
-                                    formatter={(value) => <span className="text-xs font-bold text-slate-600">{value}</span>}
+                                    formatter={(value) => <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{value}</span>}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
@@ -3835,40 +3914,40 @@ const ReportsView = ({ employees, attendance }: any) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40">
-                    <h3 className="text-lg font-bold text-slate-900 mb-6">Recent Activity</h3>
+                <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Recent Activity</h3>
                     <div className="space-y-4">
                         {[1, 2, 3].map((_, i) => (
-                            <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 border border-slate-100">
-                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-brand-600">
+                            <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                                <div className="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm text-brand-600 dark:text-brand-400">
                                     <UserPlus className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="text-sm font-bold text-slate-900">New employee onboarded</div>
-                                    <div className="text-xs text-slate-500">2 hours ago • HR Department</div>
+                                    <div className="text-sm font-bold text-slate-900 dark:text-white">New employee onboarded</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">2 hours ago • HR Department</div>
                                 </div>
-                                <ArrowRight className="w-4 h-4 text-slate-300" />
+                                <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40">
-                    <h3 className="text-lg font-bold text-slate-900 mb-6">Quick Actions</h3>
+                <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Quick Actions</h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <button className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 text-left hover:bg-brand-50 hover:border-brand-100 transition-all group">
-                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 transition-colors">
+                        <button className="p-6 bg-slate-50/50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 text-left hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:border-brand-100 dark:hover:border-brand-900/30 transition-all group">
+                            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                                 <FileText className="w-6 h-6" />
                             </div>
-                            <div className="font-bold text-slate-900">Attendance Report</div>
-                            <div className="text-xs text-slate-500 mt-1">Download monthly logs</div>
+                            <div className="font-bold text-slate-900 dark:text-white">Attendance Report</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Download monthly logs</div>
                         </button>
-                        <button className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 text-left hover:bg-brand-50 hover:border-brand-100 transition-all group">
-                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 transition-colors">
+                        <button className="p-6 bg-slate-50/50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 text-left hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:border-brand-100 dark:hover:border-brand-900/30 transition-all group">
+                            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                                 <Plus className="w-6 h-6" />
                             </div>
-                            <div className="font-bold text-slate-900">Add Employee</div>
-                            <div className="text-xs text-slate-500 mt-1">Quick staff onboarding</div>
+                            <div className="font-bold text-slate-900 dark:text-white">Add Employee</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Quick staff onboarding</div>
                         </button>
                     </div>
                 </div>

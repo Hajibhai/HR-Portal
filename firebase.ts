@@ -6,7 +6,8 @@ import {
   signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  deleteUser
+  deleteUser,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import firebaseConfig from './firebase-applet-config.json';
@@ -20,6 +21,7 @@ export const loginWithGoogle = () => signInWithPopup(auth, googleProvider);
 export const loginWithEmail = (email: string, pass: string) => signInWithEmailAndPassword(auth, email, pass);
 export const registerWithEmail = (email: string, pass: string) => createUserWithEmailAndPassword(auth, email, pass);
 export const logout = () => signOut(auth);
+export const resetPassword = (email: string) => sendPasswordResetEmail(auth, email);
 
 // Function to create a user without logging in (using a secondary app instance)
 export const adminCreateUser = async (email: string, pass: string) => {

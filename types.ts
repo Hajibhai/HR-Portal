@@ -190,6 +190,7 @@ export interface SystemUser {
     role: UserRole;
     active: boolean;
     permissions: UserPermissions;
+    theme?: 'light' | 'dark';
 }
 
 export interface AuditLog {
