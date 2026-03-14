@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -294,6 +294,47 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                     <div>
                         <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Personal Details</h3>
                         <div className="grid grid-cols-2 gap-4">
+                             <div className="col-span-2 flex items-center gap-4 mb-4">
+                                <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 overflow-hidden">
+                                    {data.profileImage ? (
+                                        <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                    ) : (
+                                        <Users className="w-8 h-8 text-slate-300" />
+                                    )}
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <input 
+                                        type="file" 
+                                        id="edit-profile-upload"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setData({...data, profileImage: reader.result as string});
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                    />
+                                    <label 
+                                        htmlFor="edit-profile-upload"
+                                        className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer transition-all"
+                                    >
+                                        Change Photo
+                                    </label>
+                                    {data.profileImage && (
+                                        <button 
+                                            onClick={() => setData({...data, profileImage: undefined})}
+                                            className="text-[10px] font-bold text-red-500 hover:text-red-600 text-left px-1"
+                                        >
+                                            Remove Photo
+                                        </button>
+                                    )}
+                                </div>
+                             </div>
                              <div><label className="text-xs font-semibold text-gray-500 uppercase">Code</label><input disabled type="text" value={data.code} className="w-full p-2 border rounded-lg mt-1 bg-gray-100 text-gray-500" /></div>
                              <div><label className="text-xs font-semibold text-gray-500 uppercase">Name</label><input type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border rounded-lg mt-1" /></div>
                              <div><label className="text-xs font-semibold text-gray-500 uppercase">Designation</label><input type="text" value={data.designation} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border rounded-lg mt-1" /></div>
@@ -1517,6 +1558,7 @@ export default function App() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [deductions, setDeductions] = useState<DeductionRecord[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
+  const hasLoggedLogin = useRef(false);
   const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [showAuditModal, setShowAuditModal] = useState(false);
@@ -1667,12 +1709,17 @@ export default function App() {
       { id: 'leave', label: 'Leave Management', icon: FileText, permission: 'canManageLeaves' },
       { id: 'payroll', label: 'Payroll Register', icon: DirhamIcon, permission: 'canViewPayroll' },
       { id: 'reports', label: 'Reports', icon: BarChart3, permission: 'canViewReports' },
-      { id: 'about', label: 'About', icon: AlertCircle },
+      { id: 'about', label: 'About', icon: AlertCircle, creatorOnly: true },
     ];
     
-    if (!systemUser) return baseItems.filter(item => !item.permission);
+    if (!systemUser) return baseItems.filter(item => !item.permission && !item.creatorOnly);
     
-    return baseItems.filter(item => !item.permission || (systemUser.permissions as any)[item.permission]);
+    const isCreator = systemUser.role === UserRole.CREATOR || systemUser.email === 'abdulkaderp3010@gmail.com';
+    
+    return baseItems.filter(item => {
+        if (item.creatorOnly && !isCreator) return false;
+        return !item.permission || (systemUser.permissions as any)[item.permission];
+    });
   }, [systemUser]);
 
   useEffect(() => {
@@ -1719,6 +1766,44 @@ export default function App() {
       }
   };
 
+  const handleLogout = async () => {
+    if (systemUser) {
+        await logAudit(systemUser, 'User Logout', `User ${systemUser.name} logged out of the system.`, 'system');
+    }
+    await logout();
+    setSystemUser(null);
+    hasLoggedLogin.current = false;
+  };
+
+  const expiringDocs = useMemo(() => {
+    const now = new Date();
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    
+    const results: any[] = [];
+    employees.forEach(emp => {
+        if (!emp.active) return;
+        
+        const docs = [
+            { name: 'Emirates ID', date: emp.documents?.emiratesIdExpiry },
+            { name: 'Passport', date: emp.documents?.passportExpiry },
+            { name: 'Labour Card', date: emp.documents?.labourCardExpiry },
+            { name: 'Visa', date: emp.documents?.visaExpiry }
+        ];
+        
+        docs.forEach(doc => {
+            if (doc.date) {
+                const expiry = new Date(doc.date);
+                if (expiry <= now) {
+                    results.push({ employeeName: emp.name, docName: doc.name, status: 'Expired', date: doc.date });
+                } else if (expiry <= thirtyDaysFromNow) {
+                    results.push({ employeeName: emp.name, docName: doc.name, status: 'Expiring Soon', date: doc.date });
+                }
+            }
+        });
+    });
+    return results;
+  }, [employees]);
+
   if (!isAuthReady) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -1748,8 +1833,10 @@ export default function App() {
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       user={systemUser}
-      onLogout={logout}
+      onLogout={handleLogout}
       companies={companies}
+      expiringDocs={expiringDocs}
+      employees={employees}
     >
       {activeTab === 'dashboard' && (
         <DashboardView 
@@ -1805,6 +1892,15 @@ export default function App() {
       )}
       {activeTab === 'about' && (
         <AboutView />
+      )}
+      {activeTab === 'profile' && (
+        <ProfileView user={systemUser} />
+      )}
+      {activeTab === 'settings' && (
+        <SettingsView user={systemUser} />
+      )}
+      {activeTab === 'help' && (
+        <HelpCenterView />
       )}
 
       {/* Modals */}
@@ -1918,27 +2014,29 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
     return (
         <div className="space-y-8 pb-12">
             {/* Header Section */}
-            {(user.role === UserRole.CREATOR || user.email === CREATOR_USER.email) && (
-                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
-                            <Activity className="w-4 h-4" />
-                            System Intelligence
-                        </div>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
-                        <p className="text-slate-500 font-medium max-w-xl">
-                            Welcome back, <span className="text-slate-900 font-bold">{user.name}</span>. 
-                            The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
-                        </p>
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-[0.2em]">
+                        <Activity className="w-4 h-4" />
+                        System Intelligence
                     </div>
-                    
-                    <div className="flex flex-wrap items-center gap-3">
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
+                    <p className="text-slate-500 font-medium max-w-xl">
+                        Welcome back, <span className="text-slate-900 font-bold">{user.name}</span>. 
+                        The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
+                    </p>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-3">
+                    {(user.role === UserRole.CREATOR || user.role === UserRole.ADMIN || user.role === UserRole.HR) && (
                         <button 
                             onClick={onOpenOnboarding}
                             className="flex-1 sm:flex-none bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
                         >
                             <UserPlus className="w-4 h-4" /> Onboard Staff
                         </button>
+                    )}
+                    {(user.role === UserRole.CREATOR || user.role === UserRole.ADMIN) && (
                         <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
                             <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="Manage Companies">
                                 <Building2 className="w-5 h-5" />
@@ -1948,9 +2046,9 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                                 <UserCog className="w-5 h-5" />
                             </button>
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
+            </div>
 
             {/* Bento Grid Layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -2086,6 +2184,170 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
     );
 };
 
+// --- Profile View ---
+const ProfileView = ({ user }: { user: SystemUser }) => {
+    return (
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-32 bg-brand-600"></div>
+                <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-32 h-32 bg-white rounded-3xl flex items-center justify-center text-4xl font-black text-brand-600 shadow-xl border-4 border-white mb-4">
+                        {user.name.charAt(0)}
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-900">{user.name}</h2>
+                    <p className="text-brand-600 font-bold uppercase tracking-widest text-xs mt-1">{user.role}</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-12">
+                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</p>
+                            <p className="text-sm font-bold text-slate-900">{user.email}</p>
+                        </div>
+                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Username</p>
+                            <p className="text-sm font-bold text-slate-900">{user.username || 'Not set'}</p>
+                        </div>
+                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Account Status</p>
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                <p className="text-sm font-bold text-slate-900">{user.active ? 'Active' : 'Inactive'}</p>
+                            </div>
+                        </div>
+                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">User ID</p>
+                            <p className="text-xs font-mono text-slate-500">{user.uid}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                <h3 className="text-lg font-black text-slate-900 mb-6">Your Permissions</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(user.permissions).map(([key, value]) => (
+                        <div key={key} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            {value ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-slate-300" />}
+                            <span className="text-xs font-bold text-slate-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Settings View ---
+const SettingsView = ({ user }: { user: SystemUser }) => {
+    return (
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center gap-4 mb-2">
+                <div className="p-3 bg-brand-50 rounded-2xl">
+                    <Settings className="w-6 h-6 text-brand-600" />
+                </div>
+                <div>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Accountant Settings</h2>
+                    <p className="text-slate-500 font-medium">Manage your system preferences and security</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6">
+                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-900 mb-6">Security</h3>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div>
+                                <p className="text-sm font-bold text-slate-900">Change Password</p>
+                                <p className="text-xs text-slate-500">Update your account password regularly</p>
+                            </div>
+                            <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-brand-600 hover:bg-slate-50 transition-all">Update</button>
+                        </div>
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div>
+                                <p className="text-sm font-bold text-slate-900">Two-Factor Authentication</p>
+                                <p className="text-xs text-slate-500">Add an extra layer of security to your account</p>
+                            </div>
+                            <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer">
+                                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-900 mb-6">System Preferences</h3>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div>
+                                <p className="text-sm font-bold text-slate-900">Email Notifications</p>
+                                <p className="text-xs text-slate-500">Receive system alerts via email</p>
+                            </div>
+                            <div className="w-12 h-6 bg-brand-600 rounded-full relative cursor-pointer">
+                                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div>
+                                <p className="text-sm font-bold text-slate-900">Dark Mode</p>
+                                <p className="text-xs text-slate-500">Switch between light and dark themes</p>
+                            </div>
+                            <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer">
+                                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Help Center View ---
+const HelpCenterView = () => {
+    const instructions = [
+        { title: 'Managing Employees', content: 'To add a new employee, go to the Dashboard and click "Onboard Staff". Fill in the personal, work, and financial details across the 4 steps.' },
+        { title: 'Attendance Tracking', content: 'Use the Monthly Timesheet tab to log daily attendance. You can mark status (P, A, W, etc.) and add overtime hours.' },
+        { title: 'Payroll Generation', content: 'The Payroll Register automatically calculates salaries based on basic pay and attendance records. You can export the register for processing.' },
+        { title: 'Document Expiry', content: 'Check the notifications bell to see documents (Passport, Visa, EID) that are expiring soon. The system alerts you 30 days in advance.' },
+        { title: 'System Audits', content: 'Every action is logged in the System Activity section. Creators can view full logs of all user actions.' }
+    ];
+
+    return (
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center gap-4 mb-2">
+                <div className="p-3 bg-brand-50 rounded-2xl">
+                    <HelpCircle className="w-6 h-6 text-brand-600" />
+                </div>
+                <div>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Help Center</h2>
+                    <p className="text-slate-500 font-medium">Instructions and guides for Al Reem DMS</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6">
+                {instructions.map((item, idx) => (
+                    <div key={idx} className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                        <h3 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-3">
+                            <span className="w-8 h-8 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-sm">{idx + 1}</span>
+                            {item.title}
+                        </h3>
+                        <p className="text-slate-600 leading-relaxed font-medium pl-11">
+                            {item.content}
+                        </p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="bg-brand-600 rounded-[2.5rem] p-10 text-white text-center">
+                <h3 className="text-2xl font-black mb-4">Need more help?</h3>
+                <p className="text-white/80 font-medium mb-8">Our support team is available 24/7 for technical assistance.</p>
+                <button className="px-8 py-4 bg-white text-brand-600 rounded-2xl font-black hover:bg-slate-50 transition-all shadow-xl shadow-brand-900/20">
+                    Contact Support Team
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) => {
     const colors: any = {
         brand: "bg-brand-50 text-brand-600 border-brand-100 shadow-brand-500/5",
@@ -2102,13 +2364,6 @@ const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) =>
             <div className="flex justify-between items-start">
                 <div className={cn("p-3.5 rounded-2xl transition-all duration-500 group-hover:rotate-6", colors[color])}>
                     <Icon className="w-6 h-6" />
-                </div>
-                <div className={cn(
-                    "flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black tracking-tight",
-                    isUp ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
-                )}>
-                    {isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                    {trend}
                 </div>
             </div>
             <div>

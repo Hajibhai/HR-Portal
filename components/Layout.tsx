@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, ChevronDown, 
@@ -20,6 +20,8 @@ interface LayoutProps {
   user: any;
   onLogout: () => void;
   companies: any[];
+  expiringDocs: any[];
+  employees: any[];
 }
 
 export const Layout: React.FC<LayoutProps> = ({ 
@@ -29,13 +31,46 @@ export const Layout: React.FC<LayoutProps> = ({
   setActiveTab, 
   user, 
   onLogout,
-  companies 
+  companies,
+  expiringDocs,
+  employees
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    
+    const results: any[] = [];
+    
+    // Search Employees
+    employees.forEach(emp => {
+        if (emp.name.toLowerCase().includes(q) || emp.code.toLowerCase().includes(q) || emp.designation.toLowerCase().includes(q)) {
+            results.push({ type: 'Employee', title: emp.name, subtitle: `${emp.code} - ${emp.designation}`, id: emp.id, tab: 'staff' });
+        }
+    });
+    
+    // Search Companies
+    companies.forEach(comp => {
+        if (comp.name.toLowerCase().includes(q)) {
+            results.push({ type: 'Company', title: comp.name, subtitle: 'Company Details', id: comp.id, tab: 'company' });
+        }
+    });
+    
+    // Search Nav Items
+    navItems.forEach(item => {
+        if (item.label.toLowerCase().includes(q)) {
+            results.push({ type: 'Navigation', title: item.label, subtitle: 'System Section', id: item.id, tab: item.id });
+        }
+    });
+    
+    return results;
+  }, [searchQuery, employees, companies, navItems]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -121,10 +156,59 @@ export const Layout: React.FC<LayoutProps> = ({
               </button>
 
               {/* Notifications */}
-              <button className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all relative group">
-                <Bell className="w-4 h-4 group-hover:animate-swing" />
-                <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                  className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all relative group"
+                >
+                  <Bell className="w-4 h-4 group-hover:animate-swing" />
+                  {expiringDocs.length > 0 && (
+                    <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {isNotificationsOpen && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setIsNotificationsOpen(false)}></div>
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute right-0 mt-2 w-80 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 z-20 overflow-hidden"
+                      >
+                        <div className="p-4 border-b border-slate-50 mb-2">
+                          <p className="text-xs font-bold text-slate-900 uppercase tracking-widest">Document Alerts</p>
+                        </div>
+                        <div className="max-h-80 overflow-y-auto space-y-1">
+                          {expiringDocs.length === 0 ? (
+                            <div className="p-8 text-center">
+                              <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                              <p className="text-xs font-bold text-slate-400">No active alerts</p>
+                            </div>
+                          ) : (
+                            expiringDocs.map((doc, idx) => (
+                              <div key={idx} className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
+                                <div className="flex justify-between items-start">
+                                  <span className={cn(
+                                    "text-[10px] font-black px-2 py-0.5 rounded-full uppercase",
+                                    doc.status === 'Expired' ? "bg-red-100 text-red-600" : "bg-orange-100 text-orange-600"
+                                  )}>
+                                    {doc.status}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-slate-400">{doc.date}</span>
+                                </div>
+                                <p className="text-xs font-bold text-slate-900">{doc.employeeName}</p>
+                                <p className="text-[10px] font-medium text-slate-500">{doc.docName}</p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
 
               <div className="h-8 w-px bg-slate-200 mx-1 hidden sm:block"></div>
 
@@ -159,13 +243,31 @@ export const Layout: React.FC<LayoutProps> = ({
                           <p className="text-sm font-bold text-slate-900 truncate">{user.email}</p>
                         </div>
                         <div className="space-y-1">
-                          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all">
+                          <button 
+                            onClick={() => {
+                                setActiveTab('profile');
+                                setIsUserDropdownOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all"
+                          >
                             <User className="w-4 h-4" /> My Profile
                           </button>
-                          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all">
+                          <button 
+                            onClick={() => {
+                                setActiveTab('settings');
+                                setIsUserDropdownOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all"
+                          >
                             <Settings className="w-4 h-4" /> Account Settings
                           </button>
-                          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all">
+                          <button 
+                            onClick={() => {
+                                setActiveTab('help');
+                                setIsUserDropdownOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all"
+                          >
                             <HelpCircle className="w-4 h-4" /> Help Center
                           </button>
                         </div>
@@ -221,13 +323,42 @@ export const Layout: React.FC<LayoutProps> = ({
                         {searchQuery ? (
                           <div className="space-y-2">
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest px-2 mb-2">Search Results</p>
-                            <div className="p-8 text-center">
-                              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Search className="w-8 h-8 text-slate-300" />
-                              </div>
-                              <p className="text-slate-500 font-medium">No results found for "{searchQuery}"</p>
-                              <p className="text-slate-400 text-sm mt-1">Try searching for something else or check your spelling.</p>
-                            </div>
+                            {searchResults.length > 0 ? (
+                                <div className="space-y-1">
+                                    {searchResults.map((res, idx) => (
+                                        <button 
+                                            key={idx}
+                                            onClick={() => {
+                                                setActiveTab(res.tab);
+                                                setIsSearchOpen(false);
+                                                setSearchQuery('');
+                                            }}
+                                            className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:border-brand-100 hover:bg-brand-50 transition-all group text-left"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
+                                                    {res.type === 'Employee' ? <User className="w-5 h-5 text-brand-600" /> : res.type === 'Company' ? <Building2 className="w-5 h-5 text-brand-600" /> : <Globe className="w-5 h-5 text-brand-600" />}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-bold text-slate-900">{res.title}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">{res.subtitle}</p>
+                                                </div>
+                                            </div>
+                                            <span className="text-[10px] font-black text-brand-600 bg-brand-50 px-2 py-1 rounded-lg uppercase tracking-wider">
+                                                {res.type}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-8 text-center">
+                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Search className="w-8 h-8 text-slate-300" />
+                                    </div>
+                                    <p className="text-slate-500 font-medium">No results found for "{searchQuery}"</p>
+                                    <p className="text-slate-400 text-sm mt-1">Try searching for something else or check your spelling.</p>
+                                </div>
+                            )}
                           </div>
                         ) : (
                           <div className="space-y-6 p-4">
