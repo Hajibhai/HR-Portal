@@ -1762,6 +1762,7 @@ export default function App() {
           onOpenManageCompanies={() => setShowManageCompanies(true)}
           onOpenOnboarding={() => setShowOnboarding(true)}
           onUpdate={() => {}}
+          setActiveTab={setActiveTab}
         />
       )}
       {activeTab === 'company' && (
@@ -1868,7 +1869,9 @@ export default function App() {
 
 // --- Dashboard View ---
 
-const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditModal, onOpenUserManagement, onOpenManageCompanies, onOpenOnboarding, onUpdate }: any) => {
+const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditModal, onOpenUserManagement, onOpenManageCompanies, onOpenOnboarding, onUpdate, setActiveTab }: any) => {
+    const [showQuickAdminMenu, setShowQuickAdminMenu] = useState(false);
+    
     // Stats Calculation
     const activeStaff = employees.filter((e:any) => e.active);
     const internalTeam = activeStaff.filter((e:any) => e.team === 'Internal Team').length;
@@ -1895,6 +1898,22 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
     ];
 
     const COLORS = ['#0ea5e9', '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b'];
+
+    const handleExport = () => {
+        const data = employees.map((e: any) => ({
+            'Code': e.code,
+            'Name': e.name,
+            'Company': e.company,
+            'Department': e.department,
+            'Designation': e.designation,
+            'Status': e.status,
+            'Joining Date': e.joiningDate
+        }));
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Employees");
+        XLSX.writeFile(wb, "AlReem_Personnel_Data.xlsx");
+    };
 
     return (
         <div className="space-y-8 pb-12">
@@ -2014,16 +2033,39 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                     <div className="relative z-10 flex flex-col h-full">
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-xl font-black tracking-tight">Quick Operations</h3>
-                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                <LayoutGrid className="w-5 h-5" />
+                            <div className="relative">
+                                <button 
+                                    onClick={() => (user.role === UserRole.CREATOR || user.role === UserRole.ADMIN) && setShowQuickAdminMenu(!showQuickAdminMenu)}
+                                    className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition-all"
+                                >
+                                    <LayoutGrid className="w-5 h-5" />
+                                </button>
+                                {showQuickAdminMenu && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setShowQuickAdminMenu(false)}></div>
+                                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-20 text-slate-900">
+                                            <button 
+                                                onClick={() => { onOpenUserManagement(); setShowQuickAdminMenu(false); }}
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-brand-600 transition-all"
+                                            >
+                                                <UserCog className="w-4 h-4" /> System User Management
+                                            </button>
+                                            <button 
+                                                onClick={() => { onOpenManageCompanies(); setShowQuickAdminMenu(false); }}
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-brand-600 transition-all"
+                                            >
+                                                <Building2 className="w-4 h-4" /> Manage Companies
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 flex-1">
-                            <QuickActionButton icon={Download} label="Export Data" />
-                            <QuickActionButton icon={ListFilter} label="Smart Filter" />
-                            <QuickActionButton icon={Bell} label="Broadcast" />
-                            <QuickActionButton icon={Settings} label="Preferences" />
+                            <QuickActionButton icon={Download} label="Export Data" onClick={handleExport} />
+                            <QuickActionButton icon={ListFilter} label="Smart Filter" onClick={() => setActiveTab('staff')} />
+                            <QuickActionButton icon={Settings} label="Preferences" onClick={() => onOpenUserManagement()} />
                         </div>
 
                         <div className="mt-8 p-4 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-md">
@@ -2102,8 +2144,11 @@ const ActivityItem = ({ icon: Icon, title, desc, time, color }: any) => {
     );
 };
 
-const QuickActionButton = ({ icon: Icon, label }: any) => (
-    <button className="flex flex-col items-center justify-center gap-3 p-4 bg-white/10 hover:bg-white/20 rounded-3xl border border-white/10 transition-all duration-300 group">
+const QuickActionButton = ({ icon: Icon, label, onClick }: any) => (
+    <button 
+        onClick={onClick}
+        className="flex flex-col items-center justify-center gap-3 p-4 bg-white/10 hover:bg-white/20 rounded-3xl border border-white/10 transition-all duration-300 group"
+    >
         <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
         <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
     </button>
