@@ -27,6 +27,8 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, AreaChart, Area
@@ -90,7 +92,7 @@ const calculatePayroll = (employee: Employee, attendance: AttendanceRecord[], de
     const totalUnpaidDays = absentDays + unpaidLeaves;
 
     // Salary
-    const { basic = 0, housing = 0, transport = 0, other = 0, airTicket = 0, leaveSalary = 0 } = employee.salary;
+    const { basic = 0, housing = 0, transport = 0, other = 0, airTicket = 0, leaveSalary = 0 } = employee.salary || {};
     const grossSalary = basic + housing + transport + other + airTicket + leaveSalary;
     
     // Deductions
@@ -110,7 +112,7 @@ const calculatePayroll = (employee: Employee, attendance: AttendanceRecord[], de
         otAmount,
         totalDeductions: lopDeduction + otherDeductionsTotal,
         netSalary: grossSalary + otAmount - (lopDeduction + otherDeductionsTotal),
-        breakdown: employee.salary
+        breakdown: employee.salary || { basic: 0, housing: 0, transport: 0, other: 0, airTicket: 0, leaveSalary: 0 }
     };
 };
 
@@ -4140,6 +4142,45 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
         XLSX.writeFile(wb, `Payroll_Register_${selectedMonth}.xlsx`);
      };
 
+     const handlePrint = () => {
+        const doc = new jsPDF('l', 'mm', 'a4');
+        doc.setFontSize(18);
+        doc.text(`Payroll Register - ${selectedMonth}`, 14, 22);
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 30);
+
+        const tableData = filteredEmployees.map((e: Employee) => {
+            const monthRecs = attendance.filter((r: any) => r.employeeId === e.id && r.date.startsWith(selectedMonth));
+            const monthDeds = deductions.filter((d: any) => d.employeeId === e.id && d.date.startsWith(selectedMonth));
+            const p = calculatePayroll(e, monthRecs, monthDeds);
+            return [
+                e.code,
+                e.name,
+                p.breakdown.basic.toLocaleString(),
+                p.breakdown.housing.toLocaleString(),
+                p.breakdown.transport.toLocaleString(),
+                p.breakdown.other.toLocaleString(),
+                p.grossSalary.toLocaleString(),
+                p.totalUnpaidDays,
+                p.totalDeductions.toFixed(0),
+                p.otAmount.toFixed(0),
+                p.netSalary.toFixed(0)
+            ];
+        });
+
+        autoTable(doc, {
+            startY: 35,
+            head: [['Code', 'Name', 'Basic', 'Housing', 'Transport', 'Other', 'Gross', 'Unpaid', 'Ded.', 'OT', 'Net']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [14, 165, 233] },
+            styles: { fontSize: 8 }
+        });
+
+        doc.save(`Payroll_Register_${selectedMonth}.pdf`);
+     };
+
      return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -4172,6 +4213,12 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
                         className="neo-button bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                      >
                          <Download className="w-4 h-4" /> Export
+                     </button>
+                     <button 
+                        onClick={handlePrint} 
+                        className="neo-button bg-brand-500 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-500/20 hover:bg-brand-600 transition-all"
+                     >
+                         <Printer className="w-4 h-4" /> Print
                      </button>
                  </div>
              </div>
@@ -4291,7 +4338,42 @@ const ReportsView = ({ employees, attendance, isDarkMode }: any) => {
     };
 
     const handlePrint = () => {
-        window.print();
+        const doc = new jsPDF('p', 'mm', 'a4');
+        doc.setFontSize(20);
+        doc.text("Workforce Analytics Report", 14, 22);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 30);
+
+        // Add Summary Stats
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text("Summary Stats:", 14, 40);
+        doc.setFontSize(10);
+        doc.text(`Total Active Staff: ${totalStaff}`, 14, 48);
+        doc.text(`Monthly Payroll: AED ${totalSpent.toLocaleString()}`, 14, 54);
+        doc.text(`Late Arrivals: ${lateDays}`, 14, 60);
+        doc.text(`Total Teams: ${teamData.length}`, 14, 66);
+
+        const tableData = activeStaff.map((e: any) => [
+            e.code,
+            e.name,
+            e.company,
+            e.department,
+            e.designation,
+            (e.salary.basic + e.salary.housing + e.salary.transport + e.salary.other).toLocaleString()
+        ]);
+
+        autoTable(doc, {
+            startY: 75,
+            head: [['Code', 'Name', 'Company', 'Dept.', 'Designation', 'Gross Salary']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [14, 165, 233] },
+            styles: { fontSize: 8 }
+        });
+
+        doc.save("AlReem_Staff_Analytics_Report.pdf");
     };
 
     return (
