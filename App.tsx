@@ -4111,9 +4111,33 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
         );
     }, [employees, searchTerm]);
 
-     // Simple export stub
+     // Real export functionality
      const handleExport = () => {
-        alert("Export functionality would generate a CSV/Excel file here.");
+        const data = filteredEmployees.map((e: Employee) => {
+            const monthRecs = attendance.filter((r: any) => r.employeeId === e.id && r.date.startsWith(selectedMonth));
+            const monthDeds = deductions.filter((d: any) => d.employeeId === e.id && d.date.startsWith(selectedMonth));
+            const p = calculatePayroll(e, monthRecs, monthDeds);
+            
+            return {
+                'Employee Code': e.code,
+                'Employee Name': e.name,
+                'Month': selectedMonth,
+                'Basic Salary': p.breakdown.basic,
+                'Housing': p.breakdown.housing,
+                'Transport': p.breakdown.transport,
+                'Other Allowance': p.breakdown.other,
+                'Gross Salary': p.grossSalary,
+                'Unpaid Days': p.totalUnpaidDays,
+                'Deductions': p.totalDeductions,
+                'OT Amount': p.otAmount,
+                'Net Salary': p.netSalary
+            };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Payroll Register");
+        XLSX.writeFile(wb, `Payroll_Register_${selectedMonth}.xlsx`);
      };
 
      return (
@@ -4244,6 +4268,31 @@ const ReportsView = ({ employees, attendance, isDarkMode }: any) => {
     }, [activeStaff]);
 
     const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#f97316'];
+    
+    const handleExport = () => {
+        const data = activeStaff.map((e: any) => ({
+            'Code': e.code,
+            'Name': e.name,
+            'Company': e.company,
+            'Department': e.department,
+            'Team': e.team,
+            'Designation': e.designation,
+            'Basic': e.salary.basic,
+            'Housing': e.salary.housing,
+            'Transport': e.salary.transport,
+            'Other': e.salary.other,
+            'Gross': e.salary.basic + e.salary.housing + e.salary.transport + e.salary.other,
+            'Joining Date': e.joiningDate
+        }));
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Staff Report");
+        XLSX.writeFile(wb, "AlReem_Staff_Analytics_Report.xlsx");
+    };
+
+    const handlePrint = () => {
+        window.print();
+    };
 
     return (
         <div className="space-y-8 pb-12">
@@ -4257,10 +4306,16 @@ const ReportsView = ({ employees, attendance, isDarkMode }: any) => {
                     <p className="text-slate-500 dark:text-slate-400 font-medium">Real-time workforce intelligence and distribution.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2">
+                    <button 
+                        onClick={handleExport}
+                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2"
+                    >
                         <Download className="w-4 h-4" /> Export Data
                     </button>
-                    <button className="px-4 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2">
+                    <button 
+                        onClick={handlePrint}
+                        className="px-4 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2"
+                    >
                         <Printer className="w-4 h-4" /> Print Report
                     </button>
                 </div>
