@@ -34,6 +34,7 @@ export interface OffboardingDetails {
   assetsReturned: boolean;
   notes: string;
   documents?: { name: string; data: string }[]; // Array of Base64 files
+  settlementLink?: string; // Google Drive link for signed document
 }
 
 export interface EmployeeDocuments {

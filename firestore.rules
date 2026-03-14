@@ -1,9 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ===============================================================
-    // Helper Functions
-    // ===============================================================
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -21,74 +18,33 @@ service cloud.firestore {
 
     function isCreator() {
       return isAuthenticated() && 
-        (request.auth.token.email == "abdulkaderp3010@gmail.com");
+        (request.auth.token.email == "abdulkaderp3010@gmail.com" && request.auth.token.email_verified == true);
     }
 
     function hasPermission(permission) {
-      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
       return isAuthenticated() && 
-        (isCreator() || (userDoc != null && userDoc.data.permissions[permission] == true));
+        (isCreator() || (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions[permission] == true));
     }
-
-    // ===============================================================
-    // Domain Validators
-    // ===============================================================
-
-    function isValidAuditLog(data) {
-      return data.keys().hasAll(['timestamp', 'userId', 'userName', 'userRole', 'action', 'details', 'type', 'isCreator']) &&
-             data.timestamp is string &&
-             data.userId is string &&
-             data.userName is string &&
-             data.userRole is string &&
-             data.action is string &&
-             data.details is string &&
-             data.type in ['create', 'update', 'delete', 'system'] &&
-             data.isCreator is bool;
-    }
-
-    function isValidUser(data) {
-      return data.keys().hasAll(['name', 'role', 'permissions']) &&
-             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
-             (!('username' in data) || (data.username is string && data.username.size() < 100)) &&
-             data.role is string &&
-             data.permissions is map;
-    }
-
-    function isValidEmployee(data) {
-      return data.name is string && data.name.size() < 100 &&
-             data.code is string && data.code.size() < 20;
-    }
-
-    // ===============================================================
-    // Rules
-    // ===============================================================
 
     match /audit_logs/{logId} {
       allow read: if isAuthenticated() && (
         isCreator() || 
         (hasPermission('canManageSettings') || hasPermission('canManageUsers') || hasPermission('canManageEmployees'))
       );
-      allow create: if isAuthenticated() && isValidAuditLog(request.resource.data);
+      allow create: if isAuthenticated();
       allow update, delete: if false;
     }
 
     match /users/{userId} {
       allow read: if isOwner(userId) || hasPermission('canManageUsers');
-      allow create: if isAuthenticated() && 
-                    isValidUser(request.resource.data) &&
-                    (isOwner(userId) || hasPermission('canManageUsers')) &&
-                    (request.resource.data.role != 'Creator' || isCreator());
-      allow update: if isAuthenticated() && 
-                    isValidUser(request.resource.data) &&
-                    (isOwner(userId) || hasPermission('canManageUsers')) &&
-                    (request.resource.data.role == resource.data.role || hasPermission('canManageUsers')) &&
-                    (request.resource.data.permissions == resource.data.permissions || hasPermission('canManageUsers'));
-      allow delete: if hasPermission('canManageUsers') && resource.data.role != 'Creator';
+      allow create: if isAuthenticated() && (isOwner(userId) || hasPermission('canManageUsers'));
+      allow update: if isAuthenticated() && (isOwner(userId) || hasPermission('canManageUsers'));
+      allow delete: if hasPermission('canManageUsers');
     }
 
     match /employees/{employeeId} {
       allow read: if hasPermission('canViewDirectory') || hasPermission('canManageEmployees');
-      allow write: if hasPermission('canManageEmployees') && isValidEmployee(request.resource.data);
+      allow write: if hasPermission('canManageEmployees');
     }
 
     match /attendance/{recordId} {
@@ -98,7 +54,7 @@ service cloud.firestore {
 
     match /leaves/{leaveId} {
       allow read: if hasPermission('canManageLeaves');
-      allow write: if hasPermission('canManageLeaves') || isAuthenticated(); // Users can apply for leaves
+      allow write: if hasPermission('canManageLeaves') || isAuthenticated();
     }
 
     match /deductions/{deductionId} {

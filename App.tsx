@@ -287,12 +287,127 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, type = 
   );
 };
 
+const FinalSettlementDocument = ({ employee, details }: { employee: Employee, details: OffboardingDetails }) => {
+    return (
+        <div className="p-10 bg-white text-black font-serif max-w-[210mm] mx-auto">
+            <div className="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold uppercase tracking-widest">Final Settlement</h1>
+                    <p className="text-sm mt-1 text-gray-600">Employee Exit Clearance & Financial Statement</p>
+                </div>
+                <div className="text-right">
+                    <p className="font-bold text-lg">{employee.company}</p>
+                    <p className="text-sm">Date: {new Date().toLocaleDateString()}</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 mb-10">
+                <div className="space-y-2">
+                    <h2 className="font-bold border-b pb-1 mb-2 uppercase text-xs text-gray-500">Employee Information</h2>
+                    <p className="text-sm"><span className="font-semibold w-32 inline-block">Name:</span> {employee.name}</p>
+                    <p className="text-sm"><span className="font-semibold w-32 inline-block">Employee ID:</span> {employee.code}</p>
+                    <p className="text-sm"><span className="font-semibold w-32 inline-block">Designation:</span> {employee.designation}</p>
+                    <p className="text-sm"><span className="font-semibold w-32 inline-block">Department:</span> {employee.department}</p>
+                </div>
+                <div className="space-y-2">
+                    <h2 className="font-bold border-b pb-1 mb-2 uppercase text-xs text-gray-500">Exit Details</h2>
+                    <p className="text-sm"><span className="font-semibold w-32 inline-block">Exit Type:</span> {details.type}</p>
+                    <p className="text-sm"><span className="font-semibold w-32 inline-block">Joining Date:</span> {employee.joiningDate}</p>
+                    <p className="text-sm"><span className="font-semibold w-32 inline-block">Last Working Day:</span> {details.exitDate}</p>
+                </div>
+            </div>
+
+            <div className="mb-10">
+                <h2 className="font-bold border-b pb-1 mb-4 uppercase text-xs text-gray-500">Financial Statement</h2>
+                <table className="w-full border-collapse">
+                    <thead>
+                        <tr className="bg-gray-50">
+                            <th className="border p-2 text-left text-sm">Description</th>
+                            <th className="border p-2 text-right w-32 text-sm">Earnings (AED)</th>
+                            <th className="border p-2 text-right w-32 text-sm">Deductions (AED)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td className="border p-2 text-sm">Gratuity Settlement</td>
+                            <td className="border p-2 text-right text-sm">{details.gratuity.toLocaleString()}</td>
+                            <td className="border p-2 text-right text-sm">-</td>
+                        </tr>
+                        <tr>
+                            <td className="border p-2 text-sm">Leave Encashment</td>
+                            <td className="border p-2 text-right text-sm">{details.leaveEncashment.toLocaleString()}</td>
+                            <td className="border p-2 text-right text-sm">-</td>
+                        </tr>
+                        <tr>
+                            <td className="border p-2 text-sm">Pending Salary / Dues</td>
+                            <td className="border p-2 text-right text-sm">{details.salaryDues.toLocaleString()}</td>
+                            <td className="border p-2 text-right text-sm">-</td>
+                        </tr>
+                        {details.otherDues > 0 && (
+                            <tr>
+                                <td className="border p-2 text-sm">Other Earnings</td>
+                                <td className="border p-2 text-right text-sm">{details.otherDues.toLocaleString()}</td>
+                                <td className="border p-2 text-right text-sm">-</td>
+                            </tr>
+                        )}
+                        <tr>
+                            <td className="border p-2 text-sm">Total Deductions</td>
+                            <td className="border p-2 text-right text-sm">-</td>
+                            <td className="border p-2 text-right text-sm">{details.deductions.toLocaleString()}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr className="font-bold bg-gray-100">
+                            <td className="border p-2 text-right text-sm">Net Payable Amount</td>
+                            <td colSpan={2} className="border p-2 text-right text-xl">AED {details.netSettlement.toLocaleString()}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div className="mb-10">
+                <h2 className="font-bold border-b pb-1 mb-2 uppercase text-xs text-gray-500">Clearance Confirmation</h2>
+                <p className="text-sm italic">
+                    {details.assetsReturned 
+                        ? "All company assets (Laptop, SIM, Uniform, Tools) have been returned in good condition." 
+                        : "Company assets return status: Pending/Not Applicable."}
+                </p>
+                {details.notes && (
+                    <div className="mt-4 p-3 bg-gray-50 border rounded text-sm">
+                        <p className="font-bold mb-1">Remarks:</p>
+                        <p>{details.notes}</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-20 grid grid-cols-2 gap-20">
+                <div className="text-center">
+                    <div className="border-t border-black pt-2">
+                        <p className="font-bold text-sm">{employee.name}</p>
+                        <p className="text-[10px] text-gray-500">Employee Signature & Date</p>
+                    </div>
+                </div>
+                <div className="text-center">
+                    <div className="border-t border-black pt-2">
+                        <p className="font-bold text-sm">For {employee.company}</p>
+                        <p className="text-[10px] text-gray-500">Authorized Signatory & Stamp</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-12 text-[10px] text-gray-400 text-center">
+                <p>This is a computer-generated document. No signature is required unless printed for physical records.</p>
+            </div>
+        </div>
+    );
+};
+
 const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Employee, onComplete: (data: OffboardingDetails) => void, onCancel: () => void }) => {
     const [step, setStep] = useState(1);
     const [details, setDetails] = useState<OffboardingDetails>({
         type: 'Resignation', exitDate: new Date().toISOString().split('T')[0], reason: '',
         gratuity: 0, leaveEncashment: 0, salaryDues: 0, otherDues: 0, deductions: 0,
-        netSettlement: 0, assetsReturned: false, notes: ''
+        netSettlement: 0, assetsReturned: false, notes: '', settlementLink: ''
     });
 
     const calculateSettlement = () => {
@@ -302,6 +417,42 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
 
     useEffect(() => { calculateSettlement(); }, [details.gratuity, details.leaveEncashment, details.salaryDues, details.otherDues, details.deductions]);
 
+    const handlePrint = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+        
+        const content = document.getElementById('settlement-document-print');
+        if (!content) return;
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Final Settlement - ${employee.name}</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <style>
+                        @media print {
+                            body { padding: 0; margin: 0; }
+                            .no-print { display: none; }
+                        }
+                        body { font-family: 'Georgia', serif; }
+                    </style>
+                </head>
+                <body>
+                    ${content.innerHTML}
+                    <script>
+                        window.onload = () => {
+                            setTimeout(() => {
+                                window.print();
+                                window.close();
+                            }, 500);
+                        };
+                    </script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent dark:border-slate-800">
@@ -309,7 +460,7 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
                     <div>
                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Offboard: {employee.name}</h2>
                          <div className="flex gap-2 mt-2">
-                            {[1, 2, 3, 4].map(i => (
+                            {[1, 2, 3, 4, 5].map(i => (
                                 <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${i <= step ? 'bg-red-600' : 'bg-gray-200 dark:bg-slate-700'}`} />
                             ))}
                         </div>
@@ -343,10 +494,10 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
                         <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                              <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Financial Settlement</h3>
                              <div className="grid grid-cols-2 gap-5">
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Gratuity</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.gratuity} onChange={e => setDetails({...details, gratuity: parseFloat(e.target.value)})} /></div>
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Leave Encashment</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.leaveEncashment} onChange={e => setDetails({...details, leaveEncashment: parseFloat(e.target.value)})} /></div>
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Pending Salary</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.salaryDues} onChange={e => setDetails({...details, salaryDues: parseFloat(e.target.value)})} /></div>
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Deductions</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-red-600 dark:text-red-400" value={details.deductions} onChange={e => setDetails({...details, deductions: parseFloat(e.target.value)})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Gratuity</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.gratuity} onChange={e => setDetails({...details, gratuity: parseFloat(e.target.value) || 0})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Leave Encashment</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.leaveEncashment} onChange={e => setDetails({...details, leaveEncashment: parseFloat(e.target.value) || 0})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Pending Salary</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.salaryDues} onChange={e => setDetails({...details, salaryDues: parseFloat(e.target.value) || 0})} /></div>
+                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Deductions</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-red-600 dark:text-red-400" value={details.deductions} onChange={e => setDetails({...details, deductions: parseFloat(e.target.value) || 0})} /></div>
                              </div>
                              <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl flex justify-between items-center">
                                  <span className="font-semibold text-gray-700 dark:text-slate-300">Net Payable Amount</span>
@@ -370,6 +521,52 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
                          </div>
                     )}
                     {step === 4 && (
+                         <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
+                             <div className="flex justify-between items-center">
+                                 <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Final Settlement Document</h3>
+                                 <button 
+                                    onClick={handlePrint}
+                                    className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium"
+                                 >
+                                     <Printer className="w-4 h-4" />
+                                     Print Document
+                                 </button>
+                             </div>
+                             
+                             <div className="p-6 border-2 border-dashed dark:border-slate-700 rounded-2xl bg-gray-50 dark:bg-slate-800/50 text-center space-y-4">
+                                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto">
+                                     <FileText className="w-8 h-8" />
+                                 </div>
+                                 <div>
+                                     <p className="font-bold text-gray-900 dark:text-white">Generate Settlement Paper</p>
+                                     <p className="text-sm text-gray-500 dark:text-slate-400">Print the document for employee signature, then upload to Google Drive and paste the link below.</p>
+                                 </div>
+                             </div>
+
+                             <div className="space-y-2">
+                                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Google Drive Link (Signed Document)</label>
+                                 <div className="relative">
+                                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                     <input 
+                                        type="url" 
+                                        className="w-full pl-10 pr-4 py-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        placeholder="https://drive.google.com/..."
+                                        value={details.settlementLink || ''}
+                                        onChange={e => setDetails({...details, settlementLink: e.target.value})}
+                                     />
+                                 </div>
+                                 <p className="text-[10px] text-gray-500 dark:text-slate-500 italic">Optional: You can add the link later if not ready.</p>
+                             </div>
+
+                             {/* Hidden template for printing */}
+                             <div className="hidden">
+                                 <div id="settlement-document-print">
+                                     <FinalSettlementDocument employee={employee} details={details} />
+                                 </div>
+                             </div>
+                         </div>
+                    )}
+                    {step === 5 && (
                         <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300 text-center py-8">
                              <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
                                  <LogOut className="w-10 h-10" />
@@ -385,7 +582,7 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
 
                 <div className="p-6 border-t border-gray-100 dark:border-slate-800 flex justify-between bg-gray-50 dark:bg-slate-800/50">
                     {step > 1 ? <button onClick={() => setStep(s => s - 1)} className="px-6 py-2.5 text-gray-600 dark:text-slate-300 font-medium hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors">Back</button> : <div></div>}
-                    {step < 4 ? (
+                    {step < 5 ? (
                         <button onClick={() => setStep(s => s + 1)} className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 dark:shadow-none transition-colors">Next Step</button>
                     ) : (
                         <button onClick={() => onComplete(details)} className="px-8 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 dark:shadow-none flex items-center gap-2 transition-colors">
@@ -2398,55 +2595,6 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                 </div>
             </div>
 
-            {/* Workforce Distribution Chart */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm">
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Workforce Distribution</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Headcount breakdown by department</p>
-                    </div>
-                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-1 rounded-xl">
-                        <button className="px-4 py-1.5 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-[10px] font-bold rounded-lg shadow-sm">Chart</button>
-                        <button className="px-4 py-1.5 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded-lg">Detailed List</button>
-                    </div>
-                </div>
-                <div className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={deptStats}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis 
-                                dataKey="name" 
-                                axisLine={false} 
-                                tickLine={false} 
-                                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
-                                dy={10}
-                            />
-                            <YAxis 
-                                axisLine={false} 
-                                tickLine={false} 
-                                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
-                            />
-                            <Tooltip 
-                                contentStyle={{ 
-                                    backgroundColor: '#0f172a', 
-                                    border: 'none', 
-                                    borderRadius: '16px',
-                                    color: '#fff',
-                                    fontSize: '12px',
-                                    fontWeight: 'bold',
-                                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
-                                }}
-                                cursor={{ fill: '#f8fafc' }}
-                            />
-                            <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                                {deptStats.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} fillOpacity={0.8} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
         </div>
     );
 };
@@ -2892,15 +3040,28 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                                         </button>
                                                     )
                                                 ) : (
-                                                    canManageEmployees && (
-                                                        <button 
-                                                            onClick={() => onRejoin(e)} 
-                                                            className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-emerald-600 dark:text-emerald-400 rounded-xl transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 active:scale-90"
-                                                            title="Rejoin"
-                                                        >
-                                                            <UserPlus className="w-4 h-4" />
-                                                        </button>
-                                                    )
+                                                    <div className="flex gap-2">
+                                                        {e.offboardingDetails?.settlementLink && (
+                                                            <a 
+                                                                href={e.offboardingDetails.settlementLink} 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-blue-600 dark:text-blue-400 rounded-xl transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 active:scale-90"
+                                                                title="View Settlement Document"
+                                                            >
+                                                                <Globe className="w-4 h-4" />
+                                                            </a>
+                                                        )}
+                                                        {canManageEmployees && (
+                                                            <button 
+                                                                onClick={() => onRejoin(e)} 
+                                                                className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-emerald-600 dark:text-emerald-400 rounded-xl transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 active:scale-90"
+                                                                title="Rejoin"
+                                                            >
+                                                                <UserPlus className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 )}
                                                 {!readOnly && canManageEmployees && (
                                                     <button 
