@@ -163,7 +163,10 @@ export const Layout: React.FC<LayoutProps> = ({
                 >
                   <Bell className="w-4 h-4 group-hover:animate-swing" />
                   {expiringDocs.length > 0 && (
-                    <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white dark:border-slate-900"></span>
+                    <span className={cn(
+                      "absolute top-2 right-2 w-1.5 h-1.5 rounded-full border border-white dark:border-slate-900",
+                      expiringDocs.some(d => d.status === 'Expired') ? "bg-red-500" : "bg-orange-500"
+                    )}></span>
                   )}
                 </button>
 
@@ -198,7 +201,9 @@ export const Layout: React.FC<LayoutProps> = ({
                                   </span>
                                   <span className="text-[10px] font-bold text-slate-400">{doc.date}</span>
                                 </div>
-                                <p className="text-xs font-bold text-slate-900 dark:text-white">{doc.employeeName}</p>
+                                <p className="text-xs font-bold text-slate-900 dark:text-white">
+                                  {doc.type === 'company' ? `Company: ${doc.employeeName}` : doc.employeeName}
+                                </p>
                                 <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{doc.docName}</p>
                               </div>
                             ))

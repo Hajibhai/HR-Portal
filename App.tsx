@@ -2219,9 +2219,11 @@ export default function App() {
 
   const expiringDocs = useMemo(() => {
     const now = new Date();
-    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const tenDaysFromNow = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
     
     const results: any[] = [];
+    
+    // Check employee documents
     employees.forEach(emp => {
         if (!emp.active) return;
         
@@ -2236,15 +2238,30 @@ export default function App() {
             if (doc.date) {
                 const expiry = new Date(doc.date);
                 if (expiry <= now) {
-                    results.push({ employeeName: emp.name, docName: doc.name, status: 'Expired', date: doc.date });
-                } else if (expiry <= thirtyDaysFromNow) {
-                    results.push({ employeeName: emp.name, docName: doc.name, status: 'Expiring Soon', date: doc.date });
+                    results.push({ employeeName: emp.name, docName: doc.name, status: 'Expired', date: doc.date, type: 'employee' });
+                } else if (expiry <= tenDaysFromNow) {
+                    results.push({ employeeName: emp.name, docName: doc.name, status: 'Expiring Soon', date: doc.date, type: 'employee' });
                 }
             }
         });
     });
+
+    // Check company documents
+    companies.forEach(company => {
+        company.driveFiles?.forEach(file => {
+            if (file.expiryDate) {
+                const expiry = new Date(file.expiryDate);
+                if (expiry <= now) {
+                    results.push({ employeeName: company.name, docName: file.name, status: 'Expired', date: file.expiryDate, type: 'company' });
+                } else if (expiry <= tenDaysFromNow) {
+                    results.push({ employeeName: company.name, docName: file.name, status: 'Expiring Soon', date: file.expiryDate, type: 'company' });
+                }
+            }
+        });
+    });
+
     return results;
-  }, [employees]);
+  }, [employees, companies]);
 
   if (!isAuthReady) {
     return (
