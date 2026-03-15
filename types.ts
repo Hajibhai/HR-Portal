@@ -140,6 +140,7 @@ export interface DeductionRecord {
 
 export interface Company {
     id: string;
+    code: string;
     name: string;
     address: string;
     email: string;

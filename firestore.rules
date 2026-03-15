@@ -62,10 +62,24 @@ service cloud.firestore {
       allow write: if hasPermission('canManagePayroll');
     }
 
-    match /companies/{companyId} {
-      allow read: if isAuthenticated();
-      allow write: if hasPermission('canManageSettings');
-    }
+// Validate Company
+function isValidCompany(data) {
+  return data.keys().hasAll(['id', 'code', 'name']) &&
+         data.id is string &&
+         data.code is string && data.code.size() >= 1 && data.code.size() <= 10 &&
+         data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+         (!('address' in data) || data.address is string) &&
+         (!('email' in data) || data.email is string) &&
+         (!('phone' in data) || data.phone is string) &&
+         (!('logo' in data) || data.logo is string);
+}
+
+match /companies/{companyId} {
+  allow read: if isAuthenticated();
+  allow create: if hasPermission('canManageSettings') && isValidCompany(request.resource.data);
+  allow update: if hasPermission('canManageSettings') && isValidCompany(request.resource.data);
+  allow delete: if hasPermission('canManageSettings');
+}
 
     match /settings/about {
       allow read: if true;

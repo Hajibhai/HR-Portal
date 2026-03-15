@@ -650,12 +650,12 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                                     )}
                                 </div>
                              </div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Code</label><input disabled type="text" value={data.code} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Name</label><input type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Designation</label><input type="text" value={data.designation} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Department</label><input type="text" value={data.department} onChange={e => setData({...data, department: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Code</label><input disabled type="text" value={data.code || ''} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Name</label><input type="text" value={data.name || ''} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Designation</label><input type="text" value={data.designation || ''} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Department</label><input type="text" value={data.department || ''} onChange={e => setData({...data, department: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                              <div className="col-span-2"><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Company</label>
-                                 <select value={data.company} onChange={e => setData({...data, company: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
+                                 <select value={data.company || ''} onChange={e => setData({...data, company: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
                                      <option value="">Select Company</option>
                                      {companies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                  </select>
@@ -664,15 +664,15 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                     </div>
 
                     {/* Salary Info */}
-                    <div>
+                     <div>
                         <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Salary Structure (AED)</h3>
                         <div className="grid grid-cols-3 gap-4">
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Basic</label><input type="number" value={data.salary.basic} onChange={e => setData({...data, salary: {...data.salary, basic: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Housing</label><input type="number" value={data.salary.housing} onChange={e => setData({...data, salary: {...data.salary, housing: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Transport</label><input type="number" value={data.salary.transport} onChange={e => setData({...data, salary: {...data.salary, transport: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Other</label><input type="number" value={data.salary.other} onChange={e => setData({...data, salary: {...data.salary, other: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Air Ticket</label><input type="number" value={data.salary.airTicket} onChange={e => setData({...data, salary: {...data.salary, airTicket: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Leave Salary</label><input type="number" value={data.salary.leaveSalary} onChange={e => setData({...data, salary: {...data.salary, leaveSalary: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Basic</label><input type="number" value={data.salary.basic ?? 0} onChange={e => setData({...data, salary: {...data.salary, basic: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Housing</label><input type="number" value={data.salary.housing ?? 0} onChange={e => setData({...data, salary: {...data.salary, housing: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Transport</label><input type="number" value={data.salary.transport ?? 0} onChange={e => setData({...data, salary: {...data.salary, transport: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Other</label><input type="number" value={data.salary.other ?? 0} onChange={e => setData({...data, salary: {...data.salary, other: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Air Ticket</label><input type="number" value={data.salary.airTicket ?? 0} onChange={e => setData({...data, salary: {...data.salary, airTicket: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Leave Salary</label><input type="number" value={data.salary.leaveSalary ?? 0} onChange={e => setData({...data, salary: {...data.salary, leaveSalary: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                         </div>
                     </div>
 
@@ -856,7 +856,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                                     >
                                         <option value="">Select Company</option>
-                                        {companies.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
+                                        {companies.map(c=><option key={c.id} value={c.name}>{c.code} - {c.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
@@ -948,7 +948,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Basic *</label>
                                     <input 
                                         type="number" 
-                                        value={data.salary?.basic} 
+                                        value={data.salary?.basic ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, basic:Number(e.target.value)}})} 
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
@@ -957,7 +957,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Housing</label>
                                     <input 
                                         type="number" 
-                                        value={data.salary?.housing} 
+                                        value={data.salary?.housing ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, housing:Number(e.target.value)}})} 
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
@@ -966,7 +966,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Transport</label>
                                     <input 
                                         type="number" 
-                                        value={data.salary?.transport} 
+                                        value={data.salary?.transport ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, transport:Number(e.target.value)}})} 
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
@@ -975,7 +975,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Air Ticket</label>
                                     <input 
                                         type="number" 
-                                        value={data.salary?.airTicket} 
+                                        value={data.salary?.airTicket ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, airTicket:Number(e.target.value)}})} 
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
@@ -984,7 +984,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Leave Salary</label>
                                     <input 
                                         type="number" 
-                                        value={data.salary?.leaveSalary} 
+                                        value={data.salary?.leaveSalary ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, leaveSalary:Number(e.target.value)}})} 
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
@@ -993,7 +993,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Other</label>
                                     <input 
                                         type="number" 
-                                        value={data.salary?.other} 
+                                        value={data.salary?.other ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, other:Number(e.target.value)}})} 
                                         className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
                                     />
@@ -1415,6 +1415,7 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
 
 const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onClose: () => void, companies: Company[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void, onLog: any }) => {
     const [formData, setFormData] = useState({
+        code: '',
         name: '',
         address: '',
         email: '',
@@ -1424,10 +1425,10 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
     const [isAdding, setIsAdding] = useState(false);
 
     const handleAdd = async () => {
-        if (!formData.name.trim()) return;
+        if (!formData.name.trim() || !formData.code.trim()) return;
         await addCompany(formData);
-        onLog('Company Added', `New company ${formData.name} was registered in the system.`, 'create');
-        setFormData({ name: '', address: '', email: '', phone: '', logo: '' });
+        onLog('Company Added', `New company ${formData.name} (${formData.code}) was registered in the system.`, 'create');
+        setFormData({ code: '', name: '', address: '', email: '', phone: '', logo: '' });
         setIsAdding(false);
     };
 
@@ -1497,6 +1498,15 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Company Code</label>
+                                        <input 
+                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                            placeholder="e.g. A1" 
+                                            value={formData.code} 
+                                            onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))} 
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
                                         <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Company Name</label>
                                         <input 
                                             className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
@@ -1505,6 +1515,8 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                             onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} 
                                         />
                                     </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Email Address</label>
                                         <input 
@@ -1600,25 +1612,33 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                     
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1">
+                                            <label className="text-[9px] font-bold text-gray-400 uppercase">Company Code</label>
+                                            <input 
+                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
+                                                value={c.code || ''} 
+                                                onChange={e => handleUpdate({...c, code: e.target.value})} 
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
                                             <label className="text-[9px] font-bold text-gray-400 uppercase">Address</label>
                                             <input 
-                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30" 
-                                                value={c.address} 
+                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
+                                                value={c.address || ''} 
                                                 onChange={e => handleUpdate({...c, address: e.target.value})} 
                                             />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-bold text-gray-400 uppercase">Email</label>
                                             <input 
-                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30" 
-                                                value={c.email} 
+                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
+                                                value={c.email || ''} 
                                                 onChange={e => handleUpdate({...c, email: e.target.value})} 
                                             />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-bold text-gray-400 uppercase">Phone</label>
                                             <input 
-                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30" 
+                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
                                                 value={c.phone || ''} 
                                                 onChange={e => handleUpdate({...c, phone: e.target.value})} 
                                             />
@@ -1902,16 +1922,20 @@ export default function App() {
 
   useEffect(() => {
     if (systemUser?.theme) {
-      setIsDarkMode(systemUser.theme === 'dark');
+      const themeIsDark = systemUser.theme === 'dark';
+      if (themeIsDark !== isDarkMode) {
+        setIsDarkMode(themeIsDark);
+      }
     }
   }, [systemUser?.theme]);
 
   useEffect(() => {
+    const root = window.document.documentElement;
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
@@ -1919,10 +1943,25 @@ export default function App() {
   const handleToggleDarkMode = async () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
+    
+    // Update document class immediately for better responsiveness
+    const root = window.document.documentElement;
+    if (newMode) {
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+
     if (systemUser) {
       const updatedUser = { ...systemUser, theme: (newMode ? 'dark' : 'light') as 'light' | 'dark' };
-      await saveSystemUser(updatedUser);
-      setSystemUser(updatedUser);
+      try {
+        await saveSystemUser(updatedUser);
+        setSystemUser(updatedUser);
+      } catch (error) {
+        console.error("Failed to save theme preference:", error);
+      }
     }
   };
 
@@ -2255,6 +2294,7 @@ export default function App() {
       {activeTab === 'staff' && (
         <StaffDirectoryView 
           employees={employees.filter(e => e.active)} 
+          companies={companies}
           onAdd={() => setShowOnboarding(true)} 
           onEdit={(e: Employee) => setShowEdit(e)} 
           onOffboard={(e: Employee) => setShowOffboarding(e)}
@@ -2264,6 +2304,7 @@ export default function App() {
       {activeTab === 'ex-employees' && (
         <StaffDirectoryView 
           employees={employees.filter(e => !e.active)} 
+          companies={companies}
           onEdit={(e: Employee) => setShowEdit(e)}
           onDelete={handleDeleteEmployee}
           onRejoin={handleRejoinEmployee}
@@ -2684,12 +2725,12 @@ const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center gap-4 mb-2">
-                <div className="p-3 bg-brand-50 rounded-2xl">
-                    <Settings className="w-6 h-6 text-brand-600" />
+            <div className="flex items-center gap-4 mb-6">
+                <div className="p-4 bg-brand-600 rounded-[1.5rem] shadow-lg shadow-brand-600/20">
+                    <Settings className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight dark:text-white">Account Settings</h2>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight dark:text-white">Account Settings</h2>
                     <p className="text-slate-500 font-medium dark:text-slate-400">Manage your system preferences and security</p>
                 </div>
             </div>
@@ -2734,16 +2775,18 @@ const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: {
                                 <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                        <div 
+                            onClick={onToggleDarkMode}
+                            className="flex items-center justify-between p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 dark:bg-slate-800/50 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group"
+                        >
                             <div>
                                 <p className="text-sm font-bold text-slate-900 dark:text-white">Dark Mode</p>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">Switch between light and dark themes</p>
                             </div>
                             <div 
-                                onClick={onToggleDarkMode}
                                 className={cn(
-                                    "w-12 h-6 rounded-full relative cursor-pointer transition-all duration-300",
-                                    isDarkMode ? "bg-brand-600" : "bg-slate-200 dark:bg-slate-700"
+                                    "w-12 h-6 rounded-full relative transition-all duration-300",
+                                    isDarkMode ? "bg-brand-600" : "bg-slate-300 dark:bg-slate-700"
                                 )}
                             >
                                 <motion.div 
@@ -2903,8 +2946,9 @@ const DashboardStatCard = ({ title, value, icon: Icon, color, index }: any) => {
 
 // --- Sub Views ---
 
-const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly, user }: { 
+const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly, user }: { 
     employees: Employee[], 
+    companies: Company[],
     onAdd?: () => void, 
     onEdit: (e: Employee) => void, 
     onOffboard?: (e: Employee) => void, 
@@ -3017,9 +3061,16 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
                                             <div className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-0.5">{e.team}</div>
                                         </td>
                                         <td className="p-6">
-                                            <span className="text-xs font-black text-slate-600 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700">
-                                                {e.company}
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-black text-slate-600 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700 w-fit">
+                                                    {e.company}
+                                                </span>
+                                                {companyList.find(c => c.name === e.company)?.code && (
+                                                    <span className="text-[9px] font-black text-brand-600 dark:text-brand-400 mt-1 ml-1 uppercase tracking-wider">
+                                                        Code: {companyList.find(c => c.name === e.company)?.code}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="p-6">
                                             <div className="flex items-center gap-2">
@@ -3118,7 +3169,7 @@ const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, on
 };
 
 const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Company[], openConfirm: any, onUpdate: (c: Company) => void, user: SystemUser }) => {
-    const [formData, setFormData] = useState({ name: '', address: '', email: '', phone: '', logo: '' });
+    const [formData, setFormData] = useState({ code: '', name: '', address: '', email: '', phone: '', logo: '' });
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -3137,9 +3188,9 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
     }, [companies, searchTerm]);
 
     const handleAdd = async () => {
-        if (!formData.name.trim()) return;
+        if (!formData.name.trim() || !formData.code.trim()) return;
         await addCompany(formData);
-        setFormData({ name: '', address: '', email: '', phone: '', logo: '' });
+        setFormData({ code: '', name: '', address: '', email: '', phone: '', logo: '' });
         setIsAdding(false);
     };
 
@@ -3229,7 +3280,16 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                         <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400 dark:text-slate-500" /></button>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Company Code</label>
+                            <input 
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
+                                placeholder="e.g. A1" 
+                                value={formData.code} 
+                                onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))} 
+                            />
+                        </div>
                         <div className="space-y-2">
                             <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Company Name</label>
                             <input 
@@ -3337,12 +3397,18 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                 <div className="space-y-4 animate-in fade-in duration-200">
                                     <input 
                                         className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
-                                        value={company.name}
+                                        placeholder="Company Code"
+                                        value={company.code || ''}
+                                        onChange={e => updateCompany({ ...company, code: e.target.value })}
+                                    />
+                                    <input 
+                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+                                        value={company.name || ''}
                                         onChange={e => updateCompany({ ...company, name: e.target.value })}
                                     />
                                     <input 
                                         className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
-                                        value={company.email}
+                                        value={company.email || ''}
                                         onChange={e => updateCompany({ ...company, email: e.target.value })}
                                     />
                                     <input 
@@ -3358,7 +3424,10 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                 </div>
                             ) : (
                                 <>
-                                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-2">{company.name}</h3>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-[10px] font-black bg-brand-600 text-white px-2 py-0.5 rounded-md uppercase tracking-wider">{company.code}</span>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight truncate">{company.name}</h3>
+                                    </div>
                                     <div className="space-y-3 mt-auto">
                                         <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
                                             <div className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">

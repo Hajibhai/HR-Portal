@@ -109,9 +109,11 @@
       "description": "Company entity name",
       "type": "object",
       "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
         "name": { "type": "string" }
       },
-      "required": ["name"]
+      "required": ["id", "code", "name"]
     },
     "AuditLog": {
       "title": "Audit Log",
