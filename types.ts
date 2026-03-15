@@ -42,6 +42,7 @@ export interface EmployeeDocuments {
     emiratesIdExpiry?: string;
     passportNumber?: string;
     passportExpiry?: string;
+    visaExpiry?: string;
     labourCardNumber?: string;
     labourCardExpiry?: string;
 }

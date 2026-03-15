@@ -27,8 +27,6 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, AreaChart, Area
@@ -92,7 +90,7 @@ const calculatePayroll = (employee: Employee, attendance: AttendanceRecord[], de
     const totalUnpaidDays = absentDays + unpaidLeaves;
 
     // Salary
-    const { basic = 0, housing = 0, transport = 0, other = 0, airTicket = 0, leaveSalary = 0 } = employee.salary || {};
+    const { basic = 0, housing = 0, transport = 0, other = 0, airTicket = 0, leaveSalary = 0 } = employee.salary;
     const grossSalary = basic + housing + transport + other + airTicket + leaveSalary;
     
     // Deductions
@@ -112,7 +110,7 @@ const calculatePayroll = (employee: Employee, attendance: AttendanceRecord[], de
         otAmount,
         totalDeductions: lopDeduction + otherDeductionsTotal,
         netSalary: grossSalary + otAmount - (lopDeduction + otherDeductionsTotal),
-        breakdown: employee.salary || { basic: 0, housing: 0, transport: 0, other: 0, airTicket: 0, leaveSalary: 0 }
+        breakdown: employee.salary
     };
 };
 
@@ -2897,14 +2895,23 @@ const DashboardStatCard = ({ title, value, icon: Icon, color, index }: any) => {
 
 // --- Sub Views ---
 
-const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly, user }: any) => {
+const StaffDirectoryView = ({ employees, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly, user }: { 
+    employees: Employee[], 
+    onAdd?: () => void, 
+    onEdit: (e: Employee) => void, 
+    onOffboard?: (e: Employee) => void, 
+    onDelete?: (e: Employee) => void, 
+    onRejoin?: (e: Employee) => void, 
+    readOnly?: boolean, 
+    user: SystemUser | null 
+}) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [companyFilter, setCompanyFilter] = useState('All');
     const [deptFilter, setDeptFilter] = useState('All');
     const canManageEmployees = user?.permissions?.canManageEmployees;
 
-    const companies = useMemo(() => ['All', ...Array.from(new Set(employees.map((e: any) => e.company)))], [employees]);
-    const departments = useMemo(() => ['All', ...Array.from(new Set(employees.map((e: any) => e.department)))], [employees]);
+    const companies = useMemo<string[]>(() => ['All', ...Array.from(new Set(employees.map(e => e.company)))], [employees]);
+    const departments = useMemo<string[]>(() => ['All', ...Array.from(new Set(employees.map(e => e.department)))], [employees]);
 
     const filteredEmployees = useMemo(() => {
         return employees.filter((e: Employee) => {
@@ -4142,45 +4149,6 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
         XLSX.writeFile(wb, `Payroll_Register_${selectedMonth}.xlsx`);
      };
 
-     const handlePrint = () => {
-        const doc = new jsPDF('l', 'mm', 'a4');
-        doc.setFontSize(18);
-        doc.text(`Payroll Register - ${selectedMonth}`, 14, 22);
-        doc.setFontSize(11);
-        doc.setTextColor(100);
-        doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 30);
-
-        const tableData = filteredEmployees.map((e: Employee) => {
-            const monthRecs = attendance.filter((r: any) => r.employeeId === e.id && r.date.startsWith(selectedMonth));
-            const monthDeds = deductions.filter((d: any) => d.employeeId === e.id && d.date.startsWith(selectedMonth));
-            const p = calculatePayroll(e, monthRecs, monthDeds);
-            return [
-                e.code,
-                e.name,
-                p.breakdown.basic.toLocaleString(),
-                p.breakdown.housing.toLocaleString(),
-                p.breakdown.transport.toLocaleString(),
-                p.breakdown.other.toLocaleString(),
-                p.grossSalary.toLocaleString(),
-                p.totalUnpaidDays,
-                p.totalDeductions.toFixed(0),
-                p.otAmount.toFixed(0),
-                p.netSalary.toFixed(0)
-            ];
-        });
-
-        autoTable(doc, {
-            startY: 35,
-            head: [['Code', 'Name', 'Basic', 'Housing', 'Transport', 'Other', 'Gross', 'Unpaid', 'Ded.', 'OT', 'Net']],
-            body: tableData,
-            theme: 'striped',
-            headStyles: { fillColor: [14, 165, 233] },
-            styles: { fontSize: 8 }
-        });
-
-        doc.save(`Payroll_Register_${selectedMonth}.pdf`);
-     };
-
      return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -4213,12 +4181,6 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
                         className="neo-button bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                      >
                          <Download className="w-4 h-4" /> Export
-                     </button>
-                     <button 
-                        onClick={handlePrint} 
-                        className="neo-button bg-brand-500 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-500/20 hover:bg-brand-600 transition-all"
-                     >
-                         <Printer className="w-4 h-4" /> Print
                      </button>
                  </div>
              </div>
@@ -4338,42 +4300,7 @@ const ReportsView = ({ employees, attendance, isDarkMode }: any) => {
     };
 
     const handlePrint = () => {
-        const doc = new jsPDF('p', 'mm', 'a4');
-        doc.setFontSize(20);
-        doc.text("Workforce Analytics Report", 14, 22);
-        doc.setFontSize(10);
-        doc.setTextColor(100);
-        doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 30);
-
-        // Add Summary Stats
-        doc.setFontSize(12);
-        doc.setTextColor(0);
-        doc.text("Summary Stats:", 14, 40);
-        doc.setFontSize(10);
-        doc.text(`Total Active Staff: ${totalStaff}`, 14, 48);
-        doc.text(`Monthly Payroll: AED ${totalSpent.toLocaleString()}`, 14, 54);
-        doc.text(`Late Arrivals: ${lateDays}`, 14, 60);
-        doc.text(`Total Teams: ${teamData.length}`, 14, 66);
-
-        const tableData = activeStaff.map((e: any) => [
-            e.code,
-            e.name,
-            e.company,
-            e.department,
-            e.designation,
-            (e.salary.basic + e.salary.housing + e.salary.transport + e.salary.other).toLocaleString()
-        ]);
-
-        autoTable(doc, {
-            startY: 75,
-            head: [['Code', 'Name', 'Company', 'Dept.', 'Designation', 'Gross Salary']],
-            body: tableData,
-            theme: 'grid',
-            headStyles: { fillColor: [14, 165, 233] },
-            styles: { fontSize: 8 }
-        });
-
-        doc.save("AlReem_Staff_Analytics_Report.pdf");
+        window.print();
     };
 
     return (
@@ -4529,45 +4456,6 @@ const ReportsView = ({ employees, attendance, isDarkMode }: any) => {
                 </motion.div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Recent Activity</h3>
-                    <div className="space-y-4">
-                        {[1, 2, 3].map((_, i) => (
-                            <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                <div className="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm text-brand-600 dark:text-brand-400">
-                                    <UserPlus className="w-5 h-5" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-sm font-bold text-slate-900 dark:text-white">New employee onboarded</div>
-                                    <div className="text-xs text-slate-500 dark:text-slate-400">2 hours ago • HR Department</div>
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Quick Actions</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <button className="p-6 bg-slate-50/50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 text-left hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:border-brand-100 dark:hover:border-brand-900/30 transition-all group">
-                            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                                <FileText className="w-6 h-6" />
-                            </div>
-                            <div className="font-bold text-slate-900 dark:text-white">Attendance Report</div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Download monthly logs</div>
-                        </button>
-                        <button className="p-6 bg-slate-50/50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 text-left hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:border-brand-100 dark:hover:border-brand-900/30 transition-all group">
-                            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                                <Plus className="w-6 h-6" />
-                            </div>
-                            <div className="font-bold text-slate-900 dark:text-white">Add Employee</div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Quick staff onboarding</div>
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
