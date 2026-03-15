@@ -2689,7 +2689,7 @@ const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: {
                     <Settings className="w-6 h-6 text-brand-600" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight dark:text-white">Accountant Settings</h2>
+                    <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight dark:text-white">Account Settings</h2>
                     <p className="text-slate-500 font-medium dark:text-slate-400">Manage your system preferences and security</p>
                 </div>
             </div>
