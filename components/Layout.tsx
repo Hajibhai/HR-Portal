@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, ChevronDown, 
   LogOut, Settings, User, Bell, Search,
-  Building2, Globe, HelpCircle
+  Building2, Globe, HelpCircle, FileText
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -68,6 +68,71 @@ export const Layout: React.FC<LayoutProps> = ({
             results.push({ type: 'Navigation', title: item.label, subtitle: 'System Section', id: item.id, tab: item.id });
         }
     });
+
+    // Search Employee Documents
+    employees.forEach(emp => {
+        const docNames = ['emirates id', 'passport', 'visa', 'labour card'];
+        docNames.forEach(name => {
+            if (name.includes(q)) {
+                results.push({ 
+                    type: 'Document', 
+                    title: `${emp.name} - ${name.toUpperCase()}`, 
+                    subtitle: 'Employee Document', 
+                    id: `${emp.id}-${name}`, 
+                    tab: 'staff' 
+                });
+            }
+        });
+        
+        emp.driveFiles?.forEach((file: any) => {
+            if (file.name.toLowerCase().includes(q)) {
+                results.push({ 
+                    type: 'Document', 
+                    title: file.name, 
+                    subtitle: `File for ${emp.name}`, 
+                    id: file.id, 
+                    tab: 'staff',
+                    url: file.webViewLink
+                });
+            }
+        });
+    });
+
+    // Search Company Documents
+    companies.forEach(comp => {
+        comp.driveFiles?.forEach((file: any) => {
+            if (file.name.toLowerCase().includes(q)) {
+                results.push({ 
+                    type: 'Document', 
+                    title: file.name, 
+                    subtitle: `Company File: ${comp.name}`, 
+                    id: file.id, 
+                    tab: 'company',
+                    url: file.webViewLink
+                });
+            }
+        });
+    });
+
+    // Search for "company document" or "employee documents"
+    if (q.includes('company document') || q.includes('company docs')) {
+        results.push({ 
+            type: 'Directory', 
+            title: 'Company Documents Directory', 
+            subtitle: 'Access all company-wide documents and files', 
+            id: 'company-docs-dir', 
+            tab: 'company' 
+        });
+    }
+    if (q.includes('employee document') || q.includes('employee docs') || q.includes('staff document')) {
+        results.push({ 
+            type: 'Directory', 
+            title: 'Employee Documents Directory', 
+            subtitle: 'Access all staff-related documents and records', 
+            id: 'employee-docs-dir', 
+            tab: 'staff' 
+        });
+    }
     
     return results;
   }, [searchQuery, employees, companies, navItems]);
@@ -334,6 +399,9 @@ export const Layout: React.FC<LayoutProps> = ({
                                           <button 
                                               key={idx}
                                               onClick={() => {
+                                                  if (res.url) {
+                                                      window.open(res.url, '_blank');
+                                                  }
                                                   setActiveTab(res.tab);
                                                   setIsSearchOpen(false);
                                                   setSearchQuery('');
@@ -342,7 +410,15 @@ export const Layout: React.FC<LayoutProps> = ({
                                           >
                                               <div className="flex items-center gap-4">
                                                   <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center border border-slate-100 dark:border-slate-700 shadow-sm group-hover:scale-110 transition-transform">
-                                                      {res.type === 'Employee' ? <User className="w-5 h-5 text-brand-600" /> : res.type === 'Company' ? <Building2 className="w-5 h-5 text-brand-600" /> : <Globe className="w-5 h-5 text-brand-600" />}
+                                                      {res.type === 'Employee' ? (
+                                                          <User className="w-5 h-5 text-brand-600" />
+                                                      ) : res.type === 'Company' ? (
+                                                          <Building2 className="w-5 h-5 text-brand-600" />
+                                                      ) : (res.type === 'Directory' || res.type === 'Document') ? (
+                                                          <FileText className="w-5 h-5 text-brand-600" />
+                                                      ) : (
+                                                          <Globe className="w-5 h-5 text-brand-600" />
+                                                      )}
                                                   </div>
                                                   <div>
                                                       <p className="text-sm font-bold text-slate-900 dark:text-white">{res.title}</p>
