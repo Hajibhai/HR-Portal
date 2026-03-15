@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, ExternalLink, Plus, X, Link as LinkIcon, Eye, Download, Globe, Calendar, Loader2, Upload } from 'lucide-react';
+import { FileText, ExternalLink, Plus, X, Link as LinkIcon, Eye, Download, Globe, Calendar, Loader2, Upload, Pencil } from 'lucide-react';
 import { DriveFile } from '../types';
 import { cn } from '../utils';
 import { extractExpiryDate } from '../services/geminiService';
@@ -9,6 +9,7 @@ interface GoogleDriveManagerProps {
     files: DriveFile[];
     onAddFile: (file: DriveFile) => void;
     onRemoveFile: (fileId: string) => void;
+    onUpdateFile?: (file: DriveFile) => void;
     title?: string;
 }
 
@@ -16,9 +17,11 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
     files = [], 
     onAddFile, 
     onRemoveFile,
+    onUpdateFile,
     title = "Linked Documents"
 }) => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingFile, setEditingFile] = useState<DriveFile | null>(null);
     const [previewFile, setPreviewFile] = useState<DriveFile | null>(null);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
@@ -26,24 +29,46 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const handleOpenEdit = (file: DriveFile) => {
+        setEditingFile(file);
+        setNewFileName(file.name);
+        setNewFileUrl(file.webViewLink);
+        setNewExpiryDate(file.expiryDate || '');
+        setIsAddModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsAddModalOpen(false);
+        setEditingFile(null);
+        setNewFileName('');
+        setNewFileUrl('');
+        setNewExpiryDate('');
+    };
+
     const handleAddLink = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newFileName || !newFileUrl) return;
 
-        const newFile: DriveFile = {
-            id: Math.random().toString(36).substr(2, 9),
-            name: newFileName,
-            mimeType: 'application/octet-stream', // Generic
-            webViewLink: newFileUrl.startsWith('http') ? newFileUrl : `https://${newFileUrl}`,
-            expiryDate: newExpiryDate || undefined,
-            iconLink: 'https://ssl.gstatic.com/docs/doclist/images/icon_10_generic_list.png'
-        };
+        if (editingFile && onUpdateFile) {
+            onUpdateFile({
+                ...editingFile,
+                name: newFileName,
+                webViewLink: newFileUrl.startsWith('http') ? newFileUrl : `https://${newFileUrl}`,
+                expiryDate: newExpiryDate || undefined,
+            });
+        } else {
+            const newFile: DriveFile = {
+                id: Math.random().toString(36).substr(2, 9),
+                name: newFileName,
+                mimeType: 'application/octet-stream', // Generic
+                webViewLink: newFileUrl.startsWith('http') ? newFileUrl : `https://${newFileUrl}`,
+                expiryDate: newExpiryDate || undefined,
+                iconLink: 'https://ssl.gstatic.com/docs/doclist/images/icon_10_generic_list.png'
+            };
+            onAddFile(newFile);
+        }
 
-        onAddFile(newFile);
-        setNewFileName('');
-        setNewFileUrl('');
-        setNewExpiryDate('');
-        setIsAddModalOpen(false);
+        handleCloseModal();
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,16 +144,18 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
     const modalContent = isAddModalOpen ? (
         <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[9999] p-4"
-            onClick={() => setIsAddModalOpen(false)}
+            onClick={handleCloseModal}
         >
             <div 
                 className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-5 border-b dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Add Document Link</h3>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                        {editingFile ? 'Edit Document' : 'Add Document Link'}
+                    </h3>
                     <button 
-                        onClick={() => setIsAddModalOpen(false)}
+                        onClick={handleCloseModal}
                         className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
                     >
                         <X className="w-5 h-5 text-slate-400" />
@@ -206,7 +233,7 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
                         type="submit"
                         className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-sm font-bold transition-all shadow-xl shadow-brand-600/20 active:scale-[0.98]"
                     >
-                        Add Document
+                        {editingFile ? 'Update Document' : 'Add Document'}
                     </button>
                 </form>
             </div>
@@ -301,6 +328,13 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
                                 title="Preview"
                             >
                                 <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button 
+                                onClick={() => handleOpenEdit(file)}
+                                className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                                title="Edit Expiry"
+                            >
+                                <Pencil className="w-3.5 h-3.5" />
                             </button>
                             <a 
                                 href={file.webViewLink} 

@@ -3224,6 +3224,13 @@ const CompanyDocumentsModal = ({ company, onClose, onUpdate }: { company: Compan
                             const updated = { ...company, driveFiles: (company.driveFiles || []).filter(f => f.id !== fileId) };
                             onUpdate(updated);
                         }}
+                        onUpdateFile={(updatedFile) => {
+                            const updated = { 
+                                ...company, 
+                                driveFiles: (company.driveFiles || []).map(f => f.id === updatedFile.id ? updatedFile : f) 
+                            };
+                            onUpdate(updated);
+                        }}
                     />
                 </div>
             </motion.div>
