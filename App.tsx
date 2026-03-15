@@ -3195,7 +3195,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                             placeholder="Search companies or documents..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-sm"
+                            className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-sm"
                         />
                         {searchTerm && (
                             <button 
