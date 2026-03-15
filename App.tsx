@@ -1936,6 +1936,145 @@ const RejoinModal = ({ employee, onComplete, onCancel }: { employee: Employee, o
     );
 };
 
+const OffboardingDetailsModal = ({ employee, onCancel }: { employee: Employee, onCancel: () => void }) => {
+    const details = employee.offboardingDetails;
+    if (!details) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col border border-transparent dark:border-slate-800 max-h-[90vh]">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-xl">
+                            <LogOut className="w-5 h-5 text-red-600 dark:text-red-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Offboarding Details</h2>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{employee.name} • {employee.code}</p>
+                        </div>
+                    </div>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+                </div>
+                
+                <div className="p-8 overflow-y-auto space-y-8">
+                    {/* Exit Info */}
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Exit Type</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{details.type}</p>
+                        </div>
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Last Working Day</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{new Date(details.exitDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                        </div>
+                        <div className="col-span-2 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Reason for Leaving</p>
+                            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{details.reason || 'No reason specified'}</p>
+                        </div>
+                    </div>
+
+                    {/* Financial Summary */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Financial Settlement</h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Gratuity</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.gratuity.toLocaleString()}</p>
+                            </div>
+                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Leave Encashment</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.leaveEncashment.toLocaleString()}</p>
+                            </div>
+                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Salary Dues</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.salaryDues.toLocaleString()}</p>
+                            </div>
+                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Other Dues</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.otherDues.toLocaleString()}</p>
+                            </div>
+                            <div className="p-4 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-2xl">
+                                <p className="text-[10px] font-bold text-red-400 uppercase mb-1">Deductions</p>
+                                <p className="text-sm font-bold text-red-600 dark:text-red-400">AED {details.deductions.toLocaleString()}</p>
+                            </div>
+                            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20 rounded-2xl">
+                                <p className="text-[10px] font-bold text-emerald-400 uppercase mb-1">Net Settlement</p>
+                                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">AED {details.netSettlement.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Assets & Notes */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Assets Status</p>
+                            <div className="flex items-center gap-2">
+                                {details.assetsReturned ? (
+                                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-bold">
+                                        <CheckCircle className="w-4 h-4" /> All Assets Returned
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm font-bold">
+                                        <XCircle className="w-4 h-4" /> Assets Pending
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        {details.notes && (
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Additional Notes</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 italic">{details.notes}</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Document Preview */}
+                    {details.settlementLink && (
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Settlement Document</h3>
+                            <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 p-4">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
+                                            <FileText className="w-5 h-5 text-brand-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white">Final_Settlement_{employee.code}.pdf</p>
+                                            <p className="text-[10px] text-slate-500 font-medium">Signed Document</p>
+                                        </div>
+                                    </div>
+                                    <a 
+                                        href={details.settlementLink} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="px-4 py-2 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-brand-600 dark:text-brand-400 transition-all flex items-center gap-2"
+                                    >
+                                        <Download className="w-3 h-3" /> Download
+                                    </a>
+                                </div>
+                                <div className="aspect-video bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden relative group">
+                                    <iframe 
+                                        src={details.settlementLink.includes('drive.google.com') ? details.settlementLink.replace('/view', '/preview') : details.settlementLink} 
+                                        className="w-full h-full border-none"
+                                        title="Document Preview"
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="p-6 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 flex justify-end">
+                    <button onClick={onCancel} className="px-8 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm shadow-lg transition-all hover:scale-105 active:scale-95">
+                        Close Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -2026,6 +2165,7 @@ export default function App() {
   // View States
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showOffboarding, setShowOffboarding] = useState<Employee | null>(null);
+  const [showOffboardingDetails, setShowOffboardingDetails] = useState<Employee | null>(null);
   const [showRejoining, setShowRejoining] = useState<Employee | null>(null);
   const [showEdit, setShowEdit] = useState<Employee | null>(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
@@ -2366,6 +2506,7 @@ export default function App() {
           onEdit={(e: Employee) => setShowEdit(e)}
           onDelete={handleDeleteEmployee}
           onRejoin={handleRejoinEmployee}
+          onViewOffboarding={(e: Employee) => setShowOffboardingDetails(e)}
           readOnly={true}
           user={systemUser}
         />
@@ -2438,6 +2579,12 @@ export default function App() {
                 alert(err.message || "Error rejoining employee");
               }
             }}
+          />
+        )}
+        {showOffboardingDetails && (
+          <OffboardingDetailsModal 
+            employee={showOffboardingDetails}
+            onCancel={() => setShowOffboardingDetails(null)}
           />
         )}
         {showEdit && (
@@ -3020,7 +3167,7 @@ const DashboardStatCard = ({ title, value, icon: Icon, color, index }: any) => {
 
 // --- Sub Views ---
 
-const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, onOffboard, onDelete, onRejoin, readOnly, user }: { 
+const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, onOffboard, onDelete, onRejoin, onViewOffboarding, readOnly, user }: { 
     employees: Employee[], 
     companies: Company[],
     onAdd?: () => void, 
@@ -3028,6 +3175,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
     onOffboard?: (e: Employee) => void, 
     onDelete?: (e: Employee) => void, 
     onRejoin?: (e: Employee) => void, 
+    onViewOffboarding?: (e: Employee) => void,
     readOnly?: boolean, 
     user: SystemUser | null 
 }) => {
@@ -3185,6 +3333,15 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                     )
                                                 ) : (
                                                     <div className="flex gap-2">
+                                                        {e.offboardingDetails && (
+                                                            <button 
+                                                                onClick={() => onViewOffboarding?.(e)} 
+                                                                className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
+                                                                title="View Offboarding Details"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </button>
+                                                        )}
                                                         {e.offboardingDetails?.settlementLink && (
                                                             <a 
                                                                 href={e.offboardingDetails.settlementLink} 
