@@ -3182,7 +3182,28 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
     const [searchTerm, setSearchTerm] = useState('');
     const [companyFilter, setCompanyFilter] = useState('All');
     const [deptFilter, setDeptFilter] = useState('All');
+    const [viewRejoinReason, setViewRejoinReason] = useState<Employee | null>(null);
     const canManageEmployees = user?.permissions?.canManageEmployees;
+
+    const calculateExperience = (joiningDate: string, exitDate?: string) => {
+        if (!joiningDate) return 'N/A';
+        const start = new Date(joiningDate);
+        const end = exitDate ? new Date(exitDate) : new Date();
+        
+        if (isNaN(start.getTime())) return 'N/A';
+        
+        let years = end.getFullYear() - start.getFullYear();
+        let months = end.getMonth() - start.getMonth();
+        
+        if (months < 0 || (months === 0 && end.getDate() < start.getDate())) {
+            years--;
+            months += 12;
+        }
+        
+        if (years <= 0 && months <= 0) return '0 Months';
+        if (years === 0) return `${months} ${months === 1 ? 'Month' : 'Months'}`;
+        return `${years} ${years === 1 ? 'Year' : 'Years'}${months > 0 ? ` ${months} ${months === 1 ? 'Month' : 'Months'}` : ''}`;
+    };
 
     const companies = useMemo<string[]>(() => ['All', ...Array.from(new Set(employees.map(e => e.company)))], [employees]);
     const departments = useMemo<string[]>(() => ['All', ...Array.from(new Set(employees.map(e => e.department)))], [employees]);
@@ -3251,6 +3272,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                 <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Department & Role</th>
                                 <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Organization</th>
                                 <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Status</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Experience</th>
                                 <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -3311,7 +3333,26 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                             </div>
                                         </td>
                                         <td className="p-6">
+                                            <div className="text-xs font-black text-slate-600 dark:text-slate-400">
+                                                {calculateExperience(e.joiningDate, e.offboardingDetails?.exitDate)}
+                                            </div>
+                                            {!e.active && e.offboardingDetails?.exitDate && (
+                                                <div className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-0.5">
+                                                    Until: {e.offboardingDetails.exitDate}
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="p-6">
                                             <div className="flex justify-end gap-2">
+                                                {e.active && e.rejoiningReason && (
+                                                    <button 
+                                                        onClick={() => setViewRejoinReason(e)} 
+                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
+                                                        title="View Rejoin Reason"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                                 {canManageEmployees && (
                                                     <button 
                                                         onClick={() => onEdit(e)} 
@@ -3386,6 +3427,58 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                     </div>
                 )}
             </div>
+
+            {/* Rejoin Reason Modal */}
+            <AnimatePresence>
+                {viewRejoinReason && (
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={() => setViewRejoinReason(null)}>
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white dark:border-slate-800 flex flex-col"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-brand-100 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center text-brand-600 dark:text-brand-400">
+                                        <Eye className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Rejoin Details</h2>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Employee: {viewRejoinReason.name}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setViewRejoinReason(null)} className="p-3 hover:bg-white dark:hover:bg-slate-800 rounded-2xl transition-all shadow-sm">
+                                    <X className="w-5 h-5 text-slate-400" />
+                                </button>
+                            </div>
+                            <div className="p-8 space-y-6">
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 block">Rejoining Date</label>
+                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 font-black text-slate-900 dark:text-white">
+                                        {viewRejoinReason.rejoiningDate || 'N/A'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 block">Reason for Rejoining</label>
+                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 leading-relaxed italic">
+                                        "{viewRejoinReason.rejoiningReason}"
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-8 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
+                                <button 
+                                    onClick={() => setViewRejoinReason(null)}
+                                    className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black hover:opacity-90 transition-all shadow-xl"
+                                >
+                                    Close Details
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
