@@ -1899,6 +1899,43 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
     );
 };
 
+const RejoinModal = ({ employee, onComplete, onCancel }: { employee: Employee, onComplete: (reason: string) => void, onCancel: () => void }) => {
+    const [reason, setReason] = useState('');
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-transparent dark:border-slate-800">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Rejoin: {employee.name}</h2>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+                </div>
+                <div className="p-6 space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Rejoining Reason</label>
+                        <textarea 
+                            className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500" 
+                            rows={4} 
+                            placeholder="Enter reason for rejoining..."
+                            value={reason} 
+                            onChange={e => setReason(e.target.value)} 
+                        />
+                    </div>
+                </div>
+                <div className="p-6 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3">
+                    <button onClick={onCancel} className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200">Cancel</button>
+                    <button 
+                        onClick={() => onComplete(reason)} 
+                        disabled={!reason.trim()}
+                        className="px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Confirm Rejoin
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -1989,6 +2026,7 @@ export default function App() {
   // View States
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showOffboarding, setShowOffboarding] = useState<Employee | null>(null);
+  const [showRejoining, setShowRejoining] = useState<Employee | null>(null);
   const [showEdit, setShowEdit] = useState<Employee | null>(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showManageCompanies, setShowManageCompanies] = useState(false);
@@ -2196,16 +2234,8 @@ export default function App() {
       );
   };
 
-  const handleRejoinEmployee = async (e: Employee) => {
-      const reason = prompt(`Enter rejoining reason for ${e.name}:`);
-      if (reason !== null) {
-          try {
-              await rehireEmployee(e.id, new Date().toISOString().split('T')[0], reason);
-              handleLogAction('Employee Rehired', `Employee ${e.name} (${e.code}) has rejoined the company.`, 'create');
-          } catch (err: any) {
-              alert(err.message);
-          }
-      }
+  const handleRejoinEmployee = (e: Employee) => {
+      setShowRejoining(e);
   };
 
   const handleLogout = async () => {
@@ -2394,6 +2424,21 @@ export default function App() {
         )}
         {showOffboarding && (
           <OffboardingWizard employee={showOffboarding} onComplete={handleOffboard} onCancel={() => setShowOffboarding(null)} />
+        )}
+        {showRejoining && (
+          <RejoinModal 
+            employee={showRejoining}
+            onCancel={() => setShowRejoining(null)}
+            onComplete={async (reason) => {
+              try {
+                await rehireEmployee(showRejoining.id, new Date().toISOString().split('T')[0], reason);
+                await handleLogAction('Employee Rehired', `Employee ${showRejoining.name} (${showRejoining.code}) has rejoined the company.`, 'create');
+                setShowRejoining(null);
+              } catch (err: any) {
+                alert(err.message || "Error rejoining employee");
+              }
+            }}
+          />
         )}
         {showEdit && (
           <EditEmployeeModal companies={companies} employee={showEdit} onSave={async (d) => { 
@@ -3162,7 +3207,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                         )}
                                                     </div>
                                                 )}
-                                                {!readOnly && canManageEmployees && (
+                                                {canManageEmployees && (
                                                     <button 
                                                         onClick={() => onDelete(e)} 
                                                         className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800 active:scale-90"
