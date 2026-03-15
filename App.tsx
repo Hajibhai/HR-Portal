@@ -2321,16 +2321,17 @@ export default function App() {
             user={systemUser}
             onLogAttendance={logAttendance}
             onDeleteAttendance={deleteAttendanceRecord}
+            companies={companies}
         />
       )}
       {activeTab === 'deductions' && (
-        <DeductionsView employees={employees} deductions={deductions} openConfirm={openConfirm} />
+        <DeductionsView employees={employees} deductions={deductions} openConfirm={openConfirm} user={systemUser} companies={companies} />
       )}
       {activeTab === 'leave' && (
-        <LeaveManagementView employees={employees} leaveRequests={leaveRequests} user={systemUser} />
+        <LeaveManagementView employees={employees} leaveRequests={leaveRequests} user={systemUser} companies={companies} />
       )}
       {activeTab === 'payroll' && (
-        <PayrollRegisterView employees={employees.filter(e => e.active)} attendance={attendance} deductions={deductions} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} user={systemUser} />
+        <PayrollRegisterView employees={employees.filter(e => e.active)} attendance={attendance} deductions={deductions} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} user={systemUser} companies={companies} />
       )}
       {activeTab === 'reports' && (
         <ReportsView employees={employees} attendance={attendance} />
@@ -2967,13 +2968,15 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
 
     const filteredEmployees = useMemo(() => {
         return employees.filter((e: Employee) => {
+            const company = companyList.find(c => c.name === e.company);
             const matchesSearch = e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                e.code.toLowerCase().includes(searchTerm.toLowerCase());
+                                e.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                company?.code.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCompany = companyFilter === 'All' || e.company === companyFilter;
             const matchesDept = deptFilter === 'All' || e.department === deptFilter;
             return matchesSearch && matchesCompany && matchesDept;
         });
-    }, [employees, searchTerm, companyFilter, deptFilter]);
+    }, [employees, searchTerm, companyFilter, deptFilter, companyList]);
 
     return (
         <div className="space-y-6">
@@ -3180,10 +3183,11 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
         const query = searchTerm.toLowerCase();
         return companies.filter(company => {
             const matchesName = company.name.toLowerCase().includes(query);
+            const matchesCode = company.code?.toLowerCase().includes(query);
             const matchesDocuments = company.driveFiles?.some(file => 
                 file.name.toLowerCase().includes(query)
             );
-            return matchesName || matchesDocuments;
+            return matchesName || matchesCode || matchesDocuments;
         });
     }, [companies, searchTerm]);
 
@@ -3641,7 +3645,7 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose 
     );
 };
 
-const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, user, onLogAttendance, onDeleteAttendance }: any) => {
+const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, user, onLogAttendance, onDeleteAttendance, companies }: any) => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const daysInMonth = new Date(year, month, 0).getDate();
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -3696,11 +3700,13 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
     };
 
     const filteredEmployees = useMemo(() => {
-        return employees.filter((e: Employee) => 
-            e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            e.code.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [employees, searchTerm]);
+        return employees.filter((e: Employee) => {
+            const company = companies.find((c: Company) => c.name === e.company);
+            return e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                   e.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                   company?.code.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+    }, [employees, searchTerm, companies]);
 
     const editingEmployee = useMemo(() => {
         if (!editingCell) return null;
@@ -3921,7 +3927,7 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
     );
 };
 
-const DeductionsView = ({ employees, deductions, openConfirm, user }: any) => {
+const DeductionsView = ({ employees, deductions, openConfirm, user, companies }: any) => {
     const [newItem, setNewItem] = useState<Partial<DeductionRecord>>({ type: 'Salary Advance', date: new Date().toISOString().split('T')[0] });
     const [searchTerm, setSearchTerm] = useState('');
     const canManagePayroll = user?.permissions?.canManagePayroll;
@@ -3936,15 +3942,17 @@ const DeductionsView = ({ employees, deductions, openConfirm, user }: any) => {
     const filteredDeductions = useMemo(() => {
         return deductions.filter((d: DeductionRecord) => {
             const emp = employees.find((e: Employee) => e.id === d.employeeId);
+            const company = companies.find((c: Company) => c.name === emp?.company);
             const search = searchTerm.toLowerCase();
             return (
                 emp?.name.toLowerCase().includes(search) ||
                 emp?.code.toLowerCase().includes(search) ||
+                company?.code.toLowerCase().includes(search) ||
                 d.type.toLowerCase().includes(search) ||
                 (d.note && d.note.toLowerCase().includes(search))
             );
         });
-    }, [deductions, employees, searchTerm]);
+    }, [deductions, employees, searchTerm, companies]);
     
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -4139,7 +4147,7 @@ const DeductionsView = ({ employees, deductions, openConfirm, user }: any) => {
     );
 };
 
-const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
+const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any) => {
     const [showNew, setShowNew] = useState(false);
     const [newReq, setNewReq] = useState({ employeeId: '', type: AttendanceStatus.ANNUAL_LEAVE, startDate: '', endDate: '', reason: '' });
     const [searchTerm, setSearchTerm] = useState('');
@@ -4159,15 +4167,17 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
     const filteredRequests = useMemo(() => {
         return leaveRequests.filter((r: LeaveRequest) => {
             const emp = employees.find((e: Employee) => e.id === r.employeeId);
+            const company = companies.find((c: Company) => c.name === emp?.company);
             const search = searchTerm.toLowerCase();
             return (
                 emp?.name.toLowerCase().includes(search) ||
                 emp?.code.toLowerCase().includes(search) ||
+                company?.code.toLowerCase().includes(search) ||
                 r.type.toLowerCase().includes(search) ||
                 r.reason?.toLowerCase().includes(search)
             );
         });
-    }, [leaveRequests, employees, searchTerm]);
+    }, [leaveRequests, employees, searchTerm, companies]);
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -4396,16 +4406,18 @@ const LeaveManagementView = ({ employees, leaveRequests, user }: any) => {
     );
 };
 
-const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth, onMonthChange, user }: any) => {
+const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth, onMonthChange, user, companies }: any) => {
      const [searchTerm, setSearchTerm] = useState('');
      const canManagePayroll = user?.permissions?.canManagePayroll;
 
      const filteredEmployees = useMemo(() => {
-        return employees.filter((e: Employee) => 
-            e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            e.code.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [employees, searchTerm]);
+        return employees.filter((e: Employee) => {
+            const company = companies.find((c: Company) => c.name === e.company);
+            return e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                   e.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                   company?.code.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+    }, [employees, searchTerm, companies]);
 
      // Real export functionality
      const handleExport = () => {
