@@ -3121,7 +3121,20 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
     const [formData, setFormData] = useState({ name: '', address: '', email: '', phone: '', logo: '' });
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const canManageSettings = user?.permissions?.canManageSettings;
+
+    const filteredCompanies = useMemo(() => {
+        if (!searchTerm.trim()) return companies;
+        const query = searchTerm.toLowerCase();
+        return companies.filter(company => {
+            const matchesName = company.name.toLowerCase().includes(query);
+            const matchesDocuments = company.driveFiles?.some(file => 
+                file.name.toLowerCase().includes(query)
+            );
+            return matchesName || matchesDocuments;
+        });
+    }, [companies, searchTerm]);
 
     const handleAdd = async () => {
         if (!formData.name.trim()) return;
@@ -3174,14 +3187,35 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                     </p>
                 </div>
                 
-                {canManageSettings && (
-                    <button 
-                        onClick={() => setIsAdding(true)}
-                        className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
-                    >
-                        <Plus className="w-4 h-4" /> Add Company
-                    </button>
-                )}
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                    <div className="relative w-full sm:w-80 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <input 
+                            type="text"
+                            placeholder="Search companies or documents..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-sm"
+                        />
+                        {searchTerm && (
+                            <button 
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                                <X className="w-3 h-3 text-slate-400" />
+                            </button>
+                        )}
+                    </div>
+
+                    {canManageSettings && (
+                        <button 
+                            onClick={() => setIsAdding(true)}
+                            className="w-full sm:w-auto bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                        >
+                            <Plus className="w-4 h-4" /> Add Company
+                        </button>
+                    )}
+                </div>
             </div>
 
             {isAdding && (
@@ -3262,7 +3296,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {companies.map((company) => (
+                {filteredCompanies.map((company) => (
                     <motion.div 
                         layout
                         key={company.id}
@@ -3364,11 +3398,23 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                     </motion.div>
                 ))}
 
-                {companies.length === 0 && (
+                {filteredCompanies.length === 0 && (
                     <div className="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-700">
                         <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-                        <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">No companies registered</h3>
-                        <p className="text-slate-400 dark:text-slate-500 font-medium mt-1">Start by adding your first business entity.</p>
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                            {searchTerm ? 'No matching companies found' : 'No companies registered'}
+                        </h3>
+                        <p className="text-slate-400 dark:text-slate-500 font-medium mt-1">
+                            {searchTerm ? 'Try adjusting your search terms.' : 'Start by adding your first business entity.'}
+                        </p>
+                        {searchTerm && (
+                            <button 
+                                onClick={() => setSearchTerm('')}
+                                className="mt-4 text-sm font-black text-brand-600 dark:text-brand-400 hover:underline"
+                            >
+                                Clear search
+                            </button>
+                        )}
                     </div>
                 )}
             </div>

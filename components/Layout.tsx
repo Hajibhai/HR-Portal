@@ -382,16 +382,6 @@ export const Layout: React.FC<LayoutProps> = ({
                                   ))}
                                 </div>
                               </div>
-                              <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Recent Searches</p>
-                                <div className="space-y-1">
-                                  {['Employee Payroll', 'Leave Requests', 'Staff Directory'].map(term => (
-                                    <button key={term} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all">
-                                      <Search className="w-3.5 h-3.5" /> {term}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
                             </div>
                           )}
                         </div>
