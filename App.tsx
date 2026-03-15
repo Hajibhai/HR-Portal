@@ -1916,26 +1916,32 @@ export default function App() {
   const [showAuditModal, setShowAuditModal] = useState(false);
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    if (systemUser?.theme) {
-      const themeIsDark = systemUser.theme === 'dark';
-      if (themeIsDark !== isDarkMode) {
-        setIsDarkMode(themeIsDark);
-      }
-    }
-  }, [systemUser?.theme]);
+    // Force light mode and clear any stored preferences
+    const root = window.document.documentElement;
+    const body = window.document.body;
+    root.classList.remove('dark');
+    root.classList.remove('dark-theme');
+    body.classList.remove('dark');
+    body.classList.remove('dark-theme');
+    localStorage.setItem('theme', 'light');
+    setIsDarkMode(false);
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
+    const body = window.document.body;
     if (isDarkMode) {
       root.classList.add('dark');
+      body.classList.add('dark-theme');
       localStorage.setItem('theme', 'dark');
     } else {
       root.classList.remove('dark');
+      root.classList.remove('dark-theme');
+      body.classList.remove('dark');
+      body.classList.remove('dark-theme');
       localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
@@ -1946,11 +1952,16 @@ export default function App() {
     
     // Update document class immediately for better responsiveness
     const root = window.document.documentElement;
+    const body = window.document.body;
     if (newMode) {
       root.classList.add('dark');
+      body.classList.add('dark-theme');
       localStorage.setItem('theme', 'dark');
     } else {
       root.classList.remove('dark');
+      root.classList.remove('dark-theme');
+      body.classList.remove('dark');
+      body.classList.remove('dark-theme');
       localStorage.setItem('theme', 'light');
     }
 
@@ -2781,8 +2792,8 @@ const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: {
                             className="flex items-center justify-between p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 dark:bg-slate-800/50 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group"
                         >
                             <div>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">Dark Mode</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Switch between light and dark themes</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">Switch between light and dark themes</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Themes</p>
                             </div>
                             <div 
                                 className={cn(
@@ -3241,6 +3252,26 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
         });
     }, [companies, searchTerm]);
 
+    const getExpiryStatus = (company: Company) => {
+        const files = company.driveFiles || [];
+        const today = new Date();
+        let expired = 0;
+        let warning = 0;
+
+        files.forEach(file => {
+            if (file.expiryDate) {
+                const expiry = new Date(file.expiryDate);
+                const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                if (diffDays < 0) expired++;
+                else if (diffDays <= 10) warning++;
+            }
+        });
+
+        if (expired > 0) return { label: `${expired} Expired`, color: 'bg-red-100 text-red-600 border-red-200' };
+        if (warning > 0) return { label: `${warning} Expiring Soon`, color: 'bg-orange-100 text-orange-600 border-orange-200' };
+        return null;
+    };
+
     const handleAdd = async () => {
         if (!formData.name.trim() || !formData.code.trim()) return;
         await addCompany(formData);
@@ -3481,6 +3512,11 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="text-[10px] font-black bg-brand-600 text-white px-2 py-0.5 rounded-md uppercase tracking-wider">{company.code}</span>
                                         <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight truncate">{company.name}</h3>
+                                        {getExpiryStatus(company) && (
+                                            <span className={cn("ml-auto text-[8px] font-black uppercase px-2 py-0.5 rounded-full border", getExpiryStatus(company)?.color)}>
+                                                {getExpiryStatus(company)?.label}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="space-y-3 mt-auto">
                                         <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">

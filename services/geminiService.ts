@@ -87,3 +87,49 @@ export const suggestRotationalSchedule = async (
     return "Error generating schedule.";
   }
 };
+
+export const extractExpiryDate = async (
+  fileData: string,
+  mimeType: string
+): Promise<string | null> => {
+  const prompt = `
+    Analyze this document and extract the expiry date. 
+    Look for keywords like "Expiry Date", "Valid Until", "Expiration", etc.
+    Return the date in YYYY-MM-DD format. 
+    If no expiry date is found, return null.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: MODEL_NAME,
+      contents: {
+        parts: [
+          {
+            inlineData: {
+              data: fileData.includes('base64,') ? fileData.split('base64,')[1] : fileData,
+              mimeType: mimeType
+            }
+          },
+          { text: prompt }
+        ]
+      },
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            expiryDate: { type: Type.STRING, description: "YYYY-MM-DD format or null" }
+          }
+        }
+      }
+    });
+
+    const responseText = response.text;
+    if (!responseText) return null;
+    const json = JSON.parse(responseText);
+    return json.expiryDate;
+  } catch (error) {
+    console.error("Gemini Expiry Extraction Error:", error);
+    return null;
+  }
+};

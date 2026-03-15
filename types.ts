@@ -53,6 +53,7 @@ export interface DriveFile {
     mimeType: string;
     webViewLink: string;
     iconLink?: string;
+    expiryDate?: string; // YYYY-MM-DD
 }
 
 export interface Employee {

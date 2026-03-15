@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, ExternalLink, Plus, X, Link as LinkIcon, Eye, Download, Globe } from 'lucide-react';
+import { FileText, ExternalLink, Plus, X, Link as LinkIcon, Eye, Download, Globe, Calendar, Loader2, Upload } from 'lucide-react';
 import { DriveFile } from '../types';
 import { cn } from '../utils';
+import { extractExpiryDate } from '../services/geminiService';
 
 interface GoogleDriveManagerProps {
     files: DriveFile[];
@@ -21,6 +22,9 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
     const [previewFile, setPreviewFile] = useState<DriveFile | null>(null);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
+    const [newExpiryDate, setNewExpiryDate] = useState('');
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAddLink = (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,13 +35,55 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
             name: newFileName,
             mimeType: 'application/octet-stream', // Generic
             webViewLink: newFileUrl.startsWith('http') ? newFileUrl : `https://${newFileUrl}`,
+            expiryDate: newExpiryDate || undefined,
             iconLink: 'https://ssl.gstatic.com/docs/doclist/images/icon_10_generic_list.png'
         };
 
         onAddFile(newFile);
         setNewFileName('');
         setNewFileUrl('');
+        setNewExpiryDate('');
         setIsAddModalOpen(false);
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsAnalyzing(true);
+        try {
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64 = event.target?.result as string;
+                const expiryDate = await extractExpiryDate(base64, file.type);
+                
+                if (expiryDate) {
+                    setNewExpiryDate(expiryDate);
+                }
+                
+                if (!newFileName) {
+                    setNewFileName(file.name);
+                }
+                
+                setIsAnalyzing(false);
+            };
+            reader.readAsDataURL(file);
+        } catch (error) {
+            console.error("Analysis error:", error);
+            setIsAnalyzing(false);
+        }
+    };
+
+    const getExpiryColor = (expiryDate?: string) => {
+        if (!expiryDate) return '';
+        const today = new Date();
+        const expiry = new Date(expiryDate);
+        const diffTime = expiry.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) return 'text-red-600 dark:text-red-400 font-bold';
+        if (diffDays <= 10) return 'text-orange-600 dark:text-orange-400 font-bold';
+        return 'text-emerald-600 dark:text-emerald-400 font-bold';
     };
 
     const getPreviewUrl = (url: string) => {
@@ -89,6 +135,33 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
                     </button>
                 </div>
                 <form onSubmit={handleAddLink} className="p-6 space-y-5">
+                    <div className="flex items-center justify-between bg-brand-50 dark:bg-brand-900/20 p-4 rounded-2xl border border-brand-100 dark:border-brand-900/30">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-brand-100 dark:bg-brand-900/40 rounded-xl text-brand-600 dark:text-brand-400">
+                                <Upload className="w-4 h-4" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-slate-900 dark:text-white">AI Document Analysis</p>
+                                <p className="text-[10px] text-slate-500">Upload to auto-extract expiry date</p>
+                            </div>
+                        </div>
+                        <button 
+                            type="button"
+                            disabled={isAnalyzing}
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-brand-200 dark:border-brand-900/50 rounded-lg text-[10px] font-bold text-brand-600 hover:bg-brand-50 transition-all disabled:opacity-50"
+                        >
+                            {isAnalyzing ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Upload File'}
+                        </button>
+                        <input 
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                        />
+                    </div>
+
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Document Name</label>
                         <input 
@@ -101,18 +174,32 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
                             className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Google Drive Share Link</label>
-                        <div className="relative">
-                            <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input 
-                                type="text"
-                                required
-                                placeholder="Paste the share link here..."
-                                value={newFileUrl}
-                                onChange={(e) => setNewFileUrl(e.target.value)}
-                                className="w-full p-4 pl-12 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
-                            />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Expiry Date</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input 
+                                    type="date"
+                                    value={newExpiryDate}
+                                    onChange={(e) => setNewExpiryDate(e.target.value)}
+                                    className="w-full p-4 pl-12 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Google Drive Link</label>
+                            <div className="relative">
+                                <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input 
+                                    type="text"
+                                    required
+                                    placeholder="Paste link..."
+                                    value={newFileUrl}
+                                    onChange={(e) => setNewFileUrl(e.target.value)}
+                                    className="w-full p-4 pl-12 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                                />
+                            </div>
                         </div>
                     </div>
                     <button 
@@ -198,7 +285,14 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
                             ) : (
                                 getFileIcon(file.name)
                             )}
-                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{file.name}</span>
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{file.name}</span>
+                                {file.expiryDate && (
+                                    <span className={cn("text-[9px] uppercase tracking-wider", getExpiryColor(file.expiryDate))}>
+                                        Expires: {new Date(file.expiryDate).toLocaleDateString()}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                         <div className="flex items-center gap-1">
                             <button 

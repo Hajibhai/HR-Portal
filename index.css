@@ -18,8 +18,16 @@
 }
 
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+  
+  :root.dark {
+    color-scheme: dark;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-900 dark:bg-slate-950 dark:text-slate-100;
+    @apply bg-white text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-900;
   }
   
   /* Custom scrollbar */
