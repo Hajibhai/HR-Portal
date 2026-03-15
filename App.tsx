@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -21,7 +21,7 @@ import {
   ChevronLeft, ChevronRight,
   Settings, Search, Bell, LogOut as SignOut, UserCog,
   Briefcase, HardHat, ShieldCheck, Download, Printer,
-  MoreVertical, Check, X as CloseIcon, Filter, Shield, Key,
+  MoreVertical, Check, X as CloseIcon, Filter, Shield, Key, GripVertical,
   Activity, LayoutGrid, ListFilter, ChevronDown, Globe, HelpCircle,
   TrendingUp, Clock, ArrowUpRight, ArrowDownRight, BarChart2, Phone,
   ShieldAlert
@@ -59,7 +59,7 @@ import {
   saveLeaveRequest, updateLeaveRequestStatus,
   saveDeduction, deleteDeduction,
   saveSystemUser, deleteSystemUser,
-  addCompany, updateCompany, deleteCompany,
+  addCompany, updateCompany, deleteCompany, reorderCompanies,
   testConnection, logAudit, handleFirestoreError, OperationType
 } from './services/storageService';
 import { DEFAULT_ABOUT_DATA, CREATOR_USER } from './constants';
@@ -3263,10 +3263,14 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
     const [searchTerm, setSearchTerm] = useState('');
     const canManageSettings = user?.permissions?.canManageSettings;
 
+    const sortedCompanies = useMemo(() => {
+        return [...companies].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }, [companies]);
+
     const filteredCompanies = useMemo(() => {
-        if (!searchTerm.trim()) return companies;
+        if (!searchTerm.trim()) return sortedCompanies;
         const query = searchTerm.toLowerCase();
-        return companies.filter(company => {
+        return sortedCompanies.filter(company => {
             const matchesName = company.name.toLowerCase().includes(query);
             const matchesCode = company.code?.toLowerCase().includes(query);
             const matchesDocuments = company.driveFiles?.some(file => 
@@ -3274,7 +3278,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
             );
             return matchesName || matchesCode || matchesDocuments;
         });
-    }, [companies, searchTerm]);
+    }, [sortedCompanies, searchTerm]);
 
     const getExpiryStatus = (company: Company) => {
         const files = company.driveFiles || [];
@@ -3298,9 +3302,13 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
 
     const handleAdd = async () => {
         if (!formData.name.trim() || !formData.code.trim()) return;
-        await addCompany(formData);
+        await addCompany(formData, companies.length);
         setFormData({ code: '', name: '', address: '', email: '', phone: '', logo: '' });
         setIsAdding(false);
+    };
+
+    const handleReorder = async (newOrder: Company[]) => {
+        await reorderCompanies(newOrder);
     };
 
     const handleUpdate = async (company: Company) => {
@@ -3464,23 +3472,36 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                 </motion.div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Reorder.Group 
+                axis="y" 
+                values={sortedCompanies} 
+                onReorder={handleReorder}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
                 {filteredCompanies.map((company) => (
-                    <motion.div 
-                        layout
+                    <Reorder.Item 
+                        value={company}
                         key={company.id}
-                        className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-black/50 transition-all group relative overflow-hidden"
+                        dragListener={!searchTerm && canManageSettings}
+                        className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-black/50 transition-all group relative overflow-hidden cursor-default"
                     >
                         <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 dark:bg-slate-800 rounded-full -mr-16 -mt-16 transition-all group-hover:bg-brand-50/50 dark:group-hover:bg-brand-900/20"></div>
                         
                         <div className="relative z-10 flex flex-col h-full">
                             <div className="flex items-start justify-between mb-6">
-                                <div className="h-16 w-16 bg-slate-50 dark:bg-slate-800 rounded-2xl p-2 border border-slate-100 dark:border-slate-700 shadow-inner flex items-center justify-center overflow-hidden">
-                                    {company.logo ? (
-                                        <img src={company.logo} alt={company.name} className="max-h-full max-w-full object-contain" />
-                                    ) : (
-                                        <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                <div className="flex items-center gap-4">
+                                    {!searchTerm && canManageSettings && (
+                                        <div className="cursor-grab active:cursor-grabbing p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-300 dark:text-slate-600 hover:text-slate-500 transition-colors">
+                                            <GripVertical className="w-5 h-5" />
+                                        </div>
                                     )}
+                                    <div className="h-16 w-16 bg-slate-50 dark:bg-slate-800 rounded-2xl p-2 border border-slate-100 dark:border-slate-700 shadow-inner flex items-center justify-center overflow-hidden">
+                                        {company.logo ? (
+                                            <img src={company.logo} alt={company.name} className="max-h-full max-w-full object-contain" />
+                                        ) : (
+                                            <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                                     {canManageSettings && (
@@ -3595,9 +3616,8 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                 </>
                             )}
                         </div>
-                    </motion.div>
+                    </Reorder.Item>
                 ))}
-
                 {filteredCompanies.length === 0 && (
                     <div className="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-700">
                         <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
@@ -3617,7 +3637,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                         )}
                     </div>
                 )}
-            </div>
+            </Reorder.Group>
 
             {viewingDocsCompany && (
                 <CompanyDocumentsModal 

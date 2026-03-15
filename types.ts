@@ -149,6 +149,7 @@ export interface Company {
     logo?: string; // Base64
     driveFiles?: DriveFile[];
     driveFolderId?: string;
+    order?: number;
 }
 
 export interface DashboardStats {

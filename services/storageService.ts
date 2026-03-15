@@ -299,11 +299,12 @@ export const deleteDeduction = async (id: string) => {
 };
 
 // --- Companies ---
-export const addCompany = async (companyData: Omit<Company, 'id'>) => {
+export const addCompany = async (companyData: Omit<Company, 'id'>, currentCompaniesCount: number = 0) => {
   const id = Math.random().toString(36).substr(2, 9);
   const newCompany: Company = {
     id,
-    ...companyData
+    ...companyData,
+    order: currentCompaniesCount
   };
   try {
     await setDoc(doc(db, 'companies', id), cleanData(newCompany));
@@ -317,6 +318,18 @@ export const updateCompany = async (company: Company) => {
     await setDoc(doc(db, 'companies', company.id), cleanData(company));
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `companies/${company.id}`);
+  }
+};
+
+export const reorderCompanies = async (companies: Company[]) => {
+  try {
+    const promises = companies.map((company, index) => {
+      const updated = { ...company, order: index };
+      return setDoc(doc(db, 'companies', company.id), cleanData(updated));
+    });
+    await Promise.all(promises);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, 'companies/reorder');
   }
 };
 

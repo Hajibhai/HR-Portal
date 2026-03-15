@@ -71,7 +71,8 @@ function isValidCompany(data) {
          (!('address' in data) || data.address is string) &&
          (!('email' in data) || data.email is string) &&
          (!('phone' in data) || data.phone is string) &&
-         (!('logo' in data) || data.logo is string);
+         (!('logo' in data) || data.logo is string) &&
+         (!('order' in data) || data.order is number);
 }
 
 match /companies/{companyId} {

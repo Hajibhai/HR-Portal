@@ -111,7 +111,8 @@
       "properties": {
         "id": { "type": "string" },
         "code": { "type": "string" },
-        "name": { "type": "string" }
+        "name": { "type": "string" },
+        "order": { "type": "number" }
       },
       "required": ["id", "code", "name"]
     },
