@@ -2496,6 +2496,7 @@ export default function App() {
           onAdd={() => setShowOnboarding(true)} 
           onEdit={(e: Employee) => setShowEdit(e)} 
           onOffboard={(e: Employee) => setShowOffboarding(e)}
+          onDelete={handleDeleteEmployee}
           user={systemUser}
         />
       )}
@@ -3396,7 +3397,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                 )}
                                                 {canManageEmployees && (
                                                     <button 
-                                                        onClick={() => onDelete(e)} 
+                                                        onClick={() => onDelete?.(e)} 
                                                         className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800 active:scale-90"
                                                         title="Delete"
                                                     >
