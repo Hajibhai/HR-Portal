@@ -3342,20 +3342,9 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                                 <Eye className="w-4 h-4" />
                                                             </button>
                                                         )}
-                                                        {e.offboardingDetails?.settlementLink && (
-                                                            <a 
-                                                                href={e.offboardingDetails.settlementLink} 
-                                                                target="_blank" 
-                                                                rel="noopener noreferrer"
-                                                                className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-blue-600 dark:text-blue-400 rounded-xl transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 active:scale-90"
-                                                                title="View Settlement Document"
-                                                            >
-                                                                <Globe className="w-4 h-4" />
-                                                            </a>
-                                                        )}
                                                         {canManageEmployees && (
                                                             <button 
-                                                                onClick={() => onRejoin(e)} 
+                                                                onClick={() => onRejoin?.(e)} 
                                                                 className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-emerald-600 dark:text-emerald-400 rounded-xl transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 active:scale-90"
                                                                 title="Rejoin"
                                                             >
