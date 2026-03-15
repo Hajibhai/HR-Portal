@@ -69,14 +69,14 @@ import { GoogleDriveManager } from './components/GoogleDriveManager';
 
 // --- Constants & Helpers ---
 const LEGEND: any = {
-    [AttendanceStatus.PRESENT]: { label: 'Present', color: 'bg-green-100 text-green-800', code: 'P' },
-    [AttendanceStatus.ABSENT]: { label: 'Absent', color: 'bg-red-100 text-red-800', code: 'A' },
-    [AttendanceStatus.WEEK_OFF]: { label: 'Week Off', color: 'bg-gray-200 text-gray-800', code: 'W' },
-    [AttendanceStatus.PUBLIC_HOLIDAY]: { label: 'Public Holiday', color: 'bg-purple-100 text-purple-800', code: 'PH' },
-    [AttendanceStatus.SICK_LEAVE]: { label: 'Sick Leave', color: 'bg-orange-100 text-orange-800', code: 'SL' },
-    [AttendanceStatus.ANNUAL_LEAVE]: { label: 'Annual Leave', color: 'bg-blue-100 text-blue-800', code: 'AL' },
-    [AttendanceStatus.UNPAID_LEAVE]: { label: 'Unpaid Leave', color: 'bg-red-50 text-red-600', code: 'UL' },
-    [AttendanceStatus.EMERGENCY_LEAVE]: { label: 'Emergency Leave', color: 'bg-pink-100 text-pink-800', code: 'EL' },
+    [AttendanceStatus.PRESENT]: { label: 'Present', color: 'bg-emerald-500 text-white', code: 'P' },
+    [AttendanceStatus.ABSENT]: { label: 'Absent', color: 'bg-red-500 text-white', code: 'A' },
+    [AttendanceStatus.WEEK_OFF]: { label: 'Week Off', color: 'bg-slate-500 text-white', code: 'W' },
+    [AttendanceStatus.PUBLIC_HOLIDAY]: { label: 'Public Holiday', color: 'bg-violet-500 text-white', code: 'PH' },
+    [AttendanceStatus.SICK_LEAVE]: { label: 'Sick Leave', color: 'bg-orange-500 text-white', code: 'SL' },
+    [AttendanceStatus.ANNUAL_LEAVE]: { label: 'Annual Leave', color: 'bg-brand-500 text-white', code: 'AL' },
+    [AttendanceStatus.UNPAID_LEAVE]: { label: 'Unpaid Leave', color: 'bg-rose-500 text-white', code: 'UL' },
+    [AttendanceStatus.EMERGENCY_LEAVE]: { label: 'Emergency Leave', color: 'bg-pink-500 text-white', code: 'EL' },
 };
 
 const calculatePayroll = (employee: Employee, attendance: AttendanceRecord[], deductions: DeductionRecord[]) => {
@@ -2272,7 +2272,15 @@ export default function App() {
         />
       )}
       {activeTab === 'timesheet' && (
-        <TimesheetView employees={employees.filter(e => e.active)} attendance={attendance} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} user={systemUser} />
+        <TimesheetView 
+            employees={employees.filter(e => e.active)} 
+            attendance={attendance} 
+            selectedMonth={selectedMonth} 
+            onMonthChange={setSelectedMonth} 
+            user={systemUser}
+            onLogAttendance={logAttendance}
+            onDeleteAttendance={deleteAttendanceRecord}
+        />
       )}
       {activeTab === 'deductions' && (
         <DeductionsView employees={employees} deductions={deductions} openConfirm={openConfirm} />
@@ -3368,7 +3376,157 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
     );
 };
 
-const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, user }: any) => {
+const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose }: any) => {
+    const [status, setStatus] = useState<AttendanceStatus | null>(currentRecord?.status || null);
+    const [otHours, setOtHours] = useState<number>(currentRecord?.overtimeHours || 0);
+    const [note, setNote] = useState<string>(currentRecord?.note || '');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSave = async () => {
+        if (!status) return;
+        setIsSubmitting(true);
+        try {
+            await onUpdate(employee.id, date, status, otHours, note);
+            onClose();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleRemove = async () => {
+        setIsSubmitting(true);
+        try {
+            await onUpdate(employee.id, date, null);
+            onClose();
+        } catch (error) {
+            console.error("Error removing attendance:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={onClose}>
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white dark:border-slate-800 flex flex-col max-h-[90vh]"
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
+                    <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-2xl font-black text-brand-600 overflow-hidden">
+                            {employee.profileImage ? (
+                                <img src={employee.profileImage} alt={employee.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            ) : (
+                                employee.name.charAt(0)
+                            )}
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{employee.name}</h3>
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="px-2 py-0.5 bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 rounded-lg text-[10px] font-black uppercase tracking-wider">{employee.code}</span>
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                    {new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="p-3 hover:bg-white dark:hover:bg-slate-700 rounded-2xl transition-all active:scale-90 shadow-sm">
+                        <X className="w-6 h-6 text-slate-400" />
+                    </button>
+                </div>
+
+                <div className="p-8 overflow-y-auto space-y-8">
+                    <section>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Select Status</label>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            {Object.entries(LEGEND).map(([s, m]: any) => (
+                                <button
+                                    key={s}
+                                    onClick={() => setStatus(s as AttendanceStatus)}
+                                    className={cn(
+                                        "flex flex-col items-center justify-center gap-2 p-4 rounded-[1.5rem] border-2 transition-all active:scale-95",
+                                        status === s 
+                                            ? "border-brand-500 bg-brand-50/50 dark:bg-brand-900/20 ring-4 ring-brand-500/10" 
+                                            : "border-slate-100 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-900/30 bg-white dark:bg-slate-900"
+                                    )}
+                                >
+                                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shadow-sm", m.color)}>
+                                        {m.code}
+                                    </div>
+                                    <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider">{m.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </section>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <section>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">Overtime Hours</label>
+                            <div className="relative">
+                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input 
+                                    type="number" 
+                                    value={otHours}
+                                    onChange={(e) => setOtHours(Number(e.target.value))}
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-brand-500 rounded-2xl outline-none transition-all font-bold text-slate-900 dark:text-white"
+                                    placeholder="0"
+                                    min="0"
+                                    max="24"
+                                />
+                            </div>
+                        </section>
+
+                        <section>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">Note / Remarks</label>
+                            <input 
+                                type="text" 
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                className="w-full px-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-brand-500 rounded-2xl outline-none transition-all font-bold text-slate-900 dark:text-white"
+                                placeholder="Optional note..."
+                            />
+                        </section>
+                    </div>
+                </div>
+
+                <div className="p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 flex gap-4">
+                    <button 
+                        onClick={handleRemove}
+                        disabled={isSubmitting || !currentRecord}
+                        className="px-6 py-4 bg-white dark:bg-slate-800 text-red-500 dark:text-red-400 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-black hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                        {isSubmitting ? (
+                            <div className="w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+                        ) : (
+                            <Trash2 className="w-4 h-4" />
+                        )}
+                        <span className="hidden sm:inline">Clear</span>
+                    </button>
+                    <button 
+                        onClick={handleSave}
+                        disabled={isSubmitting || !status}
+                        className="flex-1 py-4 bg-brand-600 text-white rounded-2xl text-sm font-black hover:bg-brand-700 transition-all active:scale-95 shadow-xl shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting ? (
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <>
+                                <CheckCircle className="w-5 h-5" />
+                                Save Attendance Details
+                            </>
+                        )}
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
+const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, user, onLogAttendance, onDeleteAttendance }: any) => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const daysInMonth = new Date(year, month, 0).getDate();
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -3381,26 +3539,45 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
     const fullYear = year.toString();
 
     const handlePrevMonth = () => {
-        const d = new Date(year, month - 2);
-        onMonthChange(d.toISOString().slice(0, 7));
+        let prevYear = year;
+        let prevMonth = month - 1;
+        if (prevMonth < 1) {
+            prevMonth = 12;
+            prevYear--;
+        }
+        onMonthChange(`${prevYear}-${String(prevMonth).padStart(2, '0')}`);
     };
 
     const handleNextMonth = () => {
-        const d = new Date(year, month);
-        onMonthChange(d.toISOString().slice(0, 7));
+        let nextYear = year;
+        let nextMonth = month + 1;
+        if (nextMonth > 12) {
+            nextMonth = 1;
+            nextYear++;
+        }
+        onMonthChange(`${nextYear}-${String(nextMonth).padStart(2, '0')}`);
     };
 
-    const handleStatusUpdate = async (employeeId: string, date: string, status: AttendanceStatus) => {
-        await logAttendance(
-            employeeId,
-            status,
-            date,
-            0,
-            undefined,
-            user?.username || 'System',
-            'Manual Update'
-        );
-        setEditingCell(null);
+    const handleStatusUpdate = async (employeeId: string, date: string, status: AttendanceStatus | null, otHours: number = 0, note: string = '') => {
+        try {
+            if (status === null) {
+                await onDeleteAttendance(employeeId, date);
+            } else {
+                await onLogAttendance(
+                    employeeId,
+                    status,
+                    date,
+                    otHours,
+                    undefined,
+                    user?.username || 'System',
+                    note || 'Manual Update'
+                );
+            }
+        } catch (error) {
+            console.error("Attendance update failed:", error);
+        } finally {
+            setEditingCell(null);
+        }
     };
 
     const filteredEmployees = useMemo(() => {
@@ -3409,6 +3586,16 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
             e.code.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [employees, searchTerm]);
+
+    const editingEmployee = useMemo(() => {
+        if (!editingCell) return null;
+        return employees.find((e: Employee) => e.id === editingCell.empId);
+    }, [editingCell, employees]);
+
+    const editingRecord = useMemo(() => {
+        if (!editingCell) return null;
+        return attendance.find((r: AttendanceRecord) => r.employeeId === editingCell.empId && r.date === editingCell.date);
+    }, [editingCell, attendance]);
 
     const handleCopyAttendance = async (sourceDate: string, targetStartDate: string, targetEndDate: string) => {
         const start = new Date(targetStartDate);
@@ -3581,31 +3768,6 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                                                 >
                                                     {meta.code || (isSunday ? 'S' : '-')}
                                                 </button>
-
-                                                {editingCell?.empId === e.id && editingCell?.date === dateStr && (
-                                                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-50 p-2 grid grid-cols-4 gap-1 min-w-[160px]">
-                                                        {Object.entries(LEGEND).map(([status, m]: any) => (
-                                                            <button
-                                                                key={status}
-                                                                onClick={() => handleStatusUpdate(e.id, dateStr, status as AttendanceStatus)}
-                                                                className={cn(
-                                                                    "w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all hover:scale-110",
-                                                                    m.color,
-                                                                    record?.status === status && "ring-2 ring-brand-500 ring-offset-1"
-                                                                )}
-                                                                title={m.label}
-                                                            >
-                                                                {m.code}
-                                                            </button>
-                                                        ))}
-                                                        <button 
-                                                            onClick={() => setEditingCell(null)}
-                                                            className="col-span-4 mt-1 py-1 text-[9px] font-bold text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 uppercase tracking-widest"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                    </div>
-                                                )}
                                             </td>
                                         );
                                     })}
@@ -3630,6 +3792,16 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                     </div>
                 )}
             </div>
+
+            {editingCell && editingEmployee && (
+                <AttendanceEditModal 
+                    employee={editingEmployee}
+                    date={editingCell.date}
+                    currentRecord={editingRecord}
+                    onUpdate={handleStatusUpdate}
+                    onClose={() => setEditingCell(null)}
+                />
+            )}
         </div>
     );
 };
