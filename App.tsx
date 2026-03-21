@@ -2094,7 +2094,8 @@ export default function App() {
   const [showAuditModal, setShowAuditModal] = useState(false);
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const isDarkMode = false;
+  const setIsDarkMode = (_val: boolean) => {};
 
   useEffect(() => {
     // Force light mode and clear any stored preferences
@@ -2105,53 +2106,10 @@ export default function App() {
     body.classList.remove('dark');
     body.classList.remove('dark-theme');
     localStorage.setItem('theme', 'light');
-    setIsDarkMode(false);
   }, []);
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    const body = window.document.body;
-    if (isDarkMode) {
-      root.classList.add('dark');
-      body.classList.add('dark-theme');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      root.classList.remove('dark-theme');
-      body.classList.remove('dark');
-      body.classList.remove('dark-theme');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
-
   const handleToggleDarkMode = async () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    
-    // Update document class immediately for better responsiveness
-    const root = window.document.documentElement;
-    const body = window.document.body;
-    if (newMode) {
-      root.classList.add('dark');
-      body.classList.add('dark-theme');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      root.classList.remove('dark-theme');
-      body.classList.remove('dark');
-      body.classList.remove('dark-theme');
-      localStorage.setItem('theme', 'light');
-    }
-
-    if (systemUser) {
-      const updatedUser = { ...systemUser, theme: (newMode ? 'dark' : 'light') as 'light' | 'dark' };
-      try {
-        await saveSystemUser(updatedUser);
-        setSystemUser(updatedUser);
-      } catch (error) {
-        console.error("Failed to save theme preference:", error);
-      }
-    }
+    // Disabled as per user request for white background
   };
 
   const handlePasswordReset = async () => {
@@ -2702,9 +2660,9 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                             <Activity className="w-4 h-4" />
                             System Intelligence
                         </div>
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Executive Dashboard</h1>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl">
-                            Welcome back, <span className="text-slate-900 dark:text-white font-bold">{user.name}</span>. 
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
+                        <p className="text-slate-500 font-medium max-w-xl">
+                            Welcome back, <span className="text-slate-900 font-bold">{user.name}</span>. 
                             The system is currently monitoring <span className="text-brand-600 font-bold">{activeStaff.length} active personnel</span> across {Object.keys(deptStats).length} departments.
                         </p>
                     </div>
@@ -2721,12 +2679,12 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                         </button>
                     )}
                     {(user.role === UserRole.CREATOR || user.role === UserRole.ADMIN) && (
-                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                            <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-400 transition-all" title="Manage Companies">
+                        <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+                            <button onClick={onOpenManageCompanies} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="Manage Companies">
                                 <Building2 className="w-5 h-5" />
                             </button>
-                            <div className="w-px h-4 bg-slate-200 dark:bg-slate-800"></div>
-                            <button onClick={onOpenUserManagement} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-400 transition-all" title="System Users">
+                            <div className="w-px h-4 bg-slate-200"></div>
+                            <button onClick={onOpenUserManagement} className="p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-all" title="System Users">
                                 <UserCog className="w-5 h-5" />
                             </button>
                         </div>
@@ -2771,13 +2729,13 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                 />
 
                 {/* Recent Activity Log */}
-                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col">
+                <div className="md:col-span-2 lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm flex flex-col">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-brand-50 dark:bg-brand-900/20 rounded-2xl">
+                            <div className="p-2.5 bg-brand-50 rounded-2xl">
                                 <Activity className="w-5 h-5 text-brand-600" />
                             </div>
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">System Activity</h3>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">System Activity</h3>
                         </div>
                         <button 
                             onClick={() => setShowAuditModal(true)}
@@ -2887,36 +2845,36 @@ const ProfileView = ({ user }: { user: SystemUser }) => {
                     <p className="text-brand-600 font-bold uppercase tracking-widest text-xs mt-1">{user.role}</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-12">
-                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="p-6 bg-white rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{user.email}</p>
+                            <p className="text-sm font-bold text-slate-900">{user.email}</p>
                         </div>
-                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="p-6 bg-white rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Username</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{user.username || 'Not set'}</p>
+                            <p className="text-sm font-bold text-slate-900">{user.username || 'Not set'}</p>
                         </div>
-                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="p-6 bg-white rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Account Status</p>
                             <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">{user.active ? 'Active' : 'Inactive'}</p>
+                                <p className="text-sm font-bold text-slate-900">{user.active ? 'Active' : 'Inactive'}</p>
                             </div>
                         </div>
-                        <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="p-6 bg-white rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">User ID</p>
-                            <p className="text-xs font-mono text-slate-500 dark:text-slate-400">{user.uid}</p>
+                            <p className="text-xs font-mono text-slate-500">{user.uid}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm">
-                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-6">Your Permissions</h3>
+            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                <h3 className="text-lg font-black text-slate-900 mb-6">Your Permissions</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Object.entries(user.permissions).map(([key, value]) => (
-                        <div key={key} className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-                            {value ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-slate-300 dark:text-slate-600" />}
-                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <div key={key} className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-slate-100">
+                            {value ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-slate-300" />}
+                            <span className="text-xs font-bold text-slate-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
                         </div>
                     ))}
                 </div>
@@ -2961,64 +2919,43 @@ const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: {
             </div>
 
             <div className="grid grid-cols-1 gap-6">
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800">
-                    <h3 className="text-lg font-black text-slate-900 mb-6 dark:text-white">Security</h3>
+                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-900 mb-6">Security</h3>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                        <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100">
                             <div>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">Change Password</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Update your account password regularly</p>
+                                <p className="text-sm font-bold text-slate-900">Change Password</p>
+                                <p className="text-xs text-slate-500">Update your account password regularly</p>
                             </div>
                             <button 
                                 onClick={onPasswordReset}
-                                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-brand-600 hover:bg-slate-50 transition-all dark:bg-slate-900 dark:border-slate-700 dark:text-brand-400"
+                                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-brand-600 hover:bg-slate-50 transition-all"
                             >
                                 Update
                             </button>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                        <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100">
                             <div>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">Two-Factor Authentication</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Add an extra layer of security to your account</p>
+                                <p className="text-sm font-bold text-slate-900">Two-Factor Authentication</p>
+                                <p className="text-xs text-slate-500">Add an extra layer of security to your account</p>
                             </div>
-                            <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer dark:bg-slate-700">
+                            <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer">
                                 <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800">
-                    <h3 className="text-lg font-black text-slate-900 mb-6 dark:text-white">System Preferences</h3>
+                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-900 mb-6">System Preferences</h3>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                        <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100">
                             <div>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">Email Notifications</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Receive system alerts via email</p>
+                                <p className="text-sm font-bold text-slate-900">Email Notifications</p>
+                                <p className="text-xs text-slate-500">Receive system alerts via email</p>
                             </div>
                             <div className="w-12 h-6 bg-brand-600 rounded-full relative cursor-pointer">
                                 <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
-                            </div>
-                        </div>
-                        <div 
-                            onClick={onToggleDarkMode}
-                            className="flex items-center justify-between p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 dark:bg-slate-800/50 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group"
-                        >
-                            <div>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">Switch between light and dark themes</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Themes</p>
-                            </div>
-                            <div 
-                                className={cn(
-                                    "w-12 h-6 rounded-full relative transition-all duration-300",
-                                    isDarkMode ? "bg-brand-600" : "bg-slate-300 dark:bg-slate-700"
-                                )}
-                            >
-                                <motion.div 
-                                    animate={{ x: isDarkMode ? 24 : 0 }}
-                                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                    className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"
-                                />
                             </div>
                         </div>
                     </div>
@@ -3077,16 +3014,16 @@ const HelpCenterView = () => {
 
 const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) => {
     const colors: any = {
-        brand: "bg-brand-50 text-brand-600 border-brand-100 shadow-brand-500/5 dark:bg-brand-900/20 dark:text-brand-400 dark:border-brand-900/30",
-        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/5 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30",
-        orange: "bg-orange-50 text-orange-600 border-orange-100 shadow-orange-500/5 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-900/30",
-        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100 shadow-indigo-500/5 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30",
+        brand: "bg-brand-50 text-brand-600 border-brand-100 shadow-brand-500/5",
+        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/5",
+        orange: "bg-orange-50 text-orange-600 border-orange-100 shadow-orange-500/5",
+        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100 shadow-indigo-500/5",
     };
 
     return (
         <motion.div 
             whileHover={{ y: -5 }}
-            className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col justify-between min-h-[200px] transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-black/50 group"
+            className="bg-white p-8 rounded-[2.5rem] border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[200px] transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 group"
         >
             <div className="flex justify-between items-start">
                 <div className={cn("p-3.5 rounded-2xl transition-all duration-500 group-hover:rotate-6", colors[color])}>
@@ -3094,7 +3031,7 @@ const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) =>
                 </div>
             </div>
             <div>
-                <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{value}</span>
+                <span className="text-4xl font-black text-slate-900 tracking-tighter">{value}</span>
                 <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">{title}</p>
             </div>
         </motion.div>
@@ -3227,15 +3164,15 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
     return (
         <div className="space-y-6">
             {/* Advanced Filter Bar */}
-            <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none flex flex-col lg:flex-row gap-4 items-center">
+            <div className="bg-white/70 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input 
                         type="text" 
                         placeholder="Search personnel by name or ID..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-11 pr-4 py-3.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm w-full outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium dark:text-white dark:placeholder:text-slate-500"
+                        className="pl-11 pr-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm w-full outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
                     />
                 </div>
                 
@@ -3243,17 +3180,17 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                     <select 
                         value={companyFilter}
                         onChange={(e) => setCompanyFilter(e.target.value)}
-                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
+                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
                     >
-                        {companies.map(c => <option key={c} value={c} className="dark:bg-slate-900">{c}</option>)}
+                        {companies.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
 
                     <select 
                         value={deptFilter}
                         onChange={(e) => setDeptFilter(e.target.value)}
-                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
+                        className="flex-1 lg:flex-none px-4 py-3.5 bg-slate-100/50 border-none rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer min-w-[140px]"
                     >
-                        {departments.map(d => <option key={d} value={d} className="dark:bg-slate-900">{d}</option>)}
+                        {departments.map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
 
                     {!readOnly && canManageEmployees && (
@@ -3267,20 +3204,20 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                 </div>
             </div>
 
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden border border-white dark:border-slate-800 shadow-2xl shadow-slate-200/60 dark:shadow-none">
+            <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden border border-white shadow-2xl shadow-slate-200/60">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800">
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Personnel Details</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Department & Role</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Organization</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Status</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Experience</th>
-                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 text-right">Actions</th>
+                            <tr className="bg-slate-50/80 border-b border-slate-100">
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Personnel Details</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Department & Role</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Organization</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Experience</th>
+                                <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                        <tbody className="divide-y divide-slate-50">
                             <AnimatePresence mode="popLayout">
                                 {filteredEmployees.map((e: Employee) => (
                                     <motion.tr 
@@ -3293,7 +3230,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                     >
                                         <td className="p-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 dark:text-slate-400 font-black border border-slate-200 dark:border-slate-700 group-hover:bg-white dark:group-hover:bg-slate-900 group-hover:border-brand-200 dark:group-hover:border-brand-900/30 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-all duration-300 overflow-hidden">
+                                                <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 font-black border border-slate-200 group-hover:bg-white group-hover:border-brand-200 group-hover:text-brand-600 transition-all duration-300 overflow-hidden">
                                                     {e.profileImage ? (
                                                         <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                     ) : (
@@ -3301,22 +3238,22 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-black text-slate-900 dark:text-white text-base">{e.name}</div>
-                                                    <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{e.code}</div>
+                                                    <div className="font-black text-slate-900 text-base">{e.name}</div>
+                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{e.code}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="p-6">
-                                            <div className="text-sm font-black text-slate-700 dark:text-slate-300">{e.designation}</div>
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-0.5">{e.team}</div>
+                                            <div className="text-sm font-black text-slate-700">{e.designation}</div>
+                                            <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{e.team}</div>
                                         </td>
                                         <td className="p-6">
                                             <div className="flex flex-col">
-                                                <span className="text-xs font-black text-slate-600 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700 w-fit">
+                                                <span className="text-xs font-black text-slate-600 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200/60 w-fit">
                                                     {e.company}
                                                 </span>
                                                 {companyList.find(c => c.name === e.company)?.code && (
-                                                    <span className="text-[9px] font-black text-brand-600 dark:text-brand-400 mt-1 ml-1 uppercase tracking-wider">
+                                                    <span className="text-[9px] font-black text-brand-600 mt-1 ml-1 uppercase tracking-wider">
                                                         Code: {companyList.find(c => c.name === e.company)?.code}
                                                     </span>
                                                 )}
@@ -3330,18 +3267,18 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                 )}></div>
                                                 <span className={cn(
                                                     "text-[10px] font-black uppercase tracking-widest",
-                                                    e.active ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
+                                                    e.active ? 'text-emerald-600' : 'text-red-600'
                                                 )}>
                                                     {e.status}
                                                 </span>
                                             </div>
                                         </td>
                                         <td className="p-6">
-                                            <div className="text-xs font-black text-slate-600 dark:text-slate-400">
+                                            <div className="text-xs font-black text-slate-600">
                                                 {calculateExperience(e.joiningDate, e.offboardingDetails?.exitDate)}
                                             </div>
                                             {!e.active && e.offboardingDetails?.exitDate && (
-                                                <div className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-0.5">
+                                                <div className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">
                                                     Until: {e.offboardingDetails.exitDate}
                                                 </div>
                                             )}
@@ -3351,7 +3288,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                 {e.active && e.rejoiningReason && (
                                                     <button 
                                                         onClick={() => setViewRejoinReason(e)} 
-                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
+                                                        className="p-2.5 hover:bg-white hover:shadow-lg text-brand-600 rounded-xl transition-all border border-transparent hover:border-brand-100 active:scale-90"
                                                         title="View Rejoin Reason"
                                                     >
                                                         <Eye className="w-4 h-4" />
@@ -3360,7 +3297,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                 {canManageEmployees && (
                                                     <button 
                                                         onClick={() => onEdit(e)} 
-                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
+                                                        className="p-2.5 hover:bg-white hover:shadow-lg text-brand-600 rounded-xl transition-all border border-transparent hover:border-brand-100 active:scale-90"
                                                         title="Edit Record"
                                                     >
                                                         <Edit className="w-4 h-4" />
@@ -4212,25 +4149,25 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                 onCopy={handleCopyAttendance}
                 currentMonth={selectedMonth}
             />
-            <div className="glass-card dark:bg-slate-900/80 p-6 rounded-3xl border border-white dark:border-slate-800 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
                         <button 
                             onClick={handlePrevMonth} 
-                            className="p-2 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl text-slate-600 dark:text-slate-400 transition-all active:scale-95"
+                            className="p-2 hover:bg-white hover:shadow-sm rounded-xl text-slate-600 transition-all active:scale-95"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <div className="px-4 text-center min-w-[140px] flex flex-col items-center">
-                            <div className="text-sm font-bold text-slate-900 dark:text-white">{monthName}</div>
-                            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                            <div className="text-sm font-bold text-slate-900">{monthName}</div>
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
                                 {fullYear}
                                 <img src="https://flagcdn.com/w20/ae.png" alt="UAE" className="w-3 h-2 rounded-sm" referrerPolicy="no-referrer" />
                             </div>
                         </div>
                         <button 
                             onClick={handleNextMonth} 
-                            className="p-2 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl text-slate-600 dark:text-slate-400 transition-all active:scale-95"
+                            className="p-2 hover:bg-white hover:shadow-sm rounded-xl text-slate-600 transition-all active:scale-95"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>
@@ -4241,7 +4178,7 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                             <div key={status} className={cn(
                                 "px-3 py-1 rounded-full text-[10px] font-bold border transition-all hover:scale-105 cursor-default",
                                 meta.color.replace('text-', 'text-').replace('bg-', 'bg-'),
-                                "border-slate-100 dark:border-slate-800"
+                                "border-slate-100"
                             )}>
                                 {meta.code}: {meta.label}
                             </div>
@@ -4251,13 +4188,13 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
 
                 <div className="flex items-center gap-3">
                     <div className="relative flex-1 sm:flex-none">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input 
                             type="text" 
                             placeholder="Search staff..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-4 py-2.5 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white dark:placeholder:text-slate-600"
+                            className="pl-11 pr-4 py-2.5 bg-slate-100/50 border-none rounded-2xl text-sm w-full sm:w-64 outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                         />
                     </div>
                     {canManageAttendance && (
@@ -4269,56 +4206,56 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                             <span className="hidden sm:inline">Copy Attendance</span>
                         </button>
                     )}
-                    <button className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-sm">
+                    <button className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
                         <Download className="w-5 h-5" />
                     </button>
                 </div>
             </div>
 
-            <div className="glass-card dark:bg-slate-900/80 rounded-3xl overflow-hidden border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+            <div className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-xl shadow-slate-200/50">
                 <div className="overflow-x-auto">
                     <table className="w-full text-center border-collapse text-[11px]">
                         <thead>
-                            <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                                <th className="p-4 text-left bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm sticky left-0 z-20 border-r border-slate-100 dark:border-slate-800 min-w-[180px]">
-                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Employee Name</span>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="p-4 text-left bg-slate-50/80 backdrop-blur-sm sticky left-0 z-20 border-r border-slate-100 min-w-[180px]">
+                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Employee Name</span>
                                 </th>
-                                <th className="p-4 font-bold text-slate-500 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800 uppercase tracking-widest text-[10px]">Leave</th>
-                                <th className="p-4 font-bold text-brand-600 dark:text-brand-400 border-r border-slate-100 dark:border-slate-800 uppercase tracking-widest text-[10px]">OT</th>
+                                <th className="p-4 font-bold text-slate-500 border-r border-slate-100 uppercase tracking-widest text-[10px]">Leave</th>
+                                <th className="p-4 font-bold text-brand-600 border-r border-slate-100 uppercase tracking-widest text-[10px]">OT</th>
                                 {days.map(d => {
                                     const date = new Date(year, month - 1, d);
                                     const dayName = date.toLocaleString('default', { weekday: 'narrow' });
                                     const isSunday = date.getDay() === 0;
                                     return (
                                         <th key={d} className={cn(
-                                            "p-2 w-10 border-r border-slate-50 dark:border-slate-800 min-w-[36px]",
-                                            isSunday ? 'bg-red-50/30 dark:bg-red-900/20 text-red-500 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'
+                                            "p-2 w-10 border-r border-slate-50 min-w-[36px]",
+                                            isSunday ? 'bg-red-50/30 text-red-500' : 'text-slate-600'
                                         )}>
                                             <div className="font-bold text-sm">{d}</div>
                                             <div className="text-[9px] font-bold uppercase opacity-60">{dayName}</div>
                                         </th>
                                     );
                                 })}
-                                <th className="p-4 font-bold text-slate-900 dark:text-white bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm sticky right-0 z-20 border-l border-slate-100 dark:border-slate-800 uppercase tracking-widest text-[10px]">Total</th>
+                                <th className="p-4 font-bold text-slate-900 bg-slate-50/80 backdrop-blur-sm sticky right-0 z-20 border-l border-slate-100 uppercase tracking-widest text-[10px]">Total</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                        <tbody className="divide-y divide-slate-50">
                             {filteredEmployees.map((e: Employee, idx: number) => (
-                                <tr key={e.id} className="hover:bg-brand-50/20 dark:hover:bg-brand-900/10 transition-colors group">
-                                    <td className="p-4 text-left border-r border-slate-100 dark:border-slate-800 sticky left-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm z-10 group-hover:bg-brand-50/50 dark:group-hover:bg-brand-900/20 transition-colors">
+                                <tr key={e.id} className="hover:bg-brand-50/20 transition-colors group">
+                                    <td className="p-4 text-left border-r border-slate-100 sticky left-0 bg-white/90 backdrop-blur-sm z-10 group-hover:bg-brand-50/50 transition-colors">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-7 h-7 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 overflow-hidden">
+                                            <div className="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-200 overflow-hidden">
                                                 {e.profileImage ? (
                                                     <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                 ) : (
                                                     e.name.charAt(0)
                                                 )}
                                             </div>
-                                            <span className="font-bold text-slate-900 dark:text-white truncate max-w-[120px]">{e.name}</span>
+                                            <span className="font-bold text-slate-900 truncate max-w-[120px]">{e.name}</span>
                                         </div>
                                     </td>
-                                    <td className="p-4 border-r border-slate-50 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-400">{e.leaveBalance}</td>
-                                    <td className="p-4 border-r border-slate-50 dark:border-slate-800 font-bold text-brand-600 dark:text-brand-400">
+                                    <td className="p-4 border-r border-slate-50 font-bold text-slate-500">{e.leaveBalance}</td>
+                                    <td className="p-4 border-r border-slate-50 font-bold text-brand-600">
                                         {attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth)).reduce((sum, r) => sum + (r.overtimeHours || 0), 0)}
                                     </td>
                                     {days.map(d => {
@@ -4328,14 +4265,14 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                                         const isSunday = new Date(year, month - 1, d).getDay() === 0;
                                         return (
                                             <td key={d} className={cn(
-                                                "border-r border-slate-50 dark:border-slate-800 p-2 font-bold transition-all relative",
-                                                meta.code ? meta.color : isSunday ? 'bg-red-50/20 dark:bg-red-900/10 text-red-200 dark:text-red-900/50' : 'text-slate-200 dark:text-slate-700 group-hover:text-slate-300 dark:group-hover:text-slate-600'
+                                                "border-r border-slate-50 p-2 font-bold transition-all relative",
+                                                meta.code ? meta.color : isSunday ? 'bg-red-50/20 text-red-200' : 'text-slate-200 group-hover:text-slate-300'
                                             )}>
                                                 <button 
                                                     onClick={() => setEditingCell({ empId: e.id, date: dateStr })}
                                                     className={cn(
                                                         "w-6 h-6 flex items-center justify-center rounded-lg mx-auto transition-transform hover:scale-110 active:scale-90",
-                                                        meta.code && "bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700"
+                                                        meta.code && "bg-white shadow-sm border border-slate-100"
                                                     )}
                                                 >
                                                     {meta.code || (isSunday ? 'S' : '-')}
@@ -4343,10 +4280,10 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                                             </td>
                                         );
                                     })}
-                                    <td className="p-4 font-bold text-slate-900 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm sticky right-0 z-10 border-l border-slate-100 dark:border-slate-800 group-hover:bg-brand-50/50 dark:group-hover:bg-brand-900/20 transition-colors">
+                                    <td className="p-4 font-bold text-slate-900 bg-white/90 backdrop-blur-sm sticky right-0 z-10 border-l border-slate-100 group-hover:bg-brand-50/50 transition-colors">
                                         <div className="flex flex-col items-center">
-                                            <span className="text-brand-600 dark:text-brand-400">{attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth) && r.status === AttendanceStatus.PRESENT).length}P</span>
-                                            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold">DAYS</span>
+                                            <span className="text-brand-600">{attendance.filter(r => r.employeeId === e.id && r.date.startsWith(selectedMonth) && r.status === AttendanceStatus.PRESENT).length}P</span>
+                                            <span className="text-[9px] text-slate-400 font-bold">DAYS</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -4356,11 +4293,11 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                 </div>
                 {filteredEmployees.length === 0 && (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
-                            <Calendar className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <Calendar className="w-8 h-8 text-slate-300" />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No records found</h3>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1">Try searching for a different staff member or changing the month.</p>
+                        <h3 className="text-lg font-bold text-slate-900">No records found</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto mt-1">Try searching for a different staff member or changing the month.</p>
                     </div>
                 )}
             </div>

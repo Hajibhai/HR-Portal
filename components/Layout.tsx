@@ -158,9 +158,9 @@ export const Layout: React.FC<LayoutProps> = ({
   }, [isSearchOpen]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen bg-white flex flex-col transition-colors duration-300">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-800 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Logo and Desktop Nav */}
@@ -170,7 +170,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   <Building2 className="text-white w-5 h-5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-black text-lg text-slate-900 dark:text-white leading-none tracking-tight">AL REEM</span>
+                  <span className="font-black text-lg text-slate-900 leading-none tracking-tight">AL REEM</span>
                   <span className="text-[9px] font-bold text-brand-600 tracking-[0.2em] mt-0.5">DMS PORTAL</span>
                 </div>
               </div>
@@ -184,8 +184,8 @@ export const Layout: React.FC<LayoutProps> = ({
                     className={cn(
                       "px-2 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-1.5 relative group",
                       activeTab === item.id 
-                        ? "text-brand-600 bg-brand-50 dark:bg-brand-900/20 dark:text-brand-400" 
-                        : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800"
+                        ? "text-brand-600 bg-brand-50" 
+                        : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
                     )}
                   >
                     <item.icon className={cn(
@@ -211,11 +211,11 @@ export const Layout: React.FC<LayoutProps> = ({
               {/* Search Icon - Desktop */}
               <button 
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-xl transition-all group relative"
+                className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all group relative"
                 title="Search (Ctrl+K)"
               >
                 <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                <div className="absolute -bottom-1 -right-1 hidden xl:flex items-center gap-0.5 px-1 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded shadow-sm scale-75">
+                <div className="absolute -bottom-1 -right-1 hidden xl:flex items-center gap-0.5 px-1 py-0.5 bg-white border border-slate-200 rounded shadow-sm scale-75">
                   <span className="text-[8px] font-bold text-slate-400">⌘K</span>
                 </div>
               </button>
@@ -224,12 +224,12 @@ export const Layout: React.FC<LayoutProps> = ({
               <div className="relative">
                 <button 
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-xl transition-all relative group"
+                  className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all relative group"
                 >
                   <Bell className="w-4 h-4 group-hover:animate-swing" />
                   {expiringDocs.length > 0 && (
                     <span className={cn(
-                      "absolute top-2 right-2 w-1.5 h-1.5 rounded-full border border-white dark:border-slate-900",
+                      "absolute top-2 right-2 w-1.5 h-1.5 rounded-full border border-white",
                       expiringDocs.some(d => d.status === 'Expired') ? "bg-red-500" : "bg-orange-500"
                     )}></span>
                   )}
@@ -243,33 +243,33 @@ export const Layout: React.FC<LayoutProps> = ({
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-20 overflow-hidden"
+                        className="absolute right-0 mt-2 w-80 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 z-20 overflow-hidden"
                       >
-                        <div className="p-4 border-b border-slate-50 dark:border-slate-800 mb-2">
-                          <p className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest">Document Alerts</p>
+                        <div className="p-4 border-b border-slate-50 mb-2">
+                          <p className="text-xs font-bold text-slate-900 uppercase tracking-widest">Document Alerts</p>
                         </div>
                         <div className="max-h-80 overflow-y-auto space-y-1">
                           {expiringDocs.length === 0 ? (
                             <div className="p-8 text-center">
-                              <Bell className="w-8 h-8 text-slate-200 dark:text-slate-700 mx-auto mb-2" />
+                              <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2" />
                               <p className="text-xs font-bold text-slate-400">No active alerts</p>
                             </div>
                           ) : (
                             expiringDocs.map((doc, idx) => (
-                              <div key={idx} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 space-y-1">
+                              <div key={idx} className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                                 <div className="flex justify-between items-start">
                                   <span className={cn(
                                     "text-[10px] font-black px-2 py-0.5 rounded-full uppercase",
-                                    doc.status === 'Expired' ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" : "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
+                                    doc.status === 'Expired' ? "bg-red-100 text-red-600" : "bg-orange-100 text-orange-600"
                                   )}>
                                     {doc.status}
                                   </span>
                                   <span className="text-[10px] font-bold text-slate-400">{doc.date}</span>
                                 </div>
-                                <p className="text-xs font-bold text-slate-900 dark:text-white">
+                                <p className="text-xs font-bold text-slate-900">
                                   {doc.type === 'company' ? `Company: ${doc.employeeName}` : doc.employeeName}
                                 </p>
-                                <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{doc.docName}</p>
+                                <p className="text-[10px] font-medium text-slate-500">{doc.docName}</p>
                               </div>
                             ))
                           )}
@@ -280,16 +280,16 @@ export const Layout: React.FC<LayoutProps> = ({
                 </AnimatePresence>
               </div>
 
-              <div className="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block"></div>
+              <div className="h-8 w-px bg-slate-200 mx-1 hidden sm:block"></div>
 
               {/* User Profile Dropdown */}
               <div className="relative">
                 <button 
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="flex items-center gap-2 p-1 pl-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 group"
+                  className="flex items-center gap-2 p-1 pl-2 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200 group"
                 >
                   <div className="text-right hidden sm:block">
-                    <div className="text-xs font-bold text-slate-900 dark:text-white leading-none">{user.name}</div>
+                    <div className="text-xs font-bold text-slate-900 leading-none">{user.name}</div>
                     <div className="text-[9px] text-brand-600 font-black uppercase tracking-wider mt-0.5">{user.role}</div>
                   </div>
                   <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-brand-600/20 group-hover:scale-105 transition-transform">
@@ -306,11 +306,11 @@ export const Layout: React.FC<LayoutProps> = ({
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-20 overflow-hidden"
+                        className="absolute right-0 mt-2 w-64 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 z-20 overflow-hidden"
                       >
-                        <div className="p-4 border-b border-slate-50 dark:border-slate-800 mb-2">
+                        <div className="p-4 border-b border-slate-50 mb-2">
                           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Signed in as</p>
-                          <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user.email}</p>
+                          <p className="text-sm font-bold text-slate-900 truncate">{user.email}</p>
                         </div>
                         <div className="space-y-1">
                           <button 
@@ -318,7 +318,7 @@ export const Layout: React.FC<LayoutProps> = ({
                                 setActiveTab('profile');
                                 setIsUserDropdownOpen(false);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all"
                           >
                             <User className="w-4 h-4" /> My Profile
                           </button>
@@ -327,7 +327,7 @@ export const Layout: React.FC<LayoutProps> = ({
                                 setActiveTab('settings');
                                 setIsUserDropdownOpen(false);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all"
                           >
                             <Settings className="w-4 h-4" /> Account Settings
                           </button>
@@ -336,15 +336,15 @@ export const Layout: React.FC<LayoutProps> = ({
                                 setActiveTab('help');
                                 setIsUserDropdownOpen(false);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-all"
                           >
                             <HelpCircle className="w-4 h-4" /> Help Center
                           </button>
                         </div>
-                        <div className="mt-2 pt-2 border-t border-slate-50 dark:border-slate-800">
+                        <div className="mt-2 pt-2 border-t border-slate-50">
                           <button 
                             onClick={onLogout}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-600 hover:bg-red-50 transition-all"
                           >
                             <LogOut className="w-4 h-4" /> Sign Out
                           </button>
@@ -579,7 +579,7 @@ export const Layout: React.FC<LayoutProps> = ({
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200/60 dark:border-slate-800 py-8">
+      <footer className="bg-white border-t border-slate-200/60 py-8">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-sm font-medium">
