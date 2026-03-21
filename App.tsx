@@ -595,7 +595,7 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
     );
 };
 
-const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee: Employee, onSave: (e: Employee) => void, onCancel: () => void, companies: Company[] }) => {
+const EditEmployeeModal = ({ employee, onSave, onCancel, companies, openConfirm }: { employee: Employee, onSave: (e: Employee) => void, onCancel: () => void, companies: Company[], openConfirm: any }) => {
     const [data, setData] = useState<Employee>(employee);
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -702,6 +702,7 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
                             files={data.driveFiles || []}
                             onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
                             onRemoveFile={(fileId) => setData({ ...data, driveFiles: (data.driveFiles || []).filter(f => f.id !== fileId) })}
+                            openConfirm={openConfirm}
                         />
                     </div>
                 </div>
@@ -714,7 +715,7 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies }: { employee
     );
 };
 
-const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (data: Employee) => void, onCancel: () => void, companies: Company[] }) => {
+const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { onComplete: (data: Employee) => void, onCancel: () => void, companies: Company[], openConfirm: any }) => {
     const [step, setStep] = useState(1);
     const [data, setData] = useState<Partial<Employee>>({
         salary: { basic: 0, housing: 0, transport: 0, other: 0, airTicket: 0, leaveSalary: 0 },
@@ -1069,6 +1070,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies }: { onComplete: (da
                                     files={data.driveFiles || []}
                                     onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
                                     onRemoveFile={(fileId) => setData({ ...data, driveFiles: (data.driveFiles || []).filter(f => f.id !== fileId) })}
+                                    openConfirm={openConfirm}
                                 />
                             </div>
                         </div>
@@ -2521,6 +2523,7 @@ export default function App() {
             user={systemUser}
             onLogAttendance={logAttendance}
             onDeleteAttendance={deleteAttendanceRecord}
+            openConfirm={openConfirm}
             companies={companies}
         />
       )}
@@ -2557,7 +2560,7 @@ export default function App() {
       {/* Modals */}
       <AnimatePresence>
         {showOnboarding && (
-          <OnboardingWizard companies={companies} onComplete={async (d) => { 
+          <OnboardingWizard companies={companies} openConfirm={openConfirm} onComplete={async (d) => { 
             const fullData = { ...d, id: Math.random().toString(36).substr(2, 9) } as Employee;
             await saveEmployee(fullData); 
             handleLogAction('Employee Onboarded', `New employee ${fullData.name} (${fullData.code}) was added to the system.`, 'create');
@@ -2589,7 +2592,7 @@ export default function App() {
           />
         )}
         {showEdit && (
-          <EditEmployeeModal companies={companies} employee={showEdit} onSave={async (d) => { 
+          <EditEmployeeModal companies={companies} employee={showEdit} openConfirm={openConfirm} onSave={async (d) => { 
             await saveEmployee(d); 
             handleLogAction('Employee Updated', `Details for employee ${d.name} (${d.code}) were updated.`, 'update');
             setShowEdit(null); 
@@ -3484,7 +3487,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
     );
 };
 
-const CompanyDocumentsModal = ({ company, onClose, onUpdate }: { company: Company, onClose: () => void, onUpdate: (c: Company) => void }) => {
+const CompanyDocumentsModal = ({ company, onClose, onUpdate, openConfirm }: { company: Company, onClose: () => void, onUpdate: (c: Company) => void, openConfirm: any }) => {
     return (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={onClose}>
             <motion.div 
@@ -3533,6 +3536,7 @@ const CompanyDocumentsModal = ({ company, onClose, onUpdate }: { company: Compan
                             };
                             onUpdate(updated);
                         }}
+                        openConfirm={openConfirm}
                     />
                 </div>
             </motion.div>
@@ -3929,13 +3933,14 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                     company={viewingDocsCompany}
                     onClose={() => setViewingDocsCompany(null)}
                     onUpdate={onUpdate}
+                    openConfirm={openConfirm}
                 />
             )}
         </div>
     );
 };
 
-const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose }: any) => {
+const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose, openConfirm }: any) => {
     const [status, setStatus] = useState<AttendanceStatus | null>(currentRecord?.status || null);
     const [otHours, setOtHours] = useState<number>(currentRecord?.overtimeHours || 0);
     const [note, setNote] = useState<string>(currentRecord?.note || '');
@@ -3955,15 +3960,21 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose 
     };
 
     const handleRemove = async () => {
-        setIsSubmitting(true);
-        try {
-            await onUpdate(employee.id, date, null);
-            onClose();
-        } catch (error) {
-            console.error("Error removing attendance:", error);
-        } finally {
-            setIsSubmitting(false);
-        }
+        openConfirm(
+            "Clear Attendance",
+            `Are you sure you want to clear the attendance record for ${employee.name} on ${new Date(date).toLocaleDateString()}?`,
+            async () => {
+                setIsSubmitting(true);
+                try {
+                    await onUpdate(employee.id, date, null);
+                    onClose();
+                } catch (error) {
+                    console.error("Error removing attendance:", error);
+                } finally {
+                    setIsSubmitting(false);
+                }
+            }
+        );
     };
 
     return (
@@ -4085,7 +4096,7 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose 
     );
 };
 
-const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, user, onLogAttendance, onDeleteAttendance, companies }: any) => {
+const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, user, onLogAttendance, onDeleteAttendance, companies, openConfirm }: any) => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const daysInMonth = new Date(year, month, 0).getDate();
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -4361,6 +4372,7 @@ const TimesheetView = ({ employees, attendance, selectedMonth, onMonthChange, us
                     currentRecord={editingRecord}
                     onUpdate={handleStatusUpdate}
                     onClose={() => setEditingCell(null)}
+                    openConfirm={openConfirm}
                 />
             )}
         </div>

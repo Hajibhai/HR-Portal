@@ -10,6 +10,7 @@ interface GoogleDriveManagerProps {
     onAddFile: (file: DriveFile) => void;
     onRemoveFile: (fileId: string) => void;
     onUpdateFile?: (file: DriveFile) => void;
+    openConfirm?: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void;
     title?: string;
 }
 
@@ -18,6 +19,7 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
     onAddFile, 
     onRemoveFile,
     onUpdateFile,
+    openConfirm,
     title = "Linked Documents"
 }) => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -346,7 +348,17 @@ export const GoogleDriveManager: React.FC<GoogleDriveManagerProps> = ({
                                 <ExternalLink className="w-3.5 h-3.5" />
                             </a>
                             <button 
-                                onClick={() => onRemoveFile(file.id)}
+                                onClick={() => {
+                                    if (openConfirm) {
+                                        openConfirm(
+                                            "Remove Document",
+                                            `Are you sure you want to remove "${file.name}"? This action cannot be undone.`,
+                                            () => onRemoveFile(file.id)
+                                        );
+                                    } else if (confirm(`Are you sure you want to remove "${file.name}"?`)) {
+                                        onRemoveFile(file.id);
+                                    }
+                                }}
                                 className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                                 title="Remove"
                             >
