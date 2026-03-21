@@ -364,15 +364,15 @@ export const Layout: React.FC<LayoutProps> = ({
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       onClick={() => setIsSearchOpen(false)}
-                      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100]"
+                      className="fixed inset-0 bg-white/60 backdrop-blur-sm z-[100]"
                     />
                       <motion.div
                         initial={{ opacity: 0, scale: 0.9, y: -20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                        className="fixed top-[15%] left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl z-[101] overflow-hidden border border-slate-200 dark:border-slate-800"
+                        className="fixed top-[15%] left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white rounded-3xl shadow-2xl z-[101] overflow-hidden border border-slate-200"
                       >
-                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                        <div className="p-6 border-b border-slate-100 flex items-center gap-4">
                           <Search className="w-6 h-6 text-brand-600" />
                           <input
                             ref={searchInputRef}
@@ -380,11 +380,11 @@ export const Layout: React.FC<LayoutProps> = ({
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search for employees, documents, or reports..."
-                            className="flex-1 bg-transparent border-none outline-none text-lg font-medium placeholder:text-slate-400 text-slate-900 dark:text-white"
+                            className="flex-1 bg-transparent border-none outline-none text-lg font-medium placeholder:text-slate-400 text-slate-900"
                           />
                           <button 
                             onClick={() => setIsSearchOpen(false)}
-                            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-400 transition-colors"
+                            className="p-2 hover:bg-slate-100 rounded-xl text-slate-400 transition-colors"
                           >
                             <X className="w-5 h-5" />
                           </button>
@@ -406,10 +406,10 @@ export const Layout: React.FC<LayoutProps> = ({
                                                   setIsSearchOpen(false);
                                                   setSearchQuery('');
                                               }}
-                                              className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-50 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-900/50 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all group text-left"
+                                              className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:border-brand-100 hover:bg-brand-50 transition-all group text-left"
                                           >
                                               <div className="flex items-center gap-4">
-                                                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center border border-slate-100 dark:border-slate-700 shadow-sm group-hover:scale-110 transition-transform">
+                                                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
                                                       {res.type === 'Employee' ? (
                                                           <User className="w-5 h-5 text-brand-600" />
                                                       ) : res.type === 'Company' ? (
@@ -421,11 +421,11 @@ export const Layout: React.FC<LayoutProps> = ({
                                                       )}
                                                   </div>
                                                   <div>
-                                                      <p className="text-sm font-bold text-slate-900 dark:text-white">{res.title}</p>
+                                                      <p className="text-sm font-bold text-slate-900">{res.title}</p>
                                                       <p className="text-[10px] font-bold text-slate-400 uppercase">{res.subtitle}</p>
                                                   </div>
                                               </div>
-                                              <span className="text-[10px] font-black text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded-lg uppercase tracking-wider">
+                                              <span className="text-[10px] font-black text-brand-600 bg-brand-50 px-2 py-1 rounded-lg uppercase tracking-wider">
                                                   {res.type}
                                               </span>
                                           </button>
@@ -433,11 +433,11 @@ export const Layout: React.FC<LayoutProps> = ({
                                   </div>
                               ) : (
                                   <div className="p-8 text-center">
-                                      <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                                          <Search className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                          <Search className="w-8 h-8 text-slate-300" />
                                       </div>
-                                      <p className="text-slate-500 dark:text-slate-400 font-medium">No results found for "{searchQuery}"</p>
-                                      <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">Try searching for something else or check your spelling.</p>
+                                      <p className="text-slate-500 font-medium">No results found for "{searchQuery}"</p>
+                                      <p className="text-slate-400 text-sm mt-1">Try searching for something else or check your spelling.</p>
                                   </div>
                               )}
                             </div>
@@ -453,12 +453,12 @@ export const Layout: React.FC<LayoutProps> = ({
                                         setActiveTab(item.id);
                                         setIsSearchOpen(false);
                                       }}
-                                      className="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-900/50 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all group"
+                                      className="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 hover:border-brand-200 hover:bg-brand-50 transition-all group"
                                     >
-                                      <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded-xl group-hover:bg-white dark:group-hover:bg-slate-700 transition-colors">
-                                        <item.icon className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400" />
+                                      <div className="p-2 bg-slate-50 rounded-xl group-hover:bg-white transition-colors">
+                                        <item.icon className="w-4 h-4 text-slate-500 group-hover:text-brand-600" />
                                       </div>
-                                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-brand-700 dark:group-hover:text-brand-400">{item.label}</span>
+                                      <span className="text-sm font-bold text-slate-700 group-hover:text-brand-700">{item.label}</span>
                                     </button>
                                   ))}
                                 </div>
@@ -466,14 +466,14 @@ export const Layout: React.FC<LayoutProps> = ({
                             </div>
                           )}
                         </div>
-                        <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
                           <div className="flex gap-4">
                             <div className="flex items-center gap-1.5">
-                              <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">ESC</kbd>
+                              <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded">ESC</kbd>
                               <span className="text-[10px] text-slate-400 font-bold">to close</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">↵</kbd>
+                              <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded">↵</kbd>
                               <span className="text-[10px] text-slate-400 font-bold">to select</span>
                             </div>
                           </div>
@@ -505,23 +505,23 @@ export const Layout: React.FC<LayoutProps> = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60]"
+              className="fixed inset-0 bg-white/60 backdrop-blur-sm z-[60]"
             />
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 w-80 bg-white dark:bg-slate-900 z-[70] shadow-2xl flex flex-col"
+              className="fixed inset-y-0 right-0 w-80 bg-white z-[70] shadow-2xl flex flex-col"
             >
-              <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+              <div className="p-6 flex items-center justify-between border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="bg-brand-600 p-2 rounded-xl">
                     <Building2 className="text-white w-5 h-5" />
                   </div>
-                  <span className="font-bold text-lg text-slate-900 dark:text-white">Al Reem DMS</span>
+                  <span className="font-bold text-lg text-slate-900">Al Reem DMS</span>
                 </div>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl">
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 hover:bg-slate-100 rounded-xl">
                   <X className="w-6 h-6 text-slate-400" />
                 </button>
               </div>
@@ -538,7 +538,7 @@ export const Layout: React.FC<LayoutProps> = ({
                       "w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all font-bold",
                       activeTab === item.id 
                         ? "bg-brand-600 text-white shadow-lg shadow-brand-600/20" 
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        : "text-slate-600 hover:bg-slate-50"
                     )}
                   >
                     <item.icon className={cn("w-5 h-5", activeTab === item.id ? "text-white" : "text-slate-400")} />
@@ -547,10 +547,10 @@ export const Layout: React.FC<LayoutProps> = ({
                 ))}
               </div>
 
-              <div className="p-6 border-t border-slate-100 dark:border-slate-800">
+              <div className="p-6 border-t border-slate-100">
                 <button 
                   onClick={onLogout}
-                  className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                  className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-red-600 font-bold hover:bg-red-50 transition-all"
                 >
                   <LogOut className="w-5 h-5" />
                   Sign Out
@@ -582,16 +582,16 @@ export const Layout: React.FC<LayoutProps> = ({
       <footer className="bg-white border-t border-slate-200/60 py-8">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-sm font-medium">
+            <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
               <Globe className="w-4 h-4" />
               <span>Al Reem Document Management System v2.5</span>
             </div>
-            <div className="flex items-center gap-6 text-slate-400 dark:text-slate-500 text-sm font-bold">
-              <button className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Privacy Policy</button>
-              <button className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Terms of Service</button>
-              <button className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Contact Support</button>
+            <div className="flex items-center gap-6 text-slate-400 text-sm font-bold">
+              <button className="hover:text-brand-600 transition-colors">Privacy Policy</button>
+              <button className="hover:text-brand-600 transition-colors">Terms of Service</button>
+              <button className="hover:text-brand-600 transition-colors">Contact Support</button>
             </div>
-            <p className="text-slate-400 dark:text-slate-500 text-xs font-medium">
+            <p className="text-slate-400 text-xs font-medium">
               © {new Date().getFullYear()} Al Reem. All rights reserved.
             </p>
           </div>

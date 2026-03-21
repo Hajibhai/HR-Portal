@@ -145,69 +145,69 @@ const CopyAttendanceModal = ({ isOpen, onClose, onCopy, currentMonth }: any) => 
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white dark:border-slate-800"
+                className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white"
             >
-                <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div>
-                        <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Copy Attendance</h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">Replicate attendance patterns across dates</p>
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Copy Attendance</h2>
+                        <p className="text-slate-500 text-sm font-medium mt-1">Replicate attendance patterns across dates</p>
                     </div>
-                    <button onClick={onClose} className="p-3 hover:bg-white dark:hover:bg-slate-700 rounded-2xl transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 shadow-sm hover:shadow-md"><X className="w-5 h-5" /></button>
+                    <button onClick={onClose} className="p-3 hover:bg-white rounded-2xl transition-all text-slate-400 hover:text-slate-600 shadow-sm hover:shadow-md"><X className="w-5 h-5" /></button>
                 </div>
 
                 <div className="p-8 space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Source Date (Copy From)</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Source Date (Copy From)</label>
                         <div className="relative">
                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <input 
                                 type="date" 
                                 value={sourceDate}
                                 onChange={(e) => setSourceDate(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white"
+                                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Target Start Date</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Target Start Date</label>
                             <div className="relative">
                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input 
                                     type="date" 
                                     value={targetStartDate}
                                     onChange={(e) => setTargetStartDate(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Target End Date</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Target End Date</label>
                             <div className="relative">
                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input 
                                     type="date" 
                                     value={targetEndDate}
                                     onChange={(e) => setTargetEndDate(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/30 flex gap-3">
-                        <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-                        <p className="text-xs text-amber-700 dark:text-amber-300 font-medium leading-relaxed">
+                    <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex gap-3">
+                        <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+                        <p className="text-xs text-amber-700 font-medium leading-relaxed">
                             This will overwrite any existing attendance records in the target date range. This action cannot be undone.
                         </p>
                     </div>
                 </div>
 
-                <div className="p-8 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+                <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex justify-end gap-3">
                     <button 
                         onClick={onClose} 
-                        className="px-6 py-3 text-slate-500 dark:text-slate-400 font-bold text-sm hover:text-slate-700 dark:hover:text-white transition-colors"
+                        className="px-6 py-3 text-slate-500 font-bold text-sm hover:text-slate-700 transition-colors"
                     >
                         Cancel
                     </button>
@@ -253,19 +253,19 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, type = 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70]">
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200 border border-transparent dark:border-slate-800">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200 border border-transparent">
         <div className="flex items-center gap-3 mb-4">
-          <div className={`p-3 rounded-full ${type === 'danger' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'}`}>
+          <div className={`p-3 rounded-full ${type === 'danger' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`}>
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
+          <h3 className="text-xl font-bold text-gray-900">{title}</h3>
         </div>
-        <p className="text-gray-600 dark:text-slate-400 mb-8">{message}</p>
+        <p className="text-gray-600 mb-8">{message}</p>
         <div className="flex justify-end gap-3">
           <button 
             disabled={isSubmitting}
             onClick={onClose} 
-            className="px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg font-medium disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium disabled:opacity-50 transition-colors"
           >
             Cancel
           </button>
@@ -455,7 +455,7 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent dark:border-slate-800">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent">
                 <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
                     <div>
                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Offboard: {employee.name}</h2>
@@ -599,7 +599,7 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies, openConfirm 
     const [data, setData] = useState<Employee>(employee);
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent dark:border-slate-800">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent">
                 <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
                     <h2 className="text-lg font-bold text-gray-900 dark:text-white">Edit Employee</h2>
                     <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors"><X className="w-5 h-5 text-gray-500 dark:text-slate-400" /></button>
@@ -751,9 +751,9 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+                <div className="p-6 border-b flex justify-between items-center bg-white">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Onboard New Employee</h2>
                     <button onClick={onCancel} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                         <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
@@ -1779,7 +1779,7 @@ const AboutView = () => {
                 </div>
             </div>
 
-            <div className="bg-indigo-900 dark:bg-indigo-950 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+            <div className="bg-white rounded-2xl p-8 text-slate-900 border border-slate-200 shadow-xl relative overflow-hidden">
                 <div className="relative z-10">
                     <h3 className="text-xl font-bold mb-2">Al Reem DMS Enterprise</h3>
                     <p className="text-indigo-100 mb-6 max-w-lg">
@@ -1794,7 +1794,7 @@ const AboutView = () => {
                         </div>
                     </div>
                 </div>
-                <Building2 className="absolute -right-8 -bottom-8 w-64 h-64 text-white/5 rotate-12" />
+                <Building2 className="absolute -right-8 -bottom-8 w-64 h-64 text-slate-900/5 rotate-12" />
             </div>
         </div>
     );
@@ -1810,7 +1810,7 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={onClose}
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-white/60 backdrop-blur-sm"
             />
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -2068,7 +2068,7 @@ const OffboardingDetailsModal = ({ employee, onCancel }: { employee: Employee, o
                 </div>
 
                 <div className="p-6 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 flex justify-end">
-                    <button onClick={onCancel} className="px-8 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm shadow-lg transition-all hover:scale-105 active:scale-95">
+                    <button onClick={onCancel} className="px-8 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold text-sm shadow-lg transition-all hover:scale-105 active:scale-95">
                         Close Details
                     </button>
                 </div>
@@ -2094,23 +2094,6 @@ export default function App() {
   const [showAuditModal, setShowAuditModal] = useState(false);
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
-  const isDarkMode = false;
-  const setIsDarkMode = (_val: boolean) => {};
-
-  useEffect(() => {
-    // Force light mode and clear any stored preferences
-    const root = window.document.documentElement;
-    const body = window.document.body;
-    root.classList.remove('dark');
-    root.classList.remove('dark-theme');
-    body.classList.remove('dark');
-    body.classList.remove('dark-theme');
-    localStorage.setItem('theme', 'light');
-  }, []);
-
-  const handleToggleDarkMode = async () => {
-    // Disabled as per user request for white background
-  };
 
   const handlePasswordReset = async () => {
     if (!user?.email) return;
@@ -2506,8 +2489,6 @@ export default function App() {
       {activeTab === 'settings' && (
         <SettingsView 
           user={systemUser} 
-          isDarkMode={isDarkMode}
-          onToggleDarkMode={handleToggleDarkMode}
           onPasswordReset={handlePasswordReset}
         />
       )}
@@ -2673,7 +2654,7 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                     {(user.role === UserRole.CREATOR || user.role === UserRole.ADMIN || user.role === UserRole.HR) && (
                         <button 
                             onClick={onOpenOnboarding}
-                            className="flex-1 sm:flex-none bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                            className="flex-1 sm:flex-none bg-white text-slate-900 border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
                         >
                             <UserPlus className="w-4 h-4" /> Onboard Staff
                         </button>
@@ -2767,7 +2748,7 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                 </div>
 
                 {/* Quick Actions & Access */}
-                <div className="md:col-span-2 lg:col-span-2 bg-brand-600 dark:bg-brand-700 rounded-[2.5rem] p-8 text-white flex flex-col relative overflow-hidden group">
+                <div className="md:col-span-2 lg:col-span-2 bg-white rounded-[2.5rem] p-8 text-slate-900 border border-slate-200 flex flex-col relative overflow-hidden group">
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mb-20 transition-transform duration-700 group-hover:scale-110"></div>
                     
                     <div className="relative z-10 flex flex-col h-full">
@@ -2819,7 +2800,7 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold">{user.name}</p>
-                                    <p className="text-[10px] text-white/60 font-bold uppercase tracking-widest">Active Session</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Active Session</p>
                                 </div>
                             </div>
                         </div>
@@ -2884,10 +2865,8 @@ const ProfileView = ({ user }: { user: SystemUser }) => {
 };
 
 // --- Settings View ---
-const SettingsView = ({ user, isDarkMode, onToggleDarkMode, onPasswordReset }: { 
+const SettingsView = ({ user, onPasswordReset }: { 
     user: SystemUser, 
-    isDarkMode: boolean, 
-    onToggleDarkMode: () => void,
     onPasswordReset: () => void 
 }) => {
     const canManageSettings = user?.permissions?.canManageSettings;
@@ -3001,9 +2980,9 @@ const HelpCenterView = () => {
                 ))}
             </div>
 
-            <div className="bg-brand-600 rounded-[2.5rem] p-10 text-white text-center">
+            <div className="bg-white rounded-[2.5rem] p-10 text-slate-900 border border-slate-200 text-center">
                 <h3 className="text-2xl font-black mb-4">Need more help?</h3>
-                <p className="text-white/80 font-medium mb-8">Our support team is available 24/7 for technical assistance.</p>
+                <p className="text-slate-600 font-medium mb-8">Our support team is available 24/7 for technical assistance.</p>
                 <button className="px-8 py-4 bg-white text-brand-600 rounded-2xl font-black hover:bg-slate-50 transition-all shadow-xl shadow-brand-900/20">
                     Contact Support Team
                 </button>
@@ -3372,7 +3351,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
             {/* Rejoin Reason Modal */}
             <AnimatePresence>
                 {viewRejoinReason && (
-                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={() => setViewRejoinReason(null)}>
+                    <div className="fixed inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={() => setViewRejoinReason(null)}>
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -3411,7 +3390,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                             <div className="p-8 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
                                 <button 
                                     onClick={() => setViewRejoinReason(null)}
-                                    className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black hover:opacity-90 transition-all shadow-xl"
+                                    className="w-full py-4 bg-white text-slate-900 border border-slate-200 rounded-2xl font-black hover:opacity-90 transition-all shadow-xl"
                                 >
                                     Close Details
                                 </button>
@@ -3426,24 +3405,24 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
 
 const CompanyDocumentsModal = ({ company, onClose, onUpdate, openConfirm }: { company: Company, onClose: () => void, onUpdate: (c: Company) => void, openConfirm: any }) => {
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={onClose}>
+        <div className="fixed inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={onClose}>
             <motion.div 
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-2xl overflow-hidden border border-white dark:border-slate-800 flex flex-col max-h-[90vh]"
+                className="bg-white rounded-[3rem] shadow-2xl w-full max-w-2xl overflow-hidden border border-white flex flex-col max-h-[90vh]"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
+                <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                     <div className="flex items-center gap-5">
-                        <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                        <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-sm border border-slate-200 flex items-center justify-center overflow-hidden">
                             {company.logo ? (
                                 <img src={company.logo} alt={company.name} className="max-h-full max-w-full object-contain" />
                             ) : (
-                                <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                <Building2 className="w-8 h-8 text-slate-300" />
                             )}
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{company.name}</h3>
+                            <h3 className="text-2xl font-black text-slate-900 leading-tight">{company.name}</h3>
                             <div className="flex items-center gap-2 mt-1">
                                 <span className="px-2 py-0.5 bg-brand-600 text-white rounded-lg text-[10px] font-black uppercase tracking-wider">{company.code}</span>
                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Linked Documents</span>
@@ -3604,7 +3583,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                     {canManageSettings && (
                         <button 
                             onClick={() => setIsAdding(true)}
-                            className="w-full sm:w-auto bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                            className="w-full sm:w-auto bg-white text-slate-900 border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
                         >
                             <Plus className="w-4 h-4" /> Add Company
                         </button>
@@ -3915,16 +3894,16 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose,
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={onClose}>
+        <div className="fixed inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center z-[100] p-4" onClick={onClose}>
             <motion.div 
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white dark:border-slate-800 flex flex-col max-h-[90vh]"
+                className="bg-white rounded-[3rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white flex flex-col max-h-[90vh]"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
+                <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                     <div className="flex items-center gap-5">
-                        <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-2xl font-black text-brand-600 overflow-hidden">
+                        <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-sm border border-slate-200 flex items-center justify-center text-2xl font-black text-brand-600 overflow-hidden">
                             {employee.profileImage ? (
                                 <img src={employee.profileImage} alt={employee.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                             ) : (
@@ -3932,7 +3911,7 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose,
                             )}
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{employee.name}</h3>
+                            <h3 className="text-2xl font-black text-slate-900 leading-tight">{employee.name}</h3>
                             <div className="flex items-center gap-2 mt-1">
                                 <span className="px-2 py-0.5 bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 rounded-lg text-[10px] font-black uppercase tracking-wider">{employee.code}</span>
                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
@@ -4934,7 +4913,7 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
      );
 };
 
-const ReportsView = ({ employees, attendance, isDarkMode }: any) => {
+const ReportsView = ({ employees, attendance }: any) => {
     const activeStaff = useMemo(() => employees.filter((e: any) => e.active), [employees]);
     
     const totalStaff = activeStaff.length;
