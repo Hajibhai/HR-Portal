@@ -32,7 +32,7 @@ service cloud.firestore {
         (hasPermission('canManageSettings') || hasPermission('canManageUsers') || hasPermission('canManageEmployees'))
       );
       allow create: if isAuthenticated();
-      allow update, delete: if false;
+      allow update, delete: if isAdmin();
     }
 
     match /users/{userId} {

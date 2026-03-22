@@ -1896,6 +1896,7 @@ const AuditLogModal = ({ isOpen, onClose, logs, currentUser }: { isOpen: boolean
     const [userFilter, setUserFilter] = useState<string>('all');
     const [editingLog, setEditingLog] = useState<AuditLog | null>(null);
     const [editDetails, setEditDetails] = useState('');
+    const [deletingLogId, setDeletingLogId] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
@@ -1939,12 +1940,11 @@ const AuditLogModal = ({ isOpen, onClose, logs, currentUser }: { isOpen: boolean
     });
 
     const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this log entry?')) {
-            try {
-                await deleteAuditLog(id);
-            } catch (error) {
-                console.error("Failed to delete log:", error);
-            }
+        try {
+            await deleteAuditLog(id);
+            setDeletingLogId(null);
+        } catch (error) {
+            console.error("Failed to delete log:", error);
         }
     };
 
@@ -2073,21 +2073,41 @@ const AuditLogModal = ({ isOpen, onClose, logs, currentUser }: { isOpen: boolean
                                                     <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
                                                     {isAdmin && (
                                                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button 
-                                                                onClick={() => {
-                                                                    setEditingLog(log);
-                                                                    setEditDetails(log.details);
-                                                                }}
-                                                                className="p-2 hover:bg-brand-50 text-brand-600 rounded-xl transition-all"
-                                                            >
-                                                                <Edit className="w-4 h-4" />
-                                                            </button>
-                                                            <button 
-                                                                onClick={() => handleDelete(log.id)}
-                                                                className="p-2 hover:bg-red-50 text-red-600 rounded-xl transition-all"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
+                                                            {deletingLogId === log.id ? (
+                                                                <div className="flex items-center gap-2 bg-red-50 p-1.5 rounded-xl border border-red-100 animate-in fade-in zoom-in duration-200">
+                                                                    <span className="text-[10px] font-black text-red-600 uppercase tracking-widest px-2">Confirm?</span>
+                                                                    <button 
+                                                                        onClick={() => handleDelete(log.id)}
+                                                                        className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all shadow-sm"
+                                                                    >
+                                                                        <Check className="w-3 h-3" />
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={() => setDeletingLogId(null)}
+                                                                        className="p-1.5 bg-white text-slate-400 rounded-lg hover:text-slate-600 border border-slate-200 transition-all"
+                                                                    >
+                                                                        <X className="w-3 h-3" />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <button 
+                                                                        onClick={() => {
+                                                                            setEditingLog(log);
+                                                                            setEditDetails(log.details);
+                                                                        }}
+                                                                        className="p-2 hover:bg-brand-50 text-brand-600 rounded-xl transition-all"
+                                                                    >
+                                                                        <Edit className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={() => setDeletingLogId(log.id)}
+                                                                        className="p-2 hover:bg-red-50 text-red-600 rounded-xl transition-all"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
@@ -2444,17 +2464,7 @@ export default function App() {
       return;
     }
 
-    if (isCreator) {
-      q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(50));
-    } else {
-      // Admins can only see non-creator logs
-      q = query(
-        collection(db, 'audit_logs'), 
-        where('isCreator', '==', false),
-        orderBy('timestamp', 'desc'), 
-        limit(50)
-      );
-    }
+    q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(500));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setAuditLogs(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as AuditLog)));
