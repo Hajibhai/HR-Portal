@@ -1415,6 +1415,77 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
     );
 };
 
+const ReorderCompaniesModal = ({ companies, onClose, onReorder }: { companies: Company[], onClose: () => void, onReorder: (newOrder: Company[]) => void }) => {
+    const [items, setItems] = useState(companies);
+
+    const handleSave = () => {
+        onReorder(items);
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]"
+            >
+                <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <div>
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Reorder Companies</h2>
+                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mt-1">Drag to adjust display order</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-white rounded-full transition-colors shadow-sm"><X className="w-5 h-5 text-slate-400" /></button>
+                </div>
+                
+                <div className="p-8 overflow-y-auto flex-1">
+                    <Reorder.Group axis="y" values={items} onReorder={setItems} className="space-y-3">
+                        {items.map((item) => (
+                            <Reorder.Item 
+                                key={item.id} 
+                                value={item}
+                                className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center gap-4 cursor-grab active:cursor-grabbing hover:bg-white hover:border-brand-200 transition-all group"
+                            >
+                                <div className="p-2 bg-white rounded-xl shadow-sm text-slate-300 group-hover:text-brand-500 transition-colors">
+                                    <GripVertical className="w-4 h-4" />
+                                </div>
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div className="h-8 w-8 bg-white rounded-lg border border-slate-100 p-1 flex items-center justify-center flex-shrink-0">
+                                        {item.logo ? (
+                                            <img src={item.logo} alt="" className="max-h-full max-w-full object-contain" />
+                                        ) : (
+                                            <Building2 className="w-4 h-4 text-slate-300" />
+                                        )}
+                                    </div>
+                                    <div className="truncate">
+                                        <div className="text-sm font-black text-slate-900 truncate">{item.name}</div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.code}</div>
+                                    </div>
+                                </div>
+                            </Reorder.Item>
+                        ))}
+                    </Reorder.Group>
+                </div>
+
+                <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex gap-4">
+                    <button 
+                        onClick={onClose}
+                        className="flex-1 px-6 py-3 text-slate-500 font-bold text-sm hover:text-slate-700 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={handleSave}
+                        className="flex-1 px-6 py-3 bg-brand-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-brand-600/20 hover:bg-brand-700 transition-all active:scale-95"
+                    >
+                        Save Order
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
 const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onClose: () => void, companies: Company[], openConfirm: (title: string, message: string, onConfirm: () => void, type?: 'danger' | 'warning') => void, onLog: any }) => {
     const [formData, setFormData] = useState({
         code: '',
@@ -1425,6 +1496,7 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
         logo: ''
     });
     const [isAdding, setIsAdding] = useState(false);
+    const [isReordering, setIsReordering] = useState(false);
 
     const handleAdd = async () => {
         if (!formData.name.trim() || !formData.code.trim()) return;
@@ -1482,18 +1554,36 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                 </div>
                 
                 <div className="p-6 space-y-6 overflow-y-auto">
+                    {isReordering && (
+                        <ReorderCompaniesModal 
+                            companies={companies}
+                            onClose={() => setIsReordering(false)}
+                            onReorder={async (newOrder) => {
+                                await reorderCompanies(newOrder);
+                                onLog('Companies Reordered', 'The display order of companies was updated.', 'update');
+                            }}
+                        />
+                    )}
                     {/* Add New Company Form */}
                     <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 space-y-4">
                         <div className="flex justify-between items-center">
                             <h3 className="text-sm font-bold text-indigo-900">Add New Company</h3>
-                            {!isAdding && (
+                            <div className="flex gap-3">
                                 <button 
-                                    onClick={() => setIsAdding(true)}
-                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+                                    onClick={() => setIsReordering(true)}
+                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
                                 >
-                                    + Create New
+                                    <GripVertical className="w-3 h-3" /> Reorder
                                 </button>
-                            )}
+                                {!isAdding && (
+                                    <button 
+                                        onClick={() => setIsAdding(true)}
+                                        className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+                                    >
+                                        + Create New
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {isAdding && (
@@ -3463,6 +3553,7 @@ const CompanyDocumentsModal = ({ company, onClose, onUpdate, openConfirm }: { co
 const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Company[], openConfirm: any, onUpdate: (c: Company) => void, user: SystemUser }) => {
     const [formData, setFormData] = useState({ code: '', name: '', address: '', email: '', phone: '', logo: '' });
     const [isAdding, setIsAdding] = useState(false);
+    const [isReordering, setIsReordering] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [viewingDocsCompany, setViewingDocsCompany] = useState<Company | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -3581,12 +3672,20 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                     </div>
 
                     {canManageSettings && (
-                        <button 
-                            onClick={() => setIsAdding(true)}
-                            className="w-full sm:w-auto bg-white text-slate-900 border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
-                        >
-                            <Plus className="w-4 h-4" /> Add Company
-                        </button>
+                        <div className="flex gap-3 w-full sm:w-auto">
+                            <button 
+                                onClick={() => setIsReordering(true)}
+                                className="flex-1 sm:flex-none bg-white text-slate-600 border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+                            >
+                                <GripVertical className="w-4 h-4" /> Reorder
+                            </button>
+                            <button 
+                                onClick={() => setIsAdding(true)}
+                                className="flex-1 sm:flex-none bg-white text-slate-900 border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                            >
+                                <Plus className="w-4 h-4" /> Add Company
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -3752,6 +3851,12 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                         value={company.phone || ''}
                                         onChange={e => updateCompany({ ...company, phone: e.target.value })}
                                     />
+                                    <input 
+                                        className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
+                                        placeholder="Office Address"
+                                        value={company.address || ''}
+                                        onChange={e => updateCompany({ ...company, address: e.target.value })}
+                                    />
                                     <div className="flex gap-2 pt-2">
                                         <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Cancel</button>
                                         <button onClick={() => handleUpdate(company)} className="flex-1 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-md shadow-brand-600/20">Save</button>
@@ -3850,6 +3955,14 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                     onClose={() => setViewingDocsCompany(null)}
                     onUpdate={onUpdate}
                     openConfirm={openConfirm}
+                />
+            )}
+
+            {isReordering && (
+                <ReorderCompaniesModal 
+                    companies={sortedCompanies}
+                    onClose={() => setIsReordering(false)}
+                    onReorder={handleReorder}
                 />
             )}
         </div>
