@@ -652,6 +652,20 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies, openConfirm 
                              </div>
                              <div><label className="text-xs font-semibold text-gray-500 uppercase">Code</label><input disabled type="text" value={data.code || ''} className="w-full p-2 border rounded-lg mt-1 bg-gray-100 text-gray-500" /></div>
                              <div><label className="text-xs font-semibold text-gray-500 uppercase">Name</label><input type="text" value={data.name || ''} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Mobile Number</label><input type="text" value={data.mobileNumber || ''} onChange={e => setData({...data, mobileNumber: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div>
+                                 <label className="text-xs font-semibold text-gray-500 uppercase">Staff Type</label>
+                                 <input 
+                                     list="staff-types-edit"
+                                     value={data.type || ''} 
+                                     onChange={e => setData({...data, type: e.target.value})} 
+                                     className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900"
+                                     placeholder="Select or type staff type"
+                                 />
+                                 <datalist id="staff-types-edit">
+                                     {Object.values(StaffType).map(t => <option key={t} value={t} />)}
+                                 </datalist>
+                             </div>
                              <div><label className="text-xs font-semibold text-gray-500 uppercase">Designation</label><input type="text" value={data.designation || ''} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
                              <div><label className="text-xs font-semibold text-gray-500 uppercase">Department</label><input type="text" value={data.department || ''} onChange={e => setData({...data, department: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
                              <div className="col-span-2"><label className="text-xs font-semibold text-gray-500 uppercase">Company</label>
@@ -918,15 +932,16 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Staff Type *</label>
-                                    <select 
+                                    <input 
+                                        list="staff-types-onboarding"
                                         value={data.type||''} 
-                                        onChange={e=>setData({...data, type:e.target.value as any})} 
+                                        onChange={e=>setData({...data, type:e.target.value})} 
                                         className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900"
-                                    >
-                                        <option value={StaffType.OFFICE}>{StaffType.OFFICE}</option>
-                                        <option value={StaffType.WORKER}>{StaffType.WORKER}</option>
-                                        <option value={StaffType.BRANCH}>{StaffType.BRANCH}</option>
-                                    </select>
+                                        placeholder="Select or type staff type"
+                                    />
+                                    <datalist id="staff-types-onboarding">
+                                        {Object.values(StaffType).map(t => <option key={t} value={t} />)}
+                                    </datalist>
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Work Location</label>
@@ -3489,7 +3504,14 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                 </div>
                                                 <div>
                                                     <div className="font-black text-slate-900 text-base">{e.name}</div>
-                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{e.code}</div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{e.code}</div>
+                                                        {e.mobileNumber && (
+                                                            <div className="text-[10px] font-black text-brand-600 uppercase tracking-widest flex items-center gap-1">
+                                                                <Phone className="w-2.5 h-2.5" /> {e.mobileNumber}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>

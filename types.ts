@@ -1,8 +1,10 @@
 
 export enum StaffType {
-  OFFICE = 'Staff',
-  WORKER = 'Worker',
+  PART_TIME = 'Part-time',
+  OFFICE = 'Office Staff',
   BRANCH = 'Branch Staff',
+  WORKER = 'Worker',
+  DRIVER = 'Driver',
 }
 
 export enum ShiftType {
@@ -63,7 +65,7 @@ export interface Employee {
   designation: string; // e.g., Helper, Driver
   department: string; // e.g., Cleaning, Maintenance
   joiningDate: string;
-  type: StaffType; // Staff / Worker
+  type: StaffType | string; // Staff / Worker
   company: string; // Specific entity name
   status: 'Active' | 'Inactive';
   team: 'Internal Team' | 'External Team' | 'Office Staff';
