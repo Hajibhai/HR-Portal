@@ -837,7 +837,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="e.g. 1001" 
                                         value={data.code||''} 
                                         onChange={e=>setData({...data, code:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -846,7 +846,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="John Doe" 
                                         value={data.name||''} 
                                         onChange={e=>setData({...data, name:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -854,7 +854,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     <select 
                                         value={data.company||''} 
                                         onChange={e=>setData({...data, company:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900"
                                     >
                                         <option value="">Select Company</option>
                                         {companies.map(c=><option key={c.id} value={c.name}>{c.code} - {c.name}</option>)}
@@ -866,7 +866,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="date" 
                                         value={data.joiningDate||''} 
                                         onChange={e=>setData({...data, joiningDate:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -875,7 +875,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="e.g. +971 ..." 
                                         value={data.mobileNumber||''} 
                                         onChange={e=>setData({...data, mobileNumber:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                             </div>
@@ -892,7 +892,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="e.g. Driver" 
                                         value={data.designation||''} 
                                         onChange={e=>setData({...data, designation:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -901,7 +901,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="e.g. Transport" 
                                         value={data.department||''} 
                                         onChange={e=>setData({...data, department:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -909,7 +909,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     <select 
                                         value={data.team||''} 
                                         onChange={e=>setData({...data, team:e.target.value as any})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900"
                                     >
                                         <option value="Internal Team">Internal Team</option>
                                         <option value="External Team">External Team</option>
@@ -921,7 +921,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     <select 
                                         value={data.type||''} 
                                         onChange={e=>setData({...data, type:e.target.value as any})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900"
                                     >
                                         <option value={StaffType.OFFICE}>{StaffType.OFFICE}</option>
                                         <option value={StaffType.WORKER}>{StaffType.WORKER}</option>
@@ -934,7 +934,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="e.g. Dubai" 
                                         value={data.workLocation||''} 
                                         onChange={e=>setData({...data, workLocation:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                             </div>
@@ -951,7 +951,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="number" 
                                         value={data.salary?.basic ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, basic:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -960,7 +960,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="number" 
                                         value={data.salary?.housing ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, housing:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -969,7 +969,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="number" 
                                         value={data.salary?.transport ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, transport:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -978,7 +978,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="number" 
                                         value={data.salary?.airTicket ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, airTicket:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -987,7 +987,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="number" 
                                         value={data.salary?.leaveSalary ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, leaveSalary:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -996,7 +996,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="number" 
                                         value={data.salary?.other ?? 0} 
                                         onChange={e=>setData({...data, salary:{...data.salary!, other:Number(e.target.value)}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                             </div>
@@ -1007,7 +1007,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="e.g. Emirates NBD" 
                                         value={data.bankName||''} 
                                         onChange={e=>setData({...data, bankName:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -1016,7 +1016,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="AE00 0000 0000 0000 0000 000" 
                                         value={data.iban||''} 
                                         onChange={e=>setData({...data, iban:e.target.value})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                             </div>
@@ -1033,7 +1033,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="784-..." 
                                         value={data.documents?.emiratesId||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, emiratesId:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -1042,7 +1042,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="date" 
                                         value={data.documents?.emiratesIdExpiry||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, emiratesIdExpiry:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -1051,7 +1051,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         placeholder="e.g. N1234567" 
                                         value={data.documents?.passportNumber||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, passportNumber:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -1060,7 +1060,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                         type="date" 
                                         value={data.documents?.passportExpiry||''} 
                                         onChange={e=>setData({...data, documents:{...data.documents!, passportExpiry:e.target.value}})} 
-                                        className="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white text-gray-900" 
                                     />
                                 </div>
                             </div>
@@ -1588,19 +1588,19 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Registered Companies ({companies.length})</h3>
                         <div className="grid gap-4">
                             {companies.map(c => (
-                                <div key={c.id} className="p-4 border dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 shadow-sm hover:shadow-md dark:hover:shadow-none transition-shadow space-y-4 relative group">
+                                <div key={c.id} className="p-4 border rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow space-y-4 relative group">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
                                             {c.logo ? (
-                                                <img src={c.logo} alt={c.name} className="h-10 w-10 object-contain rounded-lg border dark:border-slate-800 p-1 bg-gray-50 dark:bg-slate-800" />
+                                                <img src={c.logo} alt={c.name} className="h-10 w-10 object-contain rounded-lg border p-1 bg-gray-50" />
                                             ) : (
-                                                <div className="h-10 w-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg">
+                                                <div className="h-10 w-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-lg">
                                                     {c.name.charAt(0)}
                                                 </div>
                                             )}
                                             <div>
-                                                <h3 className="font-bold text-gray-800 dark:text-white text-sm">{c.name}</h3>
-                                                <p className="text-[10px] text-gray-400 dark:text-slate-500">ID: {c.id}</p>
+                                                <h3 className="font-bold text-gray-800 text-sm">{c.name}</h3>
+                                                <p className="text-[10px] text-gray-400">ID: {c.id}</p>
                                             </div>
                                         </div>
                                         <button 
@@ -1616,7 +1616,7 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-bold text-gray-400 uppercase">Company Code</label>
                                             <input 
-                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
+                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 text-gray-900" 
                                                 value={c.code || ''} 
                                                 onChange={e => handleUpdate({...c, code: e.target.value})} 
                                             />
@@ -1624,7 +1624,7 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-bold text-gray-400 uppercase">Address</label>
                                             <input 
-                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
+                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 text-gray-900" 
                                                 value={c.address || ''} 
                                                 onChange={e => handleUpdate({...c, address: e.target.value})} 
                                             />
@@ -1632,7 +1632,7 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-bold text-gray-400 uppercase">Email</label>
                                             <input 
-                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
+                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 text-gray-900" 
                                                 value={c.email || ''} 
                                                 onChange={e => handleUpdate({...c, email: e.target.value})} 
                                             />
@@ -1640,7 +1640,7 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-bold text-gray-400 uppercase">Phone</label>
                                             <input 
-                                                className="w-full p-2 border border-gray-100 dark:border-slate-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 dark:bg-slate-800/30 text-gray-900 dark:text-white" 
+                                                className="w-full p-2 border border-gray-100 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50/30 text-gray-900" 
                                                 value={c.phone || ''} 
                                                 onChange={e => handleUpdate({...c, phone: e.target.value})} 
                                             />
@@ -1830,9 +1830,9 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                     </div>
                     <button 
                         onClick={onClose}
-                        className="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-95"
+                        className="p-3 hover:bg-slate-50 rounded-2xl transition-all active:scale-95"
                     >
-                        <X className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                        <X className="w-6 h-6 text-slate-400" />
                     </button>
                 </div>
 
@@ -1859,18 +1859,18 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                                             </div>
                                             <p className="text-slate-600 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
                                             <div className="flex flex-wrap items-center gap-4">
-                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl">
                                                     <div className="w-2 h-2 rounded-full bg-brand-500"></div>
-                                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">User: {log.userName}</span>
+                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">User: {log.userName}</span>
                                                 </div>
-                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl">
                                                     <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role: {log.userRole}</span>
+                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Role: {log.userRole}</span>
                                                 </div>
                                                 {log.isCreator && (
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl">
-                                                        <ShieldCheck className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                                                        <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider">Creator Log</span>
+                                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-100 rounded-xl">
+                                                        <ShieldCheck className="w-3 h-3 text-amber-600" />
+                                                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider">Creator Log</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -1880,9 +1880,9 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                             ))
                         ) : (
                             <div className="py-20 text-center">
-                                <Activity className="w-16 h-16 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
-                                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">No audit records found</h3>
-                                <p className="text-slate-400 dark:text-slate-500 font-bold mt-2">System activity will appear here as it happens.</p>
+                                <Activity className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight">No audit records found</h3>
+                                <p className="text-slate-400 font-bold mt-2">System activity will appear here as it happens.</p>
                             </div>
                         )}
                     </div>
@@ -2049,12 +2049,12 @@ const OffboardingDetailsModal = ({ employee, onCancel }: { employee: Employee, o
                                         href={details.settlementLink} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="px-4 py-2 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-brand-600 dark:text-brand-400 transition-all flex items-center gap-2"
+                                        className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-brand-600 transition-all flex items-center gap-2"
                                     >
                                         <Download className="w-3 h-3" /> Download
                                     </a>
                                 </div>
-                                <div className="aspect-video bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden relative group">
+                                <div className="aspect-video bg-white rounded-xl border border-slate-200 overflow-hidden relative group">
                                     <iframe 
                                         src={details.settlementLink.includes('drive.google.com') ? details.settlementLink.replace('/view', '/preview') : details.settlementLink} 
                                         className="w-full h-full border-none"
@@ -2067,7 +2067,7 @@ const OffboardingDetailsModal = ({ employee, onCancel }: { employee: Employee, o
                     )}
                 </div>
 
-                <div className="p-6 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 flex justify-end">
+                <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
                     <button onClick={onCancel} className="px-8 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold text-sm shadow-lg transition-all hover:scale-105 active:scale-95">
                         Close Details
                     </button>
@@ -2764,11 +2764,11 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                                 {showQuickAdminMenu && (
                                     <>
                                         <div className="fixed inset-0 z-10" onClick={() => setShowQuickAdminMenu(false)}></div>
-                                        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-20 text-slate-900 dark:text-white">
+                                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-20 text-slate-900">
                                             {(user.role === UserRole.CREATOR || canManageUsers) && (
                                                 <button 
                                                     onClick={() => { onOpenUserManagement(); setShowQuickAdminMenu(false); }}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
+                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-brand-600 transition-all"
                                                 >
                                                     <UserCog className="w-4 h-4" /> System User Management
                                                 </button>
@@ -2776,7 +2776,7 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
                                             {(user.role === UserRole.CREATOR || canManageSettings) && (
                                                 <button 
                                                     onClick={() => { onOpenManageCompanies(); setShowQuickAdminMenu(false); }}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all"
+                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-brand-600 transition-all"
                                                 >
                                                     <Building2 className="w-4 h-4" /> Manage Companies
                                                 </button>
@@ -2816,13 +2816,13 @@ const DashboardView = ({ employees, attendance, user, auditLogs, setShowAuditMod
 const ProfileView = ({ user }: { user: SystemUser }) => {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden relative">
+            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-32 bg-brand-600"></div>
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="w-32 h-32 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center text-4xl font-black text-brand-600 shadow-xl border-4 border-white dark:border-slate-700 mb-4">
+                    <div className="w-32 h-32 bg-white rounded-3xl flex items-center justify-center text-4xl font-black text-brand-600 shadow-xl border-4 border-white mb-4">
                         {user.name.charAt(0)}
                     </div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">{user.name}</h2>
+                    <h2 className="text-2xl font-black text-slate-900">{user.name}</h2>
                     <p className="text-brand-600 font-bold uppercase tracking-widest text-xs mt-1">{user.role}</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-12">
@@ -2874,11 +2874,11 @@ const SettingsView = ({ user, onPasswordReset }: {
     if (!canManageSettings && user.role !== UserRole.CREATOR) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8">
-                <div className="w-20 h-20 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-6">
-                    <ShieldAlert className="w-10 h-10 text-red-600 dark:text-red-400" />
+                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+                    <ShieldAlert className="w-10 h-10 text-red-600" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h2>
-                <p className="text-slate-500 dark:text-slate-400 max-w-md">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h2>
+                <p className="text-slate-500 max-w-md">
                     You do not have permission to access system settings. Please contact your administrator if you believe this is an error.
                 </p>
             </div>
@@ -2892,8 +2892,8 @@ const SettingsView = ({ user, onPasswordReset }: {
                     <Settings className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight dark:text-white">Account Settings</h2>
-                    <p className="text-slate-500 font-medium dark:text-slate-400">Manage your system preferences and security</p>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">Account Settings</h2>
+                    <p className="text-slate-500 font-medium">Manage your system preferences and security</p>
                 </div>
             </div>
 
@@ -2957,23 +2957,23 @@ const HelpCenterView = () => {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center gap-4 mb-2">
-                <div className="p-3 bg-brand-50 rounded-2xl dark:bg-brand-900/20">
+                <div className="p-3 bg-brand-50 rounded-2xl">
                     <HelpCircle className="w-6 h-6 text-brand-600" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Help Center</h2>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium">Instructions and guides for Al Reem DMS</p>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Help Center</h2>
+                    <p className="text-slate-500 font-medium">Instructions and guides for Al Reem DMS</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6">
                 {instructions.map((item, idx) => (
-                    <div key={idx} className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm">
-                        <h3 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-3">
-                            <span className="w-8 h-8 bg-brand-50 dark:bg-brand-900/20 text-brand-600 rounded-xl flex items-center justify-center text-sm">{idx + 1}</span>
+                    <div key={idx} className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm">
+                        <h3 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-3">
+                            <span className="w-8 h-8 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-sm">{idx + 1}</span>
                             {item.title}
                         </h3>
-                        <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium pl-11">
+                        <p className="text-slate-600 leading-relaxed font-medium pl-11">
                             {item.content}
                         </p>
                     </div>
@@ -3019,10 +3019,10 @@ const BentoStatCard = ({ title, value, trend, isUp, icon: Icon, color }: any) =>
 
 const ActivityItem = ({ icon: Icon, title, desc, time, color }: any) => {
     const colors: any = {
-        brand: "bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-400",
-        emerald: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
-        orange: "bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400",
-        indigo: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400",
+        brand: "bg-brand-50 text-brand-600",
+        emerald: "bg-emerald-50 text-emerald-600",
+        orange: "bg-orange-50 text-orange-600",
+        indigo: "bg-indigo-50 text-indigo-600",
     };
 
     return (
@@ -3032,12 +3032,12 @@ const ActivityItem = ({ icon: Icon, title, desc, time, color }: any) => {
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{title}</h4>
+                    <h4 className="text-sm font-bold text-slate-900 truncate">{title}</h4>
                     <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap uppercase tracking-widest">{time}</span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">{desc}</p>
+                <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{desc}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-700 group-hover:text-brand-600 transition-colors self-center" />
+            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-600 transition-colors self-center" />
         </div>
     );
 };
@@ -3317,7 +3317,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                 {canManageEmployees && (
                                                     <button 
                                                         onClick={() => onDelete?.(e)} 
-                                                        className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800 active:scale-90"
+                                                        className="p-2.5 hover:bg-white hover:shadow-lg text-slate-400 hover:text-red-600 rounded-xl transition-all border border-transparent hover:border-slate-100 active:scale-90"
                                                         title="Delete"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
@@ -3333,14 +3333,14 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                 </div>
                 {filteredEmployees.length === 0 && (
                     <div className="p-32 text-center">
-                        <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-slate-700 shadow-inner">
-                            <Users className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+                        <div className="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-slate-100 shadow-inner">
+                            <Users className="w-10 h-10 text-slate-300" />
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">No personnel found</h3>
-                        <p className="text-slate-400 dark:text-slate-500 font-medium max-w-xs mx-auto mt-2">We couldn't find any records matching your current search or filter criteria.</p>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight">No personnel found</h3>
+                        <p className="text-slate-400 font-medium max-w-xs mx-auto mt-2">We couldn't find any records matching your current search or filter criteria.</p>
                         <button 
                             onClick={() => { setSearchTerm(''); setCompanyFilter('All'); setDeptFilter('All'); }}
-                            className="mt-6 text-sm font-black text-brand-600 dark:text-brand-400 hover:underline"
+                            className="mt-6 text-sm font-black text-brand-600 hover:underline"
                         >
                             Reset all filters
                         </button>
@@ -3429,7 +3429,7 @@ const CompanyDocumentsModal = ({ company, onClose, onUpdate, openConfirm }: { co
                             </div>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-3 hover:bg-white dark:hover:bg-slate-700 rounded-2xl transition-all active:scale-90 shadow-sm">
+                    <button onClick={onClose} className="p-3 hover:bg-white rounded-2xl transition-all active:scale-90 shadow-sm">
                         <X className="w-6 h-6 text-slate-400" />
                     </button>
                 </div>
@@ -3554,8 +3554,8 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                         <Building2 className="w-4 h-4" />
                         Organization Management
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Company Directory</h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl">
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Company Directory</h1>
+                    <p className="text-slate-500 font-medium max-w-xl">
                         Manage your business entities, office locations, and corporate identities.
                     </p>
                 </div>
@@ -3568,12 +3568,12 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                             placeholder="Search companies or documents..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-sm"
+                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-sm"
                         />
                         {searchTerm && (
                             <button 
                                 onClick={() => setSearchTerm('')}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded-lg transition-colors"
                             >
                                 <X className="w-3 h-3 text-slate-400" />
                             </button>
@@ -3595,54 +3595,54 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-brand-100 dark:border-brand-900 shadow-xl shadow-brand-900/5 dark:shadow-none space-y-6"
+                    className="bg-white rounded-[2.5rem] p-8 border border-brand-100 shadow-xl shadow-brand-900/5 space-y-6"
                 >
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Register New Company</h3>
-                        <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400 dark:text-slate-500" /></button>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Register New Company</h3>
+                        <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Company Code</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Company Code</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
                                 placeholder="e.g. A1" 
                                 value={formData.code} 
                                 onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Company Name</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Company Name</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
                                 placeholder="Legal Entity Name" 
                                 value={formData.name} 
                                 onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Official Email</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Official Email</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
                                 placeholder="contact@company.com" 
                                 value={formData.email} 
                                 onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Contact Number</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Contact Number</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
                                 placeholder="+971 50 123 4567" 
                                 value={formData.phone} 
                                 onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} 
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Office Address</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Office Address</label>
                             <input 
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all dark:text-white dark:placeholder:text-slate-600" 
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-brand-500 outline-none transition-all" 
                                 placeholder="Full Physical Address" 
                                 value={formData.address} 
                                 onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))} 
@@ -3650,7 +3650,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800">
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                         <div className="flex items-center gap-4">
                             <div className="relative group">
                                 <input 
@@ -3659,18 +3659,18 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                     onChange={e => handleLogoUpload(null, e)}
                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                 />
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-all">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 group-hover:bg-slate-50 transition-all">
                                     <Globe className="w-4 h-4" /> Upload Logo
                                 </div>
                             </div>
                             {formData.logo && (
-                                <div className="h-10 w-10 rounded-xl border border-slate-100 dark:border-slate-800 p-1 bg-white dark:bg-slate-900 shadow-sm">
+                                <div className="h-10 w-10 rounded-xl border border-slate-100 p-1 bg-white shadow-sm">
                                     <img src={formData.logo} alt="Preview" className="h-full w-full object-contain" />
                                 </div>
                             )}
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={() => setIsAdding(false)} className="px-6 py-2.5 text-slate-500 dark:text-slate-400 font-bold text-sm hover:text-slate-700 dark:hover:text-white">Cancel</button>
+                            <button onClick={() => setIsAdding(false)} className="px-6 py-2.5 text-slate-500 font-bold text-sm hover:text-slate-700">Cancel</button>
                             <button onClick={handleAdd} className="px-8 py-2.5 bg-brand-600 text-white rounded-xl font-black text-sm shadow-lg shadow-brand-600/20 hover:bg-brand-700 transition-all active:scale-95">Create Company</button>
                         </div>
                     </div>
@@ -3688,23 +3688,23 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                         value={company}
                         key={company.id}
                         dragListener={!searchTerm && canManageSettings}
-                        className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-black/50 transition-all group relative overflow-hidden cursor-default"
+                        className="bg-white rounded-[2.5rem] p-8 border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-slate-200/20 transition-all group relative overflow-hidden cursor-default"
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 dark:bg-slate-800 rounded-full -mr-16 -mt-16 transition-all group-hover:bg-brand-50/50 dark:group-hover:bg-brand-900/20"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 transition-all group-hover:bg-brand-50/50"></div>
                         
                         <div className="relative z-10 flex flex-col h-full">
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-4">
                                     {!searchTerm && canManageSettings && (
-                                        <div className="cursor-grab active:cursor-grabbing p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-300 dark:text-slate-600 hover:text-slate-500 transition-colors">
+                                        <div className="cursor-grab active:cursor-grabbing p-2 hover:bg-slate-100 rounded-xl text-slate-300 hover:text-slate-500 transition-colors">
                                             <GripVertical className="w-5 h-5" />
                                         </div>
                                     )}
-                                    <div className="h-16 w-16 bg-slate-50 dark:bg-slate-800 rounded-2xl p-2 border border-slate-100 dark:border-slate-700 shadow-inner flex items-center justify-center overflow-hidden">
+                                    <div className="h-16 w-16 bg-slate-50 rounded-2xl p-2 border border-slate-100 shadow-inner flex items-center justify-center overflow-hidden">
                                         {company.logo ? (
                                             <img src={company.logo} alt={company.name} className="max-h-full max-w-full object-contain" />
                                         ) : (
-                                            <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                            <Building2 className="w-8 h-8 text-slate-300" />
                                         )}
                                     </div>
                                 </div>
@@ -3713,13 +3713,13 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                         <>
                                             <button 
                                                 onClick={() => setEditingId(company.id)}
-                                                className="p-2 hover:bg-brand-50 dark:hover:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-xl transition-colors"
+                                                className="p-2 hover:bg-brand-50 text-brand-600 rounded-xl transition-colors"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </button>
                                             <button 
                                                 onClick={() => handleDelete(company.id)}
-                                                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl transition-colors"
+                                                className="p-2 hover:bg-red-50 text-red-600 rounded-xl transition-colors"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -3731,29 +3731,29 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                             {editingId === company.id ? (
                                 <div className="space-y-4 animate-in fade-in duration-200">
                                     <input 
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+                                        className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
                                         placeholder="Company Code"
                                         value={company.code || ''}
                                         onChange={e => updateCompany({ ...company, code: e.target.value })}
                                     />
                                     <input 
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+                                        className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
                                         value={company.name || ''}
                                         onChange={e => updateCompany({ ...company, name: e.target.value })}
                                     />
                                     <input 
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+                                        className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
                                         value={company.email || ''}
                                         onChange={e => updateCompany({ ...company, email: e.target.value })}
                                     />
                                     <input 
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+                                        className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500"
                                         placeholder="Contact Number"
                                         value={company.phone || ''}
                                         onChange={e => updateCompany({ ...company, phone: e.target.value })}
                                     />
                                     <div className="flex gap-2 pt-2">
-                                        <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-bold">Cancel</button>
+                                        <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Cancel</button>
                                         <button onClick={() => handleUpdate(company)} className="flex-1 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-md shadow-brand-600/20">Save</button>
                                     </div>
                                 </div>
@@ -3761,7 +3761,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                 <>
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="text-[10px] font-black bg-brand-600 text-white px-2 py-0.5 rounded-md uppercase tracking-wider">{company.code}</span>
-                                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight truncate">{company.name}</h3>
+                                        <h3 className="text-xl font-black text-slate-900 tracking-tight truncate">{company.name}</h3>
                                         {getExpiryStatus(company) && (
                                             <span className={cn("ml-auto text-[8px] font-black uppercase px-2 py-0.5 rounded-full border", getExpiryStatus(company)?.color)}>
                                                 {getExpiryStatus(company)?.label}
@@ -3769,30 +3769,30 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                         )}
                                     </div>
                                     <div className="space-y-3 mt-auto">
-                                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-                                            <div className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <div className="p-1.5 bg-slate-50 rounded-lg">
                                                 <FileText className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold truncate">{company.email || 'No email provided'}</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-                                            <div className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <div className="p-1.5 bg-slate-50 rounded-lg">
                                                 <Phone className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold truncate">{company.phone || 'No contact provided'}</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-                                            <div className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <div className="p-1.5 bg-slate-50 rounded-lg">
                                                 <Building2 className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold line-clamp-1">{company.address || 'No address provided'}</span>
                                         </div>
                                     </div>
-                                    <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                    <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <div className="flex -space-x-2">
                                                 {(company.driveFiles || []).slice(0, 3).map(file => (
-                                                    <div key={file.id} className="w-8 h-8 rounded-lg border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden shadow-sm">
+                                                    <div key={file.id} className="w-8 h-8 rounded-lg border-2 border-white bg-slate-100 flex items-center justify-center overflow-hidden shadow-sm">
                                                         {file.iconLink ? (
                                                             <img src={file.iconLink} alt="" className="w-4 h-4" />
                                                         ) : (
@@ -3801,7 +3801,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                                     </div>
                                                 ))}
                                                 {(company.driveFiles || []).length > 3 && (
-                                                    <div className="w-8 h-8 rounded-lg border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                                                    <div className="w-8 h-8 rounded-lg border-2 border-white bg-slate-100 flex items-center justify-center shadow-sm">
                                                         <span className="text-[10px] font-bold text-slate-500">+{(company.driveFiles || []).length - 3}</span>
                                                     </div>
                                                 )}
@@ -3812,7 +3812,7 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                                         </div>
                                         <button 
                                             onClick={() => setViewingDocsCompany(company)}
-                                            className="px-4 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-brand-900/30 text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border border-slate-100 dark:border-slate-700 flex items-center gap-2"
+                                            className="px-4 py-2 bg-slate-50 hover:bg-brand-50 text-slate-600 hover:text-brand-600 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border border-slate-100 flex items-center gap-2"
                                         >
                                             <FileText className="w-3.5 h-3.5" />
                                             View All
@@ -3824,18 +3824,18 @@ const CompanyView = ({ companies, openConfirm, onUpdate, user }: { companies: Co
                     </Reorder.Item>
                 ))}
                 {filteredCompanies.length === 0 && (
-                    <div className="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-700">
-                        <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-                        <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                    <div className="col-span-full py-20 text-center bg-slate-50 rounded-[2.5rem] border border-dashed border-slate-200">
+                        <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-black text-slate-900 tracking-tight">
                             {searchTerm ? 'No matching companies found' : 'No companies registered'}
                         </h3>
-                        <p className="text-slate-400 dark:text-slate-500 font-medium mt-1">
+                        <p className="text-slate-400 font-medium mt-1">
                             {searchTerm ? 'Try adjusting your search terms.' : 'Start by adding your first business entity.'}
                         </p>
                         {searchTerm && (
                             <button 
                                 onClick={() => setSearchTerm('')}
-                                className="mt-4 text-sm font-black text-brand-600 dark:text-brand-400 hover:underline"
+                                className="mt-4 text-sm font-black text-brand-600 hover:underline"
                             >
                                 Clear search
                             </button>
@@ -3913,14 +3913,14 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose,
                         <div>
                             <h3 className="text-2xl font-black text-slate-900 leading-tight">{employee.name}</h3>
                             <div className="flex items-center gap-2 mt-1">
-                                <span className="px-2 py-0.5 bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 rounded-lg text-[10px] font-black uppercase tracking-wider">{employee.code}</span>
+                                <span className="px-2 py-0.5 bg-brand-100 text-brand-700 rounded-lg text-[10px] font-black uppercase tracking-wider">{employee.code}</span>
                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                                     {new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-3 hover:bg-white dark:hover:bg-slate-700 rounded-2xl transition-all active:scale-90 shadow-sm">
+                    <button onClick={onClose} className="p-3 hover:bg-white rounded-2xl transition-all active:scale-90 shadow-sm">
                         <X className="w-6 h-6 text-slate-400" />
                     </button>
                 </div>
@@ -3936,14 +3936,14 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose,
                                     className={cn(
                                         "flex flex-col items-center justify-center gap-2 p-4 rounded-[1.5rem] border-2 transition-all active:scale-95",
                                         status === s 
-                                            ? "border-brand-500 bg-brand-50/50 dark:bg-brand-900/20 ring-4 ring-brand-500/10" 
-                                            : "border-slate-100 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-900/30 bg-white dark:bg-slate-900"
+                                            ? "border-brand-500 bg-brand-50/50 ring-4 ring-brand-500/10" 
+                                            : "border-slate-100 hover:border-brand-200 bg-white"
                                     )}
                                 >
                                     <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shadow-sm", m.color)}>
                                         {m.code}
                                     </div>
-                                    <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider">{m.label}</span>
+                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">{m.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -3958,7 +3958,7 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose,
                                     type="number" 
                                     value={otHours}
                                     onChange={(e) => setOtHours(Number(e.target.value))}
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-brand-500 rounded-2xl outline-none transition-all font-bold text-slate-900 dark:text-white"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent focus:border-brand-500 rounded-2xl outline-none transition-all font-bold text-slate-900"
                                     placeholder="0"
                                     min="0"
                                     max="24"
@@ -3972,18 +3972,18 @@ const AttendanceEditModal = ({ employee, date, currentRecord, onUpdate, onClose,
                                 type="text" 
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
-                                className="w-full px-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-brand-500 rounded-2xl outline-none transition-all font-bold text-slate-900 dark:text-white"
+                                className="w-full px-4 py-4 bg-slate-50 border-2 border-transparent focus:border-brand-500 rounded-2xl outline-none transition-all font-bold text-slate-900"
                                 placeholder="Optional note..."
                             />
                         </section>
                     </div>
                 </div>
 
-                <div className="p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 flex gap-4">
+                <div className="p-8 border-t border-slate-100 bg-slate-50/30 flex gap-4">
                     <button 
                         onClick={handleRemove}
                         disabled={isSubmitting || !currentRecord}
-                        className="px-6 py-4 bg-white dark:bg-slate-800 text-red-500 dark:text-red-400 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-black hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-6 py-4 bg-white text-red-500 border border-slate-200 rounded-2xl text-sm font-black hover:bg-red-50 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {isSubmitting ? (
                             <div className="w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
@@ -4326,77 +4326,77 @@ const DeductionsView = ({ employees, deductions, openConfirm, user, companies }:
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Deductions & Penalties</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage employee advances, fines, and asset damages.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Deductions & Penalties</h2>
+                    <p className="text-slate-500 text-sm mt-1">Manage employee advances, fines, and asset damages.</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
                         <input 
                             type="text"
                             placeholder="Search deductions..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm dark:text-white dark:placeholder:text-slate-600"
+                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
                         />
                     </div>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 rounded-2xl border border-brand-100 dark:border-brand-900/30">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-2xl border border-brand-100">
                         <AlertCircle className="w-4 h-4" />
                         <span className="text-xs font-bold uppercase tracking-wider">Financial Records</span>
                     </div>
                 </div>
             </div>
 
-            <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+            <div className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/50">
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/30 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-400">
+                    <div className="w-10 h-10 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600">
                         <Plus className="w-6 h-6" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Record New Transaction</h3>
+                    <h3 className="text-lg font-bold text-slate-800">Record New Transaction</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Staff Member</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Staff Member</label>
                         <select 
-                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
                             value={newItem.employeeId || ''} 
                             onChange={e => setNewItem({...newItem, employeeId: e.target.value})}
                         >
                             <option value="">Select Employee</option>
-                            {employees.map((e:any)=><option key={e.id} value={e.id} className="dark:bg-slate-900">{e.name}</option>)}
+                            {employees.map((e:any)=><option key={e.id} value={e.id}>{e.name}</option>)}
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Date</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Date</label>
                         <input 
                             type="date" 
-                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
                             value={newItem.date || ''} 
                             onChange={e => setNewItem({...newItem, date: e.target.value})} 
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Category</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Category</label>
                         <select 
-                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
                             value={newItem.type} 
                             onChange={e => setNewItem({...newItem, type: e.target.value as any})}
                         >
-                            <option className="dark:bg-slate-900">Salary Advance</option>
-                            <option className="dark:bg-slate-900">Fine Amount</option>
-                            <option className="dark:bg-slate-900">Damage Material/Asset</option>
-                            <option className="dark:bg-slate-900">Loan Amount</option>
-                            <option className="dark:bg-slate-900">Other</option>
+                            <option>Salary Advance</option>
+                            <option>Fine Amount</option>
+                            <option>Damage Material/Asset</option>
+                            <option>Loan Amount</option>
+                            <option>Other</option>
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Amount (AED)</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Amount (AED)</label>
                         <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs font-bold">AED</span>
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">AED</span>
                             <input 
                                 type="number" 
-                                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all font-bold text-slate-900 dark:text-white" 
+                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all font-bold text-slate-900" 
                                 placeholder="0.00" 
                                 value={newItem.amount || ''} 
                                 onChange={e => setNewItem({...newItem, amount: Number(e.target.value)})} 
@@ -4404,10 +4404,10 @@ const DeductionsView = ({ employees, deductions, openConfirm, user, companies }:
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Notes</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Notes</label>
                         <div className="flex gap-2">
                             <input 
-                                className="flex-1 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white dark:placeholder:text-slate-600" 
+                                className="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all placeholder:text-slate-400" 
                                 placeholder="Reason..." 
                                 value={newItem.note || ''} 
                                 onChange={e => setNewItem({...newItem, note: e.target.value})} 
@@ -4415,7 +4415,7 @@ const DeductionsView = ({ employees, deductions, openConfirm, user, companies }:
                             <button 
                                 onClick={handleAdd}
                                 disabled={!newItem.employeeId || !newItem.amount}
-                                className="p-3 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-all active:scale-95 shadow-lg shadow-brand-200 dark:shadow-none disabled:opacity-50 disabled:scale-100"
+                                className="p-3 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-all active:scale-95 shadow-lg shadow-brand-200 disabled:opacity-50 disabled:scale-100"
                             >
                                 <Check className="w-5 h-5" />
                             </button>
@@ -4424,20 +4424,20 @@ const DeductionsView = ({ employees, deductions, openConfirm, user, companies }:
                 </div>
             </div>
 
-            <div className="glass-card dark:bg-slate-900/80 rounded-3xl overflow-hidden border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Date</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Employee</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Type</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Amount</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Note</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Employee</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Note</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                        <tbody className="divide-y divide-slate-50">
                             <AnimatePresence mode="popLayout">
                                 {filteredDeductions.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((d: DeductionRecord) => {
                                     const emp = employees.find((e:any) => e.id === d.employeeId);
@@ -4448,39 +4448,39 @@ const DeductionsView = ({ employees, deductions, openConfirm, user, companies }:
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
-                                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group"
+                                            className="hover:bg-slate-50/50 transition-colors group"
                                         >
                                             <td className="p-5">
-                                                <div className="text-sm font-bold text-slate-900 dark:text-white">{new Date(d.date).toLocaleDateString()}</div>
+                                                <div className="text-sm font-bold text-slate-900">{new Date(d.date).toLocaleDateString()}</div>
                                             </td>
                                             <td className="p-5">
                                                 <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-brand-50 dark:bg-brand-900/20 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900/30 overflow-hidden">
+                                            <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 border border-brand-100 overflow-hidden">
                                                 {emp?.profileImage ? (
                                                     <img src={emp.profileImage} alt={emp.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                 ) : (
                                                     emp?.name?.charAt(0) || '?'
                                                 )}
                                             </div>
-                                                    <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{emp?.name || 'Unknown'}</div>
+                                                    <div className="text-sm font-bold text-slate-700">{emp?.name || 'Unknown'}</div>
                                                 </div>
                                             </td>
                                             <td className="p-5">
                                                 <span className={cn(
                                                     "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-                                                    d.type === 'Fine Amount' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/30' :
-                                                    d.type === 'Salary Advance' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30' :
-                                                    d.type === 'Loan Amount' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30' :
-                                                    'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700'
+                                                    d.type === 'Fine Amount' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                    d.type === 'Salary Advance' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                    d.type === 'Loan Amount' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                    'bg-slate-50 text-slate-600 border-slate-100'
                                                 )}>
                                                     {d.type}
                                                 </span>
                                             </td>
                                             <td className="p-5">
-                                                <div className="text-sm font-bold text-red-600 dark:text-red-400">AED {d.amount.toFixed(2)}</div>
+                                                <div className="text-sm font-bold text-red-600">AED {d.amount.toFixed(2)}</div>
                                             </td>
                                             <td className="p-5">
-                                                <div className="text-sm text-slate-500 dark:text-slate-400 italic max-w-xs truncate">{d.note || '-'}</div>
+                                                <div className="text-sm text-slate-500 italic max-w-xs truncate">{d.note || '-'}</div>
                                             </td>
                                             <td className="p-5">
                                                 <div className="flex justify-end">
@@ -4488,7 +4488,7 @@ const DeductionsView = ({ employees, deductions, openConfirm, user, companies }:
                                                         onClick={() => openConfirm("Delete Deduction", "Are you sure you want to remove this record?", async () => {
                                                             await deleteDeduction(d.id!);
                                                         })}
-                                                        className="p-2 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -4503,11 +4503,11 @@ const DeductionsView = ({ employees, deductions, openConfirm, user, companies }:
                 </div>
                 {deductions.length === 0 && (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
-                            <CreditCard className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <CreditCard className="w-8 h-8 text-slate-300" />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No transactions yet</h3>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1">Add deductions or penalties to see them listed here.</p>
+                        <h3 className="text-lg font-bold text-slate-900">No transactions yet</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto mt-1">Add deductions or penalties to see them listed here.</p>
                     </div>
                 )}
             </div>
@@ -4762,11 +4762,11 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                 </div>
                 {leaveRequests.length === 0 && (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
-                            <Calendar className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <Calendar className="w-8 h-8 text-slate-300" />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No leave requests</h3>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1">All caught up! No pending leave requests to review.</p>
+                        <h3 className="text-lg font-bold text-slate-900">No leave requests</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto mt-1">All caught up! No pending leave requests to review.</p>
                     </div>
                 )}
             </div>
@@ -4825,7 +4825,7 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
                  </div>
                  <div className="flex items-center gap-3">
                      <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
                         <input 
                             type="text"
                             placeholder="Search staff..."
@@ -4835,7 +4835,7 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
                         />
                     </div>
                      <div className="relative group">
-                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-600 transition-colors" />
+                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
                          <input 
                             type="month" 
                             value={selectedMonth} 
@@ -4852,53 +4852,53 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
                  </div>
              </div>
              
-             <div className="glass-card dark:bg-slate-900/80 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
+             <div className="glass-card rounded-3xl border border-white shadow-xl shadow-slate-200/50 overflow-hidden">
                  <div className="overflow-x-auto">
                      <table className="w-full text-left border-collapse">
                          <thead>
-                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest sticky left-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">Employee</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Basic</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Housing</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Transport</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Other</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Gross</th>
-                                 <th className="p-5 text-[10px] font-bold text-red-400 dark:text-red-500 uppercase tracking-widest text-right">Unpaid</th>
-                                 <th className="p-5 text-[10px] font-bold text-red-400 dark:text-red-500 uppercase tracking-widest text-right">Deductions</th>
-                                 <th className="p-5 text-[10px] font-bold text-emerald-400 dark:text-emerald-500 uppercase tracking-widest text-right">OT Pay</th>
-                                 <th className="p-5 text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-widest text-right">Net Salary</th>
+                             <tr className="bg-slate-50/50 border-b border-slate-100">
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest sticky left-0 bg-white/80 backdrop-blur-md z-10">Employee</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Basic</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Housing</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Transport</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Other</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Gross</th>
+                                 <th className="p-5 text-[10px] font-bold text-red-400 uppercase tracking-widest text-right">Unpaid</th>
+                                 <th className="p-5 text-[10px] font-bold text-red-400 uppercase tracking-widest text-right">Deductions</th>
+                                 <th className="p-5 text-[10px] font-bold text-emerald-400 uppercase tracking-widest text-right">OT Pay</th>
+                                 <th className="p-5 text-[10px] font-bold text-slate-900 uppercase tracking-widest text-right">Net Salary</th>
                              </tr>
                          </thead>
-                         <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                         <tbody className="divide-y divide-slate-50">
                              {filteredEmployees.map((e:Employee) => {
                                  const monthRecs = attendance.filter((r:any) => r.employeeId === e.id && r.date.startsWith(selectedMonth));
                                  const monthDeds = deductions.filter((d:any) => d.employeeId === e.id && d.date.startsWith(selectedMonth));
                                  const p = calculatePayroll(e, monthRecs, monthDeds);
                                  
                                  return (
-                                     <tr key={e.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
-                                         <td className="p-5 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50/50 dark:group-hover:bg-slate-800/50 transition-colors z-10 border-r border-slate-100 dark:border-slate-800">
+                                     <tr key={e.id} className="hover:bg-slate-50/50 transition-colors group">
+                                         <td className="p-5 sticky left-0 bg-white group-hover:bg-slate-50/50 transition-colors z-10 border-r border-slate-100">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-brand-50 dark:bg-brand-900/20 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 dark:text-brand-400 overflow-hidden">
+                                                <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center text-[10px] font-bold text-brand-600 overflow-hidden">
                                                     {e.profileImage ? (
                                                         <img src={e.profileImage} alt={e.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                     ) : (
                                                         e.name.charAt(0)
                                                     )}
                                                 </div>
-                                                <div className="text-sm font-bold text-slate-900 dark:text-white">{e.name}</div>
+                                                <div className="text-sm font-bold text-slate-900">{e.name}</div>
                                             </div>
                                          </td>
-                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.basic.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.housing.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.transport.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm text-slate-500 dark:text-slate-400">{p.breakdown.other.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-slate-900 dark:text-white">{p.grossSalary.toLocaleString()}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-red-500 dark:text-red-400">{p.totalUnpaidDays}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-red-600 dark:text-red-400">-{p.totalDeductions.toFixed(0)}</td>
-                                         <td className="p-5 text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">+{p.otAmount.toFixed(0)}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.basic.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.housing.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.transport.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm text-slate-500">{p.breakdown.other.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-slate-900">{p.grossSalary.toLocaleString()}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-red-500">{p.totalUnpaidDays}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-red-600">-{p.totalDeductions.toFixed(0)}</td>
+                                         <td className="p-5 text-right text-sm font-bold text-emerald-600">+{p.otAmount.toFixed(0)}</td>
                                          <td className="p-5 text-right">
-                                            <div className="inline-block px-4 py-1.5 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 rounded-xl text-sm font-black border border-brand-100 dark:border-brand-900/30">
+                                            <div className="inline-block px-4 py-1.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-black border border-brand-100">
                                                 {p.netSalary.toFixed(0)}
                                             </div>
                                          </td>
@@ -4978,13 +4978,13 @@ const ReportsView = ({ employees, attendance }: any) => {
                 className="flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Analytics & Reports</h2>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium">Real-time workforce intelligence and distribution.</p>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">Analytics & Reports</h2>
+                    <p className="text-slate-500 font-medium">Real-time workforce intelligence and distribution.</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <button 
                         onClick={handleExport}
-                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2"
+                        className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
                     >
                         <Download className="w-4 h-4" /> Export Data
                     </button>
@@ -5009,21 +5009,21 @@ const ReportsView = ({ employees, attendance }: any) => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: stat.delay }}
-                        className="glass-card dark:bg-slate-900/80 p-6 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none group hover:scale-[1.02] transition-all"
+                        className="glass-card p-6 rounded-3xl border border-white shadow-xl shadow-slate-200/40 group hover:scale-[1.02] transition-all"
                     >
                         <div className="flex items-center gap-4">
                             <div className={cn(
                                 "w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12",
-                                stat.color === 'brand' ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400' :
-                                stat.color === 'emerald' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' :
-                                stat.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400' :
-                                'bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400'
+                                stat.color === 'brand' ? 'bg-brand-50 text-brand-600' :
+                                stat.color === 'emerald' ? 'bg-emerald-50 text-emerald-600' :
+                                stat.color === 'orange' ? 'bg-orange-50 text-orange-600' :
+                                'bg-violet-50 text-violet-600'
                             )}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{stat.label}</div>
-                                <div className="text-xl font-black text-slate-900 dark:text-white">{stat.value}</div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</div>
+                                <div className="text-xl font-black text-slate-900">{stat.value}</div>
                             </div>
                         </div>
                     </motion.div>
@@ -5035,39 +5035,39 @@ const ReportsView = ({ employees, attendance }: any) => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="lg:col-span-2 glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none"
+                    className="lg:col-span-2 glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40"
                 >
                     <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Staff Distribution by Company</h3>
+                        <h3 className="text-lg font-bold text-slate-900">Staff Distribution by Company</h3>
                         <div className="flex items-center gap-2">
                             <div className="w-3 h-3 bg-brand-500 rounded-full"></div>
-                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Active Employees</span>
+                            <span className="text-xs font-bold text-slate-500">Active Employees</span>
                         </div>
                     </div>
                     <div className="h-[350px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={companyData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis 
                                     dataKey="name" 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    tick={{ fill: isDarkMode ? '#64748b' : '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
                                     dy={10}
                                 />
                                 <YAxis 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    tick={{ fill: isDarkMode ? '#64748b' : '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
                                 />
                                 <Tooltip 
-                                    cursor={{ fill: isDarkMode ? '#1e293b' : '#f8fafc' }}
+                                    cursor={{ fill: '#f8fafc' }}
                                     contentStyle={{ 
                                         borderRadius: '16px', 
                                         border: 'none', 
                                         boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                                        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-                                        color: isDarkMode ? '#ffffff' : '#000000'
+                                        backgroundColor: '#ffffff',
+                                        color: '#000000'
                                     }}
                                 />
                                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
@@ -5084,9 +5084,9 @@ const ReportsView = ({ employees, attendance }: any) => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 }}
-                    className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border border-white dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none"
+                    className="glass-card p-8 rounded-3xl border border-white shadow-xl shadow-slate-200/40"
                 >
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-8">Team Composition</h3>
+                    <h3 className="text-lg font-bold text-slate-900 mb-8">Team Composition</h3>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -5108,14 +5108,14 @@ const ReportsView = ({ employees, attendance }: any) => {
                                         borderRadius: '16px', 
                                         border: 'none', 
                                         boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                                        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-                                        color: isDarkMode ? '#ffffff' : '#000000'
+                                        backgroundColor: '#ffffff',
+                                        color: '#000000'
                                     }}
                                 />
                                 <Legend 
                                     verticalAlign="bottom" 
                                     iconType="circle"
-                                    formatter={(value) => <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{value}</span>}
+                                    formatter={(value) => <span className="text-xs font-bold text-slate-600">{value}</span>}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
