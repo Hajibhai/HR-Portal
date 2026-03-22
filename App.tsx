@@ -60,7 +60,7 @@ import {
   saveDeduction, deleteDeduction,
   saveSystemUser, deleteSystemUser,
   addCompany, updateCompany, deleteCompany, reorderCompanies,
-  testConnection, logAudit, handleFirestoreError, OperationType
+  testConnection, logAudit, updateAuditLog, deleteAuditLog, handleFirestoreError, OperationType
 } from './services/storageService';
 import { DEFAULT_ABOUT_DATA, CREATOR_USER } from './constants';
 import SmartCommand from './components/SmartCommand';
@@ -1890,8 +1890,73 @@ const AboutView = () => {
     );
 };
 
-const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: () => void, logs: AuditLog[] }) => {
+const AuditLogModal = ({ isOpen, onClose, logs, currentUser }: { isOpen: boolean, onClose: () => void, logs: AuditLog[], currentUser: SystemUser | null }) => {
+    const [filterType, setFilterType] = useState<'all' | 'onboarding' | 'offboarding' | 'login' | 'logout' | 'delete' | 'update' | 'rehire'>('all');
+    const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly' | 'yearly'>('all');
+    const [userFilter, setUserFilter] = useState<string>('all');
+    const [editingLog, setEditingLog] = useState<AuditLog | null>(null);
+    const [editDetails, setEditDetails] = useState('');
+
     if (!isOpen) return null;
+
+    const isAdmin = currentUser?.role === UserRole.CREATOR || currentUser?.role === UserRole.ADMIN || currentUser?.email === 'abdulkaderp3010@gmail.com';
+
+    const users = Array.from(new Set(logs.map(l => l.userName)));
+
+    const filteredLogs = logs.filter(log => {
+        // Type filter
+        if (filterType !== 'all') {
+            const action = log.action.toLowerCase();
+            if (filterType === 'onboarding' && !action.includes('onboard')) return false;
+            if (filterType === 'offboarding' && !action.includes('offboard')) return false;
+            if (filterType === 'login' && !action.includes('login')) return false;
+            if (filterType === 'logout' && !action.includes('logout')) return false;
+            if (filterType === 'delete' && !action.includes('delete')) return false;
+            if (filterType === 'update' && !action.includes('update')) return false;
+            if (filterType === 'rehire' && !action.includes('rehire') && !action.includes('rejoin')) return false;
+        }
+
+        // User filter
+        if (userFilter !== 'all' && log.userName !== userFilter) return false;
+
+        // Time filter
+        if (timeFilter !== 'all') {
+            const logDate = new Date(log.timestamp);
+            const now = new Date();
+            if (timeFilter === 'weekly') {
+                const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                if (logDate < oneWeekAgo) return false;
+            } else if (timeFilter === 'monthly') {
+                const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+                if (logDate < oneMonthAgo) return false;
+            } else if (timeFilter === 'yearly') {
+                const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+                if (logDate < oneYearAgo) return false;
+            }
+        }
+
+        return true;
+    });
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm('Are you sure you want to delete this log entry?')) {
+            try {
+                await deleteAuditLog(id);
+            } catch (error) {
+                console.error("Failed to delete log:", error);
+            }
+        }
+    };
+
+    const handleUpdate = async () => {
+        if (!editingLog) return;
+        try {
+            await updateAuditLog({ ...editingLog, details: editDetails });
+            setEditingLog(null);
+        } catch (error) {
+            console.error("Failed to update log:", error);
+        }
+    };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -1906,30 +1971,89 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl border border-white overflow-hidden flex flex-col max-h-[90vh]"
+                className="relative w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl border border-white overflow-hidden flex flex-col max-h-[90vh]"
             >
-                <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-brand-50 rounded-2xl">
-                            <Activity className="w-6 h-6 text-brand-600" />
+                <div className="p-8 border-b border-slate-100 bg-white sticky top-0 z-10">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-brand-50 rounded-2xl">
+                                <Activity className="w-6 h-6 text-brand-600" />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Log</h2>
+                                <p className="text-slate-400 text-sm font-bold">Real-time system activity and security trail</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Log</h2>
-                            <p className="text-slate-400 text-sm font-bold">Real-time system activity and security trail</p>
+                        <button 
+                            onClick={onClose}
+                            className="p-3 hover:bg-slate-50 rounded-2xl transition-all active:scale-95"
+                        >
+                            <X className="w-6 h-6 text-slate-400" />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Action Type</label>
+                            <div className="relative">
+                                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <select 
+                                    value={filterType}
+                                    onChange={(e) => setFilterType(e.target.value as any)}
+                                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500/20 transition-all appearance-none"
+                                >
+                                    <option value="all">All Activities</option>
+                                    <option value="onboarding">Onboarding</option>
+                                    <option value="offboarding">Offboarding</option>
+                                    <option value="login">Login</option>
+                                    <option value="logout">Logout</option>
+                                    <option value="delete">Deletions</option>
+                                    <option value="update">Updates</option>
+                                    <option value="rehire">Rehire/Rejoin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Time Period</label>
+                            <div className="relative">
+                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <select 
+                                    value={timeFilter}
+                                    onChange={(e) => setTimeFilter(e.target.value as any)}
+                                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500/20 transition-all appearance-none"
+                                >
+                                    <option value="all">All Time</option>
+                                    <option value="weekly">Last Week</option>
+                                    <option value="monthly">Last Month</option>
+                                    <option value="yearly">Last Year</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">User Wise</label>
+                            <div className="relative">
+                                <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <select 
+                                    value={userFilter}
+                                    onChange={(e) => setUserFilter(e.target.value)}
+                                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-brand-500/20 transition-all appearance-none"
+                                >
+                                    <option value="all">All Users</option>
+                                    {users.map(user => (
+                                        <option key={user} value={user}>{user}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <button 
-                        onClick={onClose}
-                        className="p-3 hover:bg-slate-50 rounded-2xl transition-all active:scale-95"
-                    >
-                        <X className="w-6 h-6 text-slate-400" />
-                    </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
                     <div className="space-y-4">
-                        {logs.length > 0 ? (
-                            logs.map((log) => (
+                        {filteredLogs.length > 0 ? (
+                            filteredLogs.map((log) => (
                                 <div key={log.id} className="group p-6 bg-slate-50 rounded-3xl border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-xl hover:shadow-brand-500/5 transition-all duration-300">
                                     <div className="flex items-start gap-6">
                                         <div className={cn(
@@ -1945,9 +2069,56 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-2">
                                                 <h4 className="text-lg font-black text-slate-900 tracking-tight">{log.action}</h4>
-                                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
+                                                    {isAdmin && (
+                                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button 
+                                                                onClick={() => {
+                                                                    setEditingLog(log);
+                                                                    setEditDetails(log.details);
+                                                                }}
+                                                                className="p-2 hover:bg-brand-50 text-brand-600 rounded-xl transition-all"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleDelete(log.id)}
+                                                                className="p-2 hover:bg-red-50 text-red-600 rounded-xl transition-all"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <p className="text-slate-600 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
+                                            
+                                            {editingLog?.id === log.id ? (
+                                                <div className="mb-4 space-y-3">
+                                                    <textarea 
+                                                        value={editDetails}
+                                                        onChange={(e) => setEditDetails(e.target.value)}
+                                                        className="w-full p-4 bg-white border border-brand-200 rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-brand-500/10 min-h-[100px]"
+                                                    />
+                                                    <div className="flex justify-end gap-2">
+                                                        <button 
+                                                            onClick={() => setEditingLog(null)}
+                                                            className="px-4 py-2 text-xs font-black text-slate-400 hover:text-slate-600"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button 
+                                                            onClick={handleUpdate}
+                                                            className="px-6 py-2 bg-brand-600 text-white rounded-xl text-xs font-black shadow-lg shadow-brand-600/20 hover:bg-brand-700 transition-all"
+                                                        >
+                                                            Save Changes
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="text-slate-600 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
+                                            )}
+
                                             <div className="flex flex-wrap items-center gap-4">
                                                 <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl">
                                                     <div className="w-2 h-2 rounded-full bg-brand-500"></div>
@@ -1972,7 +2143,7 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                             <div className="py-20 text-center">
                                 <Activity className="w-16 h-16 text-slate-200 mx-auto mb-4" />
                                 <h3 className="text-xl font-black text-slate-900 tracking-tight">No audit records found</h3>
-                                <p className="text-slate-400 font-bold mt-2">System activity will appear here as it happens.</p>
+                                <p className="text-slate-400 font-bold mt-2">Try adjusting your filters to see more activity.</p>
                             </div>
                         )}
                     </div>
@@ -2634,7 +2805,7 @@ export default function App() {
           <ManageCompaniesModal onClose={() => setShowManageCompanies(false)} companies={companies} openConfirm={openConfirm} onLog={handleLogAction} />
         )}
         {showAuditModal && (
-          <AuditLogModal isOpen={showAuditModal} onClose={() => setShowAuditModal(false)} logs={auditLogs} />
+          <AuditLogModal isOpen={showAuditModal} onClose={() => setShowAuditModal(false)} logs={auditLogs} currentUser={systemUser} />
         )}
         {showBulkImport && (
           <BulkImportModal onClose={() => setShowBulkImport(false)} onImport={(data) => {

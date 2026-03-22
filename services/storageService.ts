@@ -385,3 +385,20 @@ export const logAudit = async (user: SystemUser, action: string, details: string
     console.error("Failed to log audit:", error);
   }
 };
+
+export const updateAuditLog = async (log: AuditLog) => {
+  try {
+    const { id, ...data } = log;
+    await updateDoc(doc(db, 'audit_logs', id), cleanData(data));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, `audit_logs/${log.id}`);
+  }
+};
+
+export const deleteAuditLog = async (id: string) => {
+  try {
+    await deleteDoc(doc(db, 'audit_logs', id));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, `audit_logs/${id}`);
+  }
+};
