@@ -456,74 +456,74 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent">
-                <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Offboard: {employee.name}</h2>
+                        <h2 className="text-xl font-bold text-gray-900">Offboard: {employee.name}</h2>
                          <div className="flex gap-2 mt-2">
                             {[1, 2, 3, 4, 5].map(i => (
-                                <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${i <= step ? 'bg-red-600' : 'bg-gray-200 dark:bg-slate-700'}`} />
+                                <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${i <= step ? 'bg-red-600' : 'bg-gray-200'}`} />
                             ))}
                         </div>
                     </div>
-                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500"><X className="w-5 h-5" /></button>
                 </div>
                 
                 <div className="p-8 overflow-y-auto flex-1">
                     {step === 1 && (
                          <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Exit Details</h3>
+                             <h3 className="text-lg font-semibold text-gray-800">Exit Details</h3>
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                  <div className="space-y-2">
-                                     <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Exit Type</label>
-                                     <select className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.type} onChange={e => setDetails({...details, type: e.target.value as any})}>
+                                     <label className="text-sm font-medium text-gray-700">Exit Type</label>
+                                     <select className="w-full p-3 border rounded-xl bg-white text-gray-900" value={details.type} onChange={e => setDetails({...details, type: e.target.value as any})}>
                                          <option>Resignation</option><option>Termination</option><option>End of Contract</option><option>Absconding</option>
                                      </select>
                                  </div>
                                  <div className="space-y-2">
-                                     <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Last Working Day</label>
-                                     <input type="date" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.exitDate} onChange={e => setDetails({...details, exitDate: e.target.value})} />
+                                     <label className="text-sm font-medium text-gray-700">Last Working Day</label>
+                                     <input type="date" className="w-full p-3 border rounded-xl bg-white text-gray-900" value={details.exitDate} onChange={e => setDetails({...details, exitDate: e.target.value})} />
                                  </div>
                                  <div className="col-span-2 space-y-2">
-                                     <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Reason</label>
-                                     <textarea className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" rows={3} value={details.reason} onChange={e => setDetails({...details, reason: e.target.value})} />
+                                     <label className="text-sm font-medium text-gray-700">Reason</label>
+                                     <textarea className="w-full p-3 border rounded-xl bg-white text-gray-900" rows={3} value={details.reason} onChange={e => setDetails({...details, reason: e.target.value})} />
                                  </div>
                              </div>
                          </div>
                     )}
                     {step === 2 && (
                         <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Financial Settlement</h3>
+                             <h3 className="text-lg font-semibold text-gray-800">Financial Settlement</h3>
                              <div className="grid grid-cols-2 gap-5">
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Gratuity</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.gratuity} onChange={e => setDetails({...details, gratuity: parseFloat(e.target.value) || 0})} /></div>
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Leave Encashment</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.leaveEncashment} onChange={e => setDetails({...details, leaveEncashment: parseFloat(e.target.value) || 0})} /></div>
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Pending Salary</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" value={details.salaryDues} onChange={e => setDetails({...details, salaryDues: parseFloat(e.target.value) || 0})} /></div>
-                                 <div className="space-y-2"><label className="text-sm dark:text-slate-300">Deductions</label><input type="number" className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-red-600 dark:text-red-400" value={details.deductions} onChange={e => setDetails({...details, deductions: parseFloat(e.target.value) || 0})} /></div>
+                                 <div className="space-y-2"><label className="text-sm">Gratuity</label><input type="number" className="w-full p-3 border rounded-xl bg-white text-gray-900" value={details.gratuity} onChange={e => setDetails({...details, gratuity: parseFloat(e.target.value) || 0})} /></div>
+                                 <div className="space-y-2"><label className="text-sm">Leave Encashment</label><input type="number" className="w-full p-3 border rounded-xl bg-white text-gray-900" value={details.leaveEncashment} onChange={e => setDetails({...details, leaveEncashment: parseFloat(e.target.value) || 0})} /></div>
+                                 <div className="space-y-2"><label className="text-sm">Pending Salary</label><input type="number" className="w-full p-3 border rounded-xl bg-white text-gray-900" value={details.salaryDues} onChange={e => setDetails({...details, salaryDues: parseFloat(e.target.value) || 0})} /></div>
+                                 <div className="space-y-2"><label className="text-sm">Deductions</label><input type="number" className="w-full p-3 border rounded-xl bg-white text-red-600" value={details.deductions} onChange={e => setDetails({...details, deductions: parseFloat(e.target.value) || 0})} /></div>
                              </div>
-                             <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl flex justify-between items-center">
-                                 <span className="font-semibold text-gray-700 dark:text-slate-300">Net Payable Amount</span>
-                                 <span className="text-2xl font-bold text-green-700 dark:text-green-400">AED {details.netSettlement.toLocaleString()}</span>
+                             <div className="p-4 bg-gray-50 rounded-xl flex justify-between items-center">
+                                 <span className="font-semibold text-gray-700">Net Payable Amount</span>
+                                 <span className="text-2xl font-bold text-green-700">AED {details.netSettlement.toLocaleString()}</span>
                              </div>
                         </div>
                     )}
                     {step === 3 && (
                          <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Assets & Clearance</h3>
-                             <div className="flex items-center gap-4 p-4 border dark:border-slate-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setDetails({...details, assetsReturned: !details.assetsReturned})}>
-                                 <div className={`w-6 h-6 rounded border flex items-center justify-center ${details.assetsReturned ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-slate-600'}`}>
+                             <h3 className="text-lg font-semibold text-gray-800">Assets & Clearance</h3>
+                             <div className="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setDetails({...details, assetsReturned: !details.assetsReturned})}>
+                                 <div className={`w-6 h-6 rounded border flex items-center justify-center ${details.assetsReturned ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
                                      {details.assetsReturned && <Check className="w-4 h-4 text-white" />}
                                  </div>
-                                 <span className="text-gray-900 dark:text-white">All company assets returned (Laptop, Sim, Uniform, Tools)</span>
+                                 <span className="text-gray-900">All company assets returned (Laptop, Sim, Uniform, Tools)</span>
                              </div>
                              <div className="space-y-2">
-                                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Additional Notes</label>
-                                 <textarea className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" rows={4} value={details.notes} onChange={e => setDetails({...details, notes: e.target.value})} placeholder="Clearance details..." />
+                                 <label className="text-sm font-medium text-gray-700">Additional Notes</label>
+                                 <textarea className="w-full p-3 border rounded-xl bg-white text-gray-900" rows={4} value={details.notes} onChange={e => setDetails({...details, notes: e.target.value})} placeholder="Clearance details..." />
                              </div>
                          </div>
                     )}
                     {step === 4 && (
                          <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                              <div className="flex justify-between items-center">
-                                 <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">Final Settlement Document</h3>
+                                 <h3 className="text-lg font-semibold text-gray-800">Final Settlement Document</h3>
                                  <button 
                                     onClick={handlePrint}
                                     className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium"
@@ -533,31 +533,31 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
                                  </button>
                              </div>
                              
-                             <div className="p-6 border-2 border-dashed dark:border-slate-700 rounded-2xl bg-gray-50 dark:bg-slate-800/50 text-center space-y-4">
-                                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto">
+                             <div className="p-6 border-2 border-dashed rounded-2xl bg-gray-50 text-center space-y-4">
+                                 <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto">
                                      <FileText className="w-8 h-8" />
                                  </div>
                                  <div>
-                                     <p className="font-bold text-gray-900 dark:text-white">Generate Settlement Paper</p>
-                                     <p className="text-sm text-gray-500 dark:text-slate-400">Print the document for employee signature, then upload to Google Drive and paste the link below.</p>
+                                     <p className="font-bold text-gray-900">Generate Settlement Paper</p>
+                                     <p className="text-sm text-gray-500">Print the document for employee signature, then upload to Google Drive and paste the link below.</p>
                                  </div>
                              </div>
-
+ 
                              <div className="space-y-2">
-                                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Google Drive Link (Signed Document)</label>
+                                 <label className="text-sm font-medium text-gray-700">Google Drive Link (Signed Document)</label>
                                  <div className="relative">
                                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                      <input 
                                         type="url" 
-                                        className="w-full pl-10 pr-4 py-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full pl-10 pr-4 py-3 border rounded-xl bg-white text-gray-900" 
                                         placeholder="https://drive.google.com/..."
                                         value={details.settlementLink || ''}
                                         onChange={e => setDetails({...details, settlementLink: e.target.value})}
                                      />
                                  </div>
-                                 <p className="text-[10px] text-gray-500 dark:text-slate-500 italic">Optional: You can add the link later if not ready.</p>
+                                 <p className="text-[10px] text-gray-500 italic">Optional: You can add the link later if not ready.</p>
                              </div>
-
+ 
                              {/* Hidden template for printing */}
                              <div className="hidden">
                                  <div id="settlement-document-print">
@@ -568,24 +568,24 @@ const OffboardingWizard = ({ employee, onComplete, onCancel }: { employee: Emplo
                     )}
                     {step === 5 && (
                         <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300 text-center py-8">
-                             <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                             <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                  <LogOut className="w-10 h-10" />
                              </div>
-                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Ready to Offboard?</h3>
-                             <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto">
+                             <h3 className="text-2xl font-bold text-gray-900">Ready to Offboard?</h3>
+                             <p className="text-gray-500 max-w-md mx-auto">
                                  You are about to mark <strong>{employee.name}</strong> as inactive. 
                                  Final settlement amount: <strong>AED {details.netSettlement.toLocaleString()}</strong>.
                              </p>
                         </div>
                     )}
                 </div>
-
-                <div className="p-6 border-t border-gray-100 dark:border-slate-800 flex justify-between bg-gray-50 dark:bg-slate-800/50">
-                    {step > 1 ? <button onClick={() => setStep(s => s - 1)} className="px-6 py-2.5 text-gray-600 dark:text-slate-300 font-medium hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors">Back</button> : <div></div>}
+ 
+                <div className="p-6 border-t border-gray-100 flex justify-between bg-gray-50">
+                    {step > 1 ? <button onClick={() => setStep(s => s - 1)} className="px-6 py-2.5 text-gray-600 font-medium hover:bg-gray-200 rounded-xl transition-colors">Back</button> : <div></div>}
                     {step < 5 ? (
-                        <button onClick={() => setStep(s => s + 1)} className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 dark:shadow-none transition-colors">Next Step</button>
+                        <button onClick={() => setStep(s => s + 1)} className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 transition-colors">Next Step</button>
                     ) : (
-                        <button onClick={() => onComplete(details)} className="px-8 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 dark:shadow-none flex items-center gap-2 transition-colors">
+                        <button onClick={() => onComplete(details)} className="px-8 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-lg shadow-red-200 flex items-center gap-2 transition-colors">
                             Confirm & Offboard
                         </button>
                     )}
@@ -600,21 +600,21 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies, openConfirm 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-transparent">
-                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">Edit Employee</h2>
-                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors"><X className="w-5 h-5 text-gray-500 dark:text-slate-400" /></button>
+                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+                    <h2 className="text-lg font-bold text-gray-900">Edit Employee</h2>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
                 <div className="p-6 overflow-y-auto space-y-6">
                     {/* Basic Info */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Personal Details</h3>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Personal Details</h3>
                         <div className="grid grid-cols-2 gap-4">
                              <div className="col-span-2 flex items-center gap-4 mb-4">
-                                <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden">
+                                <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 overflow-hidden">
                                     {data.profileImage ? (
                                         <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                     ) : (
-                                        <Users className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                        <Users className="w-8 h-8 text-slate-300" />
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-2">
@@ -636,7 +636,7 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies, openConfirm 
                                     />
                                     <label 
                                         htmlFor="edit-profile-upload"
-                                        className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                                        className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer transition-all"
                                     >
                                         Change Photo
                                     </label>
@@ -650,54 +650,54 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies, openConfirm 
                                     )}
                                 </div>
                              </div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Code</label><input disabled type="text" value={data.code || ''} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Name</label><input type="text" value={data.name || ''} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Designation</label><input type="text" value={data.designation || ''} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Department</label><input type="text" value={data.department || ''} onChange={e => setData({...data, department: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div className="col-span-2"><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Company</label>
-                                 <select value={data.company || ''} onChange={e => setData({...data, company: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Code</label><input disabled type="text" value={data.code || ''} className="w-full p-2 border rounded-lg mt-1 bg-gray-100 text-gray-500" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Name</label><input type="text" value={data.name || ''} onChange={e => setData({...data, name: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Designation</label><input type="text" value={data.designation || ''} onChange={e => setData({...data, designation: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Department</label><input type="text" value={data.department || ''} onChange={e => setData({...data, department: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div className="col-span-2"><label className="text-xs font-semibold text-gray-500 uppercase">Company</label>
+                                 <select value={data.company || ''} onChange={e => setData({...data, company: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900">
                                      <option value="">Select Company</option>
                                      {companies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                  </select>
                              </div>
                         </div>
                     </div>
-
+ 
                     {/* Salary Info */}
                      <div>
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Salary Structure (AED)</h3>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Salary Structure (AED)</h3>
                         <div className="grid grid-cols-3 gap-4">
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Basic</label><input type="number" value={data.salary.basic ?? 0} onChange={e => setData({...data, salary: {...data.salary, basic: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Housing</label><input type="number" value={data.salary.housing ?? 0} onChange={e => setData({...data, salary: {...data.salary, housing: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Transport</label><input type="number" value={data.salary.transport ?? 0} onChange={e => setData({...data, salary: {...data.salary, transport: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Other</label><input type="number" value={data.salary.other ?? 0} onChange={e => setData({...data, salary: {...data.salary, other: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Air Ticket</label><input type="number" value={data.salary.airTicket ?? 0} onChange={e => setData({...data, salary: {...data.salary, airTicket: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Leave Salary</label><input type="number" value={data.salary.leaveSalary ?? 0} onChange={e => setData({...data, salary: {...data.salary, leaveSalary: Number(e.target.value)}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Basic</label><input type="number" value={data.salary.basic ?? 0} onChange={e => setData({...data, salary: {...data.salary, basic: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Housing</label><input type="number" value={data.salary.housing ?? 0} onChange={e => setData({...data, salary: {...data.salary, housing: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Transport</label><input type="number" value={data.salary.transport ?? 0} onChange={e => setData({...data, salary: {...data.salary, transport: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Other</label><input type="number" value={data.salary.other ?? 0} onChange={e => setData({...data, salary: {...data.salary, other: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Air Ticket</label><input type="number" value={data.salary.airTicket ?? 0} onChange={e => setData({...data, salary: {...data.salary, airTicket: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Leave Salary</label><input type="number" value={data.salary.leaveSalary ?? 0} onChange={e => setData({...data, salary: {...data.salary, leaveSalary: Number(e.target.value)}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
                         </div>
                     </div>
-
+ 
                     {/* Banking */}
                      <div>
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Banking Details</h3>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Banking Details</h3>
                         <div className="grid grid-cols-2 gap-4">
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Bank Name</label><input type="text" value={data.bankName || ''} onChange={e => setData({...data, bankName: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">IBAN / Account</label><input type="text" value={data.iban || ''} onChange={e => setData({...data, iban: e.target.value})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Bank Name</label><input type="text" value={data.bankName || ''} onChange={e => setData({...data, bankName: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">IBAN / Account</label><input type="text" value={data.iban || ''} onChange={e => setData({...data, iban: e.target.value})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
                         </div>
                     </div>
-
+ 
                     {/* Documents */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Documents & Identification</h3>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Documents & Identification</h3>
                         <div className="grid grid-cols-2 gap-4">
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Emirates ID</label><input type="text" value={data.documents?.emiratesId || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesId: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">EID Expiry</label><input type="date" value={data.documents?.emiratesIdExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesIdExpiry: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passport Number</label><input type="text" value={data.documents?.passportNumber || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportNumber: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                             <div><label className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passport Expiry</label><input type="date" value={data.documents?.passportExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportExpiry: e.target.value}})} className="w-full p-2 border dark:border-slate-700 rounded-lg mt-1 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Emirates ID</label><input type="text" value={data.documents?.emiratesId || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesId: e.target.value}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">EID Expiry</label><input type="date" value={data.documents?.emiratesIdExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), emiratesIdExpiry: e.target.value}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Passport Number</label><input type="text" value={data.documents?.passportNumber || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportNumber: e.target.value}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
+                             <div><label className="text-xs font-semibold text-gray-500 uppercase">Passport Expiry</label><input type="date" value={data.documents?.passportExpiry || ''} onChange={e => setData({...data, documents: {...(data.documents || {}), passportExpiry: e.target.value}})} className="w-full p-2 border rounded-lg mt-1 bg-white text-gray-900" /></div>
                         </div>
                     </div>
                     {/* Linked Documents */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-3">Linked Documents</h3>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase mb-3">Linked Documents</h3>
                         <GoogleDriveManager 
                             files={data.driveFiles || []}
                             onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
@@ -706,8 +706,8 @@ const EditEmployeeModal = ({ employee, onSave, onCancel, companies, openConfirm 
                         />
                     </div>
                 </div>
-                <div className="p-4 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 flex justify-end gap-3">
-                    <button onClick={onCancel} className="px-4 py-2 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg text-sm font-medium text-gray-700 dark:text-slate-200 transition-colors">Cancel</button>
+                <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
+                    <button onClick={onCancel} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors">Cancel</button>
                     <button onClick={() => onSave(data)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">Save Changes</button>
                 </div>
             </div>
@@ -754,54 +754,54 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="p-6 border-b flex justify-between items-center bg-white">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Onboard New Employee</h2>
-                    <button onClick={onCancel} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                        <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
+                    <h2 className="text-xl font-bold text-gray-900">Onboard New Employee</h2>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <X className="w-5 h-5 text-gray-500" />
                     </button>
                 </div>
-
+ 
                 {/* Stepper */}
-                <div className="px-8 py-6 bg-gray-50/50 dark:bg-slate-800/50 border-b dark:border-slate-800">
+                <div className="px-8 py-6 bg-gray-50/50 border-b">
                     <div className="flex items-center justify-between max-w-2xl mx-auto relative">
                         {/* Connecting Lines */}
-                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
+                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
                         
                         {steps.map((s, idx) => (
-                            <div key={s.id} className="relative z-10 flex items-center gap-3 bg-gray-50/50 dark:bg-slate-800/50 px-2">
+                            <div key={s.id} className="relative z-10 flex items-center gap-3 bg-gray-50/50 px-2">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                                     step === s.id 
-                                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-900/30' 
+                                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' 
                                     : step > s.id 
-                                    ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' 
-                                    : 'bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500'
+                                    ? 'bg-indigo-100 text-indigo-600' 
+                                    : 'bg-white border-2 border-gray-200 text-gray-400'
                                 }`}>
                                     {step > s.id ? <CheckCircle className="w-5 h-5" /> : s.id}
                                 </div>
-                                <span className={`text-sm font-bold ${step === s.id ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-slate-500'}`}>
+                                <span className={`text-sm font-bold ${step === s.id ? 'text-gray-900' : 'text-gray-400'}`}>
                                     {s.name}
                                 </span>
                                 {idx < steps.length - 1 && (
-                                    <div className={`w-12 h-0.5 ${step > s.id ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-slate-700'}`}></div>
+                                    <div className={`w-12 h-0.5 ${step > s.id ? 'bg-indigo-600' : 'bg-gray-200'}`}></div>
                                 )}
                             </div>
                         ))}
                     </div>
                 </div>
-
+ 
                 {/* Content */}
                 <div className="p-8 max-h-[60vh] overflow-y-auto">
                     {step === 1 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Personal Information</h3>
+                            <h3 className="text-lg font-bold text-gray-900">Personal Information</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1.5 col-span-2">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Profile Image</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Profile Image</label>
                                     <div className="flex items-center gap-4">
-                                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden">
+                                        <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 overflow-hidden">
                                             {data.profileImage ? (
                                                 <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                             ) : (
-                                                <Users className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                                                <Users className="w-8 h-8 text-slate-300" />
                                             )}
                                         </div>
                                         <div className="flex flex-col gap-2">
@@ -823,16 +823,16 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                             />
                                             <label 
                                                 htmlFor="profile-upload"
-                                                className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                                                className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-100 transition-colors"
                                             >
                                                 Upload Photo
                                             </label>
-                                            <p className="text-[10px] text-slate-400 dark:text-slate-500">JPG, PNG or GIF. Max 1MB.</p>
+                                            <p className="text-[10px] text-slate-400">JPG, PNG or GIF. Max 1MB.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Employee Code *</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Employee Code *</label>
                                     <input 
                                         placeholder="e.g. 1001" 
                                         value={data.code||''} 
@@ -841,7 +841,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Full Name *</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Full Name *</label>
                                     <input 
                                         placeholder="John Doe" 
                                         value={data.name||''} 
@@ -850,7 +850,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Company</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Company</label>
                                     <select 
                                         value={data.company||''} 
                                         onChange={e=>setData({...data, company:e.target.value})} 
@@ -861,7 +861,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Joining Date *</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Joining Date *</label>
                                     <input 
                                         type="date" 
                                         value={data.joiningDate||''} 
@@ -870,7 +870,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Mobile Number</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Mobile Number</label>
                                     <input 
                                         placeholder="e.g. +971 ..." 
                                         value={data.mobileNumber||''} 
@@ -884,10 +884,10 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
 
                     {step === 2 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Role & Work Details</h3>
+                            <h3 className="text-lg font-bold text-gray-900">Role & Work Details</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Designation</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Designation</label>
                                     <input 
                                         placeholder="e.g. Driver" 
                                         value={data.designation||''} 
@@ -896,7 +896,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Department</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Department</label>
                                     <input 
                                         placeholder="e.g. Transport" 
                                         value={data.department||''} 
@@ -905,7 +905,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Team</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Team</label>
                                     <select 
                                         value={data.team||''} 
                                         onChange={e=>setData({...data, team:e.target.value as any})} 
@@ -917,7 +917,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Staff Type *</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Staff Type *</label>
                                     <select 
                                         value={data.type||''} 
                                         onChange={e=>setData({...data, type:e.target.value as any})} 
@@ -929,7 +929,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Work Location</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Work Location</label>
                                     <input 
                                         placeholder="e.g. Dubai" 
                                         value={data.workLocation||''} 
@@ -943,10 +943,10 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
 
                     {step === 3 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Salary & Banking</h3>
+                            <h3 className="text-lg font-bold text-gray-900">Salary & Banking</h3>
                             <div className="grid grid-cols-3 gap-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Basic *</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Basic *</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.basic ?? 0} 
@@ -955,7 +955,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Housing</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Housing</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.housing ?? 0} 
@@ -964,7 +964,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Transport</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Transport</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.transport ?? 0} 
@@ -973,7 +973,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Air Ticket</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Air Ticket</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.airTicket ?? 0} 
@@ -982,7 +982,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Leave Salary</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Leave Salary</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.leaveSalary ?? 0} 
@@ -991,7 +991,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Other</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Other</label>
                                     <input 
                                         type="number" 
                                         value={data.salary?.other ?? 0} 
@@ -1002,7 +1002,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                             </div>
                             <div className="grid grid-cols-2 gap-6 pt-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Bank Name</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Bank Name</label>
                                     <input 
                                         placeholder="e.g. Emirates NBD" 
                                         value={data.bankName||''} 
@@ -1011,7 +1011,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">IBAN / Acct No.</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">IBAN / Acct No.</label>
                                     <input 
                                         placeholder="AE00 0000 0000 0000 0000 000" 
                                         value={data.iban||''} 
@@ -1025,10 +1025,10 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
 
                     {step === 4 && (
                         <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Documents & Identification</h3>
+                            <h3 className="text-lg font-bold text-gray-900">Documents & Identification</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Emirates ID Number</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Emirates ID Number</label>
                                     <input 
                                         placeholder="784-..." 
                                         value={data.documents?.emiratesId||''} 
@@ -1037,7 +1037,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">EID Expiry</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">EID Expiry</label>
                                     <input 
                                         type="date" 
                                         value={data.documents?.emiratesIdExpiry||''} 
@@ -1046,7 +1046,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Passport Number</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Passport Number</label>
                                     <input 
                                         placeholder="e.g. N1234567" 
                                         value={data.documents?.passportNumber||''} 
@@ -1055,7 +1055,7 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Passport Expiry</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Passport Expiry</label>
                                     <input 
                                         type="date" 
                                         value={data.documents?.passportExpiry||''} 
@@ -1064,8 +1064,8 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                                     />
                                 </div>
                             </div>
-                            <div className="mt-8 pt-8 border-t dark:border-slate-800">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Linked Documents</h3>
+                            <div className="mt-8 pt-8 border-t">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Linked Documents</h3>
                                 <GoogleDriveManager 
                                     files={data.driveFiles || []}
                                     onAddFile={(file) => setData({ ...data, driveFiles: [...(data.driveFiles || []), file] })}
@@ -1078,12 +1078,12 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center">
+                <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
                     <button 
                         onClick={prevStep} 
                         disabled={step === 1}
                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                            step === 1 ? 'opacity-0 pointer-events-none' : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
+                            step === 1 ? 'opacity-0 pointer-events-none' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
                         }`}
                     >
                         Back
@@ -1093,14 +1093,14 @@ const OnboardingWizard = ({ onComplete, onCancel, companies, openConfirm }: { on
                         <button 
                             onClick={nextStep} 
                             disabled={!isStepValid()}
-                            className="px-8 py-2.5 bg-[#1e293b] dark:bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 dark:hover:bg-indigo-700 transition-all disabled:opacity-50 shadow-lg shadow-slate-200 dark:shadow-none"
+                            className="px-8 py-2.5 bg-[#1e293b] text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-all disabled:opacity-50 shadow-lg shadow-slate-200"
                         >
                             Next Step <ArrowRight className="w-4 h-4" />
                         </button>
                     ) : (
                         <button 
                             onClick={() => onComplete(data as Employee)} 
-                            className="px-8 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none"
+                            className="px-8 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
                         >
                             Complete Onboarding <CheckCircle className="w-4 h-4" />
                         </button>
@@ -1243,20 +1243,20 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
                             <Shield className="w-5 h-5" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-800 dark:text-white">System User Management</h2>
+                        <h2 className="text-xl font-bold text-gray-800">System User Management</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 dark:text-slate-400" /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5" /></button>
                 </div>
                 
                 <div className="p-6 max-h-[70vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-semibold text-gray-700 dark:text-slate-300">Active System Users</h3>
+                        <h3 className="font-semibold text-gray-700">Active System Users</h3>
                         {(currentUser.role === UserRole.ADMIN || currentUser.role === UserRole.CREATOR || currentUser.email === CREATOR_USER.email) && (
                             <button onClick={() => { setShowAdd(true); setEditingUser(null); }} className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700">
                                 <Plus className="w-4 h-4" /> Add User
@@ -1265,24 +1265,24 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                     </div>
 
                     {showAdd && (
-                        <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/30 space-y-3">
+                        <div className="mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-100 space-y-3">
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Full Name</label>
-                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Full Name" value={newUser.name} onChange={e=>setNewUser({...newUser, name: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Full Name</label>
+                                    <input className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" placeholder="Full Name" value={newUser.name} onChange={e=>setNewUser({...newUser, name: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Username / Email</label>
-                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Username" value={newUser.username} onChange={e=>setNewUser({...newUser, username: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Username / Email</label>
+                                    <input className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" placeholder="Username" value={newUser.username} onChange={e=>setNewUser({...newUser, username: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Password</label>
-                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" type="password" placeholder="Password" value={newUser.password} onChange={e=>setNewUser({...newUser, password: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Password</label>
+                                    <input className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" type="password" placeholder="Password" value={newUser.password} onChange={e=>setNewUser({...newUser, password: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Role</label>
+                                    <label className="text-[10px] font-bold text-indigo-600 uppercase">Role</label>
                                     <input 
-                                        className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" 
                                         placeholder="Enter Role Manually" 
                                         value={newUser.role} 
                                         onChange={e=>setNewUser({...newUser, role: e.target.value})} 
@@ -1291,10 +1291,10 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                             </div>
 
                             <div className="space-y-2 mt-4">
-                                <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Permissions</label>
+                                <label className="text-[10px] font-bold text-indigo-600 uppercase">Permissions</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {Object.keys(newUser.permissions).map(perm => (
-                                        <label key={perm} className="flex items-center gap-2 p-2 border dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 cursor-pointer hover:bg-indigo-100/30 dark:hover:bg-indigo-900/30">
+                                        <label key={perm} className="flex items-center gap-2 p-2 border rounded-lg bg-white cursor-pointer hover:bg-indigo-100/30">
                                             <input 
                                                 type="checkbox" 
                                                 checked={(newUser.permissions as any)[perm]} 
@@ -1304,39 +1304,39 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                                                 })}
                                                 className="w-4 h-4 text-indigo-600 rounded"
                                             />
-                                            <span className="text-[10px] font-medium text-gray-700 dark:text-slate-300 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
+                                            <span className="text-[10px] font-medium text-gray-700 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
 
                             <div className="flex justify-end gap-2 mt-4">
-                                <button onClick={() => setShowAdd(false)} className="px-3 py-1.5 text-gray-600 dark:text-slate-400 text-sm font-medium">Cancel</button>
+                                <button onClick={() => setShowAdd(false)} className="px-3 py-1.5 text-gray-600 text-sm font-medium">Cancel</button>
                                 <button onClick={handleAdd} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-bold">Save User</button>
                             </div>
                         </div>
                     )}
 
                     {editingUser && (
-                        <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-100 dark:border-orange-900/30 space-y-3">
-                            <h4 className="text-sm font-bold text-orange-800 dark:text-orange-400">Editing: {editingUser.name}</h4>
+                        <div className="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-100 space-y-3">
+                            <h4 className="text-sm font-bold text-orange-800">Editing: {editingUser.name}</h4>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Full Name</label>
-                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Full Name" value={editingUser.name} onChange={e=>setEditingUser({...editingUser, name: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Full Name</label>
+                                    <input className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" placeholder="Full Name" value={editingUser.name} onChange={e=>setEditingUser({...editingUser, name: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Username / Email</label>
-                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" placeholder="Username" value={editingUser.email || editingUser.username || ''} onChange={e=>setEditingUser({...editingUser, email: e.target.value, username: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Username / Email</label>
+                                    <input className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" placeholder="Username" value={editingUser.email || editingUser.username || ''} onChange={e=>setEditingUser({...editingUser, email: e.target.value, username: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Password</label>
-                                    <input className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" type="password" placeholder="Password" value={editingUser.password || ''} onChange={e=>setEditingUser({...editingUser, password: e.target.value})} />
+                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Password</label>
+                                    <input className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" type="password" placeholder="Password" value={editingUser.password || ''} onChange={e=>setEditingUser({...editingUser, password: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Role</label>
+                                    <label className="text-[10px] font-bold text-orange-600 uppercase">Role</label>
                                     <input 
-                                        className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-2 border rounded-lg text-sm bg-white text-gray-900" 
                                         placeholder="Enter Role Manually" 
                                         value={editingUser.role} 
                                         onChange={e=>setEditingUser({...editingUser, role: e.target.value as any})} 
@@ -1345,10 +1345,10 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                             </div>
                             
                             <div className="space-y-2 mt-4">
-                                <label className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase">Permissions</label>
+                                <label className="text-[10px] font-bold text-orange-600 uppercase">Permissions</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {Object.keys(editingUser.permissions).map(perm => (
-                                        <label key={perm} className="flex items-center gap-2 p-2 border dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 cursor-pointer hover:bg-orange-100/30 dark:hover:bg-orange-900/30">
+                                        <label key={perm} className="flex items-center gap-2 p-2 border rounded-lg bg-white cursor-pointer hover:bg-orange-100/30">
                                             <input 
                                                 type="checkbox" 
                                                 checked={(editingUser.permissions as any)[perm]} 
@@ -1358,14 +1358,14 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                                                 })}
                                                 className="w-4 h-4 text-orange-600 rounded"
                                             />
-                                            <span className="text-[10px] font-medium text-gray-700 dark:text-slate-300 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
+                                            <span className="text-[10px] font-medium text-gray-700 capitalize">{perm.replace('can', '').replace(/([A-Z])/g, ' $1')}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
 
                             <div className="flex justify-end gap-2 mt-4">
-                                <button onClick={() => setEditingUser(null)} className="px-3 py-1.5 text-gray-600 dark:text-slate-400 text-sm font-medium">Cancel</button>
+                                <button onClick={() => setEditingUser(null)} className="px-3 py-1.5 text-gray-600 text-sm font-medium">Cancel</button>
                                 <button onClick={handleEdit} className="px-3 py-1.5 bg-orange-600 text-white rounded-lg text-sm font-bold">Update User</button>
                             </div>
                         </div>
@@ -1382,22 +1382,22 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                                 return u.role !== UserRole.CREATOR && u.email !== CREATOR_USER.email;
                             })
                             .map(u => (
-                            <div key={u.uid || u.username} className="flex items-center justify-between p-3 border dark:border-slate-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <div key={u.uid || u.username} className="flex items-center justify-between p-3 border rounded-xl hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-gray-500 dark:text-slate-400 font-bold text-xs">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xs">
                                         {u.name.charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-800 dark:text-white text-sm">{u.name} <span className="text-gray-400 dark:text-slate-500 font-normal">({u.email || u.username})</span></p>
-                                        <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">{u.role}</p>
+                                        <p className="font-medium text-gray-800 text-sm">{u.name} <span className="text-gray-400 font-normal">({u.email || u.username})</span></p>
+                                        <p className="text-xs text-indigo-600 font-semibold uppercase">{u.role}</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={() => { setEditingUser(u); setShowAdd(false); }} className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors">
+                                    <button onClick={() => { setEditingUser(u); setShowAdd(false); }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                                         <Edit className="w-4 h-4" />
                                     </button>
                                     {u.email !== CREATOR_USER.username && (
-                                        <button onClick={() => handleDelete(u)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
+                                        <button onClick={() => handleDelete(u)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     )}
@@ -1407,7 +1407,7 @@ const UserManagementModal = ({ onClose, users, openConfirm, currentUser, onLog }
                     </div>
                 </div>
                 
-                <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border-t dark:border-slate-800 text-center text-xs text-gray-500 dark:text-slate-400 font-medium">
+                <div className="p-4 bg-gray-50 border-t text-center text-xs text-gray-500 font-medium">
                     Only Admin can Create New User.
                 </div>
             </div>
@@ -1470,26 +1470,26 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
                             <Building2 className="w-5 h-5" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-800 dark:text-white">Manage Companies</h2>
+                        <h2 className="text-xl font-bold text-gray-800">Manage Companies</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 dark:text-slate-400" /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5" /></button>
                 </div>
                 
                 <div className="p-6 space-y-6 overflow-y-auto">
                     {/* Add New Company Form */}
-                    <div className="bg-indigo-50/50 dark:bg-indigo-900/10 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/30 space-y-4">
+                    <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 space-y-4">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-bold text-indigo-900 dark:text-indigo-400">Add New Company</h3>
+                            <h3 className="text-sm font-bold text-indigo-900">Add New Company</h3>
                             {!isAdding && (
                                 <button 
                                     onClick={() => setIsAdding(true)}
-                                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
                                 >
                                     + Create New
                                 </button>
@@ -1500,18 +1500,18 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Company Code</label>
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Company Code</label>
                                         <input 
-                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900" 
                                             placeholder="e.g. A1" 
                                             value={formData.code} 
                                             onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))} 
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Company Name</label>
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Company Name</label>
                                         <input 
-                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900" 
                                             placeholder="e.g. Acme Corp" 
                                             value={formData.name} 
                                             onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} 
@@ -1520,18 +1520,18 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Email Address</label>
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Email Address</label>
                                         <input 
-                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900" 
                                             placeholder="contact@company.com" 
                                             value={formData.email} 
                                             onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} 
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Contact Number</label>
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase">Contact Number</label>
                                         <input 
-                                            className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                            className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900" 
                                             placeholder="+971 50 123 4567" 
                                             value={formData.phone} 
                                             onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} 
@@ -1539,9 +1539,9 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Office Address</label>
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Office Address</label>
                                     <input 
-                                        className="w-full p-2 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
+                                        className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900" 
                                         placeholder="123 Business St, Suite 100" 
                                         value={formData.address} 
                                         onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))} 
@@ -1556,18 +1556,18 @@ const ManageCompaniesModal = ({ onClose, companies, openConfirm, onLog }: { onCl
                                                 onChange={e => handleLogoUpload(null, e)}
                                                 className="absolute inset-0 opacity-0 cursor-pointer"
                                             />
-                                            <button className="px-3 py-1.5 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700">
+                                            <button className="px-3 py-1.5 bg-white border rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50">
                                                 Upload Logo
                                             </button>
                                         </div>
                                         {formData.logo && (
-                                            <img src={formData.logo} alt="Preview" className="h-8 w-8 object-contain rounded border dark:border-slate-700 bg-white dark:bg-slate-800" />
+                                            <img src={formData.logo} alt="Preview" className="h-8 w-8 object-contain rounded border bg-white" />
                                         )}
                                     </div>
                                     <div className="flex gap-2">
                                         <button 
                                             onClick={() => setIsAdding(false)}
-                                            className="px-4 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+                                            className="px-4 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg"
                                         >
                                             Cancel
                                         </button>
@@ -1698,31 +1698,31 @@ const BulkImportModal = ({ onClose, onImport }: { onClose: () => void, onImport:
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-                <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                <div className="p-6 border-b flex justify-between items-center bg-gray-50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
                             <Download className="w-5 h-5" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-800 dark:text-white">Bulk Import Employees</h2>
+                        <h2 className="text-xl font-bold text-gray-800">Bulk Import Employees</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors"><X className="w-5 h-5 dark:text-slate-400" /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5" /></button>
                 </div>
                 
                 <div className="p-8 text-center space-y-4">
-                    <div className="border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-2xl p-8 hover:border-indigo-300 dark:hover:border-indigo-500 transition-colors cursor-pointer relative">
+                    <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 hover:border-indigo-300 transition-colors cursor-pointer relative">
                         <input type="file" accept=".xlsx, .xls, .csv" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                         <div className="flex flex-col items-center gap-3">
-                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400">
+                            <div className="p-4 bg-indigo-50 rounded-full text-indigo-600">
                                 <FileText className="w-8 h-8" />
                             </div>
                             <div>
-                                <p className="font-bold text-gray-700 dark:text-slate-200">Click to upload or drag and drop</p>
-                                <p className="text-sm text-gray-500 dark:text-slate-400">Excel or CSV files only</p>
+                                <p className="font-bold text-gray-700">Click to upload or drag and drop</p>
+                                <p className="text-sm text-gray-500">Excel or CSV files only</p>
                             </div>
                         </div>
                     </div>
-                    <p className="text-xs text-gray-400 dark:text-slate-500">Make sure your file follows the standard template format.</p>
+                    <p className="text-xs text-gray-400">Make sure your file follows the standard template format.</p>
                 </div>
             </div>
         </div>
@@ -1734,12 +1734,12 @@ const BulkImportModal = ({ onClose, onImport }: { onClose: () => void, onImport:
 const AboutView = () => {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="h-32 bg-gradient-to-r from-indigo-600 to-blue-600"></div>
                 <div className="px-8 pb-8">
                     <div className="relative flex justify-between items-end -mt-12 mb-6">
-                        <div className="p-1 bg-white dark:bg-slate-900 rounded-2xl shadow-lg">
-                            <div className="w-24 h-24 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                        <div className="p-1 bg-white rounded-2xl shadow-lg">
+                            <div className="w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center text-indigo-600">
                                 <Users className="w-12 h-12" />
                             </div>
                         </div>
@@ -1747,31 +1747,31 @@ const AboutView = () => {
                     
                     <div className="space-y-4">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{DEFAULT_ABOUT_DATA.name}</h2>
-                            <p className="text-indigo-600 dark:text-indigo-400 font-medium">{DEFAULT_ABOUT_DATA.title}</p>
+                            <h2 className="text-2xl font-bold text-gray-900">{DEFAULT_ABOUT_DATA.name}</h2>
+                            <p className="text-indigo-600 font-medium">{DEFAULT_ABOUT_DATA.title}</p>
                         </div>
                         
-                        <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
+                        <p className="text-gray-600 leading-relaxed">
                             {DEFAULT_ABOUT_DATA.bio}
                         </p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
-                                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm text-gray-400 dark:text-slate-500">
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                                <div className="p-2 bg-white rounded-lg shadow-sm text-gray-400">
                                     <FileText className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold">Email</p>
-                                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{DEFAULT_ABOUT_DATA.email}</p>
+                                    <p className="text-xs text-gray-400 uppercase font-bold">Email</p>
+                                    <p className="text-sm font-medium text-gray-700">{DEFAULT_ABOUT_DATA.email}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
-                                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm text-gray-400 dark:text-slate-500">
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                                <div className="p-2 bg-white rounded-lg shadow-sm text-gray-400">
                                     <AlertCircle className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold">Support</p>
-                                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{DEFAULT_ABOUT_DATA.contactInfo}</p>
+                                    <p className="text-xs text-gray-400 uppercase font-bold">Support</p>
+                                    <p className="text-sm font-medium text-gray-700">{DEFAULT_ABOUT_DATA.contactInfo}</p>
                                 </div>
                             </div>
                         </div>
@@ -1816,16 +1816,16 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-white dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]"
+                className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl border border-white overflow-hidden flex flex-col max-h-[90vh]"
             >
-                <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
+                <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-2xl">
-                            <Activity className="w-6 h-6 text-brand-600 dark:text-brand-400" />
+                        <div className="p-3 bg-brand-50 rounded-2xl">
+                            <Activity className="w-6 h-6 text-brand-600" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">System Audit Log</h2>
-                            <p className="text-slate-400 dark:text-slate-500 text-sm font-bold">Real-time system activity and security trail</p>
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Log</h2>
+                            <p className="text-slate-400 text-sm font-bold">Real-time system activity and security trail</p>
                         </div>
                     </div>
                     <button 
@@ -1840,13 +1840,13 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                     <div className="space-y-4">
                         {logs.length > 0 ? (
                             logs.map((log) => (
-                                <div key={log.id} className="group p-6 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-brand-200 dark:hover:border-brand-900/30 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xl hover:shadow-brand-500/5 dark:hover:shadow-none transition-all duration-300">
+                                <div key={log.id} className="group p-6 bg-slate-50 rounded-3xl border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-xl hover:shadow-brand-500/5 transition-all duration-300">
                                     <div className="flex items-start gap-6">
                                         <div className={cn(
                                             "p-4 rounded-2xl shrink-0 transition-transform group-hover:scale-110 duration-300",
-                                            log.type === 'create' ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' :
-                                            log.type === 'delete' ? 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400' :
-                                            log.type === 'update' ? 'bg-brand-100 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400' : 'bg-indigo-100 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400'
+                                            log.type === 'create' ? 'bg-emerald-100 text-emerald-600' :
+                                            log.type === 'delete' ? 'bg-red-100 text-red-600' :
+                                            log.type === 'update' ? 'bg-brand-100 text-brand-600' : 'bg-indigo-100 text-indigo-600'
                                         )}>
                                             {log.type === 'create' ? <UserPlus className="w-6 h-6" /> :
                                              log.type === 'delete' ? <UserMinus className="w-6 h-6" /> :
@@ -1854,10 +1854,10 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-2">
-                                                <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{log.action}</h4>
-                                                <span className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
+                                                <h4 className="text-lg font-black text-slate-900 tracking-tight">{log.action}</h4>
+                                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</span>
                                             </div>
-                                            <p className="text-slate-600 dark:text-slate-300 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
+                                            <p className="text-slate-600 font-bold text-sm mb-4 leading-relaxed">{log.details}</p>
                                             <div className="flex flex-wrap items-center gap-4">
                                                 <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
                                                     <div className="w-2 h-2 rounded-full bg-brand-500"></div>
@@ -1888,10 +1888,10 @@ const AuditLogModal = ({ isOpen, onClose, logs }: { isOpen: boolean, onClose: ()
                     </div>
                 </div>
 
-                <div className="p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex justify-end">
+                <div className="p-8 border-t border-slate-100 bg-slate-50/50 flex justify-end">
                     <button 
                         onClick={onClose}
-                        className="px-8 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-sm font-black hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 shadow-sm"
+                        className="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl text-sm font-black hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
                     >
                         Close Logs
                     </button>
@@ -1906,16 +1906,16 @@ const RejoinModal = ({ employee, onComplete, onCancel }: { employee: Employee, o
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-transparent dark:border-slate-800">
-                <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Rejoin: {employee.name}</h2>
-                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-transparent">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h2 className="text-xl font-bold text-gray-900">Rejoin: {employee.name}</h2>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500"><X className="w-5 h-5" /></button>
                 </div>
                 <div className="p-6 space-y-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Rejoining Reason</label>
+                        <label className="text-sm font-medium text-gray-700">Rejoining Reason</label>
                         <textarea 
-                            className="w-full p-3 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500" 
+                            className="w-full p-3 border rounded-xl bg-white text-gray-900 outline-none focus:ring-2 focus:ring-brand-500" 
                             rows={4} 
                             placeholder="Enter reason for rejoining..."
                             value={reason} 
@@ -1923,8 +1923,8 @@ const RejoinModal = ({ employee, onComplete, onCancel }: { employee: Employee, o
                         />
                     </div>
                 </div>
-                <div className="p-6 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3">
-                    <button onClick={onCancel} className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200">Cancel</button>
+                <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                    <button onClick={onCancel} className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700">Cancel</button>
                     <button 
                         onClick={() => onComplete(reason)} 
                         disabled={!reason.trim()}
@@ -1944,34 +1944,34 @@ const OffboardingDetailsModal = ({ employee, onCancel }: { employee: Employee, o
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col border border-transparent dark:border-slate-800 max-h-[90vh]">
-                <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col border border-transparent max-h-[90vh]">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-xl">
-                            <LogOut className="w-5 h-5 text-red-600 dark:text-red-400" />
+                        <div className="p-2 bg-red-50 rounded-xl">
+                            <LogOut className="w-5 h-5 text-red-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Offboarding Details</h2>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{employee.name} • {employee.code}</p>
+                            <h2 className="text-xl font-bold text-gray-900">Offboarding Details</h2>
+                            <p className="text-xs text-slate-500 font-medium">{employee.name} • {employee.code}</p>
                         </div>
                     </div>
-                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500"><X className="w-5 h-5" /></button>
                 </div>
                 
                 <div className="p-8 overflow-y-auto space-y-8">
                     {/* Exit Info */}
                     <div className="grid grid-cols-2 gap-6">
-                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Exit Type</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{details.type}</p>
+                            <p className="text-sm font-bold text-slate-900">{details.type}</p>
                         </div>
-                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Last Working Day</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{new Date(details.exitDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                            <p className="text-sm font-bold text-slate-900">{new Date(details.exitDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
                         </div>
-                        <div className="col-span-2 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Reason for Leaving</p>
-                            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{details.reason || 'No reason specified'}</p>
+                            <p className="text-sm text-slate-700 leading-relaxed">{details.reason || 'No reason specified'}</p>
                         </div>
                     </div>
 
@@ -1979,53 +1979,53 @@ const OffboardingDetailsModal = ({ employee, onCancel }: { employee: Employee, o
                     <div className="space-y-4">
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Financial Settlement</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                            <div className="p-4 bg-white border border-slate-100 rounded-2xl">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Gratuity</p>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.gratuity.toLocaleString()}</p>
+                                <p className="text-sm font-bold text-slate-900">AED {details.gratuity.toLocaleString()}</p>
                             </div>
-                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                            <div className="p-4 bg-white border border-slate-100 rounded-2xl">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Leave Encashment</p>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.leaveEncashment.toLocaleString()}</p>
+                                <p className="text-sm font-bold text-slate-900">AED {details.leaveEncashment.toLocaleString()}</p>
                             </div>
-                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                            <div className="p-4 bg-white border border-slate-100 rounded-2xl">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Salary Dues</p>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.salaryDues.toLocaleString()}</p>
+                                <p className="text-sm font-bold text-slate-900">AED {details.salaryDues.toLocaleString()}</p>
                             </div>
-                            <div className="p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl">
+                            <div className="p-4 bg-white border border-slate-100 rounded-2xl">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Other Dues</p>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">AED {details.otherDues.toLocaleString()}</p>
+                                <p className="text-sm font-bold text-slate-900">AED {details.otherDues.toLocaleString()}</p>
                             </div>
-                            <div className="p-4 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-2xl">
+                            <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
                                 <p className="text-[10px] font-bold text-red-400 uppercase mb-1">Deductions</p>
-                                <p className="text-sm font-bold text-red-600 dark:text-red-400">AED {details.deductions.toLocaleString()}</p>
+                                <p className="text-sm font-bold text-red-600">AED {details.deductions.toLocaleString()}</p>
                             </div>
-                            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20 rounded-2xl">
+                            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
                                 <p className="text-[10px] font-bold text-emerald-400 uppercase mb-1">Net Settlement</p>
-                                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">AED {details.netSettlement.toLocaleString()}</p>
+                                <p className="text-sm font-bold text-emerald-600">AED {details.netSettlement.toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Assets & Notes */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Assets Status</p>
                             <div className="flex items-center gap-2">
                                 {details.assetsReturned ? (
-                                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-bold">
+                                    <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold">
                                         <CheckCircle className="w-4 h-4" /> All Assets Returned
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm font-bold">
+                                    <div className="flex items-center gap-2 text-red-600 text-sm font-bold">
                                         <XCircle className="w-4 h-4" /> Assets Pending
                                     </div>
                                 )}
                             </div>
                         </div>
                         {details.notes && (
-                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Additional Notes</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 italic">{details.notes}</p>
+                                <p className="text-sm text-slate-600 italic">{details.notes}</p>
                             </div>
                         )}
                     </div>
@@ -2034,14 +2034,14 @@ const OffboardingDetailsModal = ({ employee, onCancel }: { employee: Employee, o
                     {details.settlementLink && (
                         <div className="space-y-4">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Settlement Document</h3>
-                            <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 p-4">
+                            <div className="bg-slate-100 rounded-2xl border-2 border-dashed border-slate-200 p-4">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
+                                        <div className="p-2 bg-white rounded-lg shadow-sm">
                                             <FileText className="w-5 h-5 text-brand-600" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-bold text-slate-900 dark:text-white">Final_Settlement_{employee.code}.pdf</p>
+                                            <p className="text-sm font-bold text-slate-900">Final_Settlement_{employee.code}.pdf</p>
                                             <p className="text-[10px] text-slate-500 font-medium">Signed Document</p>
                                         </div>
                                     </div>
@@ -3286,7 +3286,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                     !readOnly && canManageEmployees && (
                                                         <button 
                                                             onClick={() => onOffboard(e)} 
-                                                            className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-red-600 dark:text-red-400 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/30 active:scale-90"
+                                                            className="p-2.5 hover:bg-white hover:shadow-lg text-red-600 rounded-xl transition-all border border-transparent hover:border-red-100 active:scale-90"
                                                             title="Offboard"
                                                         >
                                                             <LogOut className="w-4 h-4" />
@@ -3297,7 +3297,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                         {e.offboardingDetails && (
                                                             <button 
                                                                 onClick={() => onViewOffboarding?.(e)} 
-                                                                className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-brand-600 dark:text-brand-400 rounded-xl transition-all border border-transparent hover:border-brand-100 dark:hover:border-brand-900/30 active:scale-90"
+                                                                className="p-2.5 hover:bg-white hover:shadow-lg text-brand-600 rounded-xl transition-all border border-transparent hover:border-brand-100 active:scale-90"
                                                                 title="View Offboarding Details"
                                                             >
                                                                 <Eye className="w-4 h-4" />
@@ -3306,7 +3306,7 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                                                         {canManageEmployees && (
                                                             <button 
                                                                 onClick={() => onRejoin?.(e)} 
-                                                                className="p-2.5 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none text-emerald-600 dark:text-emerald-400 rounded-xl transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 active:scale-90"
+                                                                className="p-2.5 hover:bg-white hover:shadow-lg text-emerald-600 rounded-xl transition-all border border-transparent hover:border-emerald-100 active:scale-90"
                                                                 title="Rejoin"
                                                             >
                                                                 <UserPlus className="w-4 h-4" />
@@ -3356,38 +3356,38 @@ const StaffDirectoryView = ({ employees, companies: companyList, onAdd, onEdit, 
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white dark:border-slate-800 flex flex-col"
+                            className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white flex flex-col"
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                            <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-brand-100 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center text-brand-600 dark:text-brand-400">
+                                    <div className="w-12 h-12 bg-brand-100 rounded-2xl flex items-center justify-center text-brand-600">
                                         <Eye className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Rejoin Details</h2>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Employee: {viewRejoinReason.name}</p>
+                                        <h2 className="text-xl font-black text-slate-900 tracking-tight">Rejoin Details</h2>
+                                        <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Employee: {viewRejoinReason.name}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setViewRejoinReason(null)} className="p-3 hover:bg-white dark:hover:bg-slate-800 rounded-2xl transition-all shadow-sm">
+                                <button onClick={() => setViewRejoinReason(null)} className="p-3 hover:bg-white rounded-2xl transition-all shadow-sm">
                                     <X className="w-5 h-5 text-slate-400" />
                                 </button>
                             </div>
                             <div className="p-8 space-y-6">
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 block">Rejoining Date</label>
-                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 font-black text-slate-900 dark:text-white">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 block">Rejoining Date</label>
+                                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 font-black text-slate-900">
                                         {viewRejoinReason.rejoiningDate || 'N/A'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 block">Reason for Rejoining</label>
-                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 leading-relaxed italic">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 block">Reason for Rejoining</label>
+                                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 font-medium text-slate-600 leading-relaxed italic">
                                         "{viewRejoinReason.rejoiningReason}"
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-8 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
+                            <div className="p-8 bg-slate-50/50 border-t border-slate-100">
                                 <button 
                                     onClick={() => setViewRejoinReason(null)}
                                     className="w-full py-4 bg-white text-slate-900 border border-slate-200 rounded-2xl font-black hover:opacity-90 transition-all shadow-xl"
@@ -4551,24 +4551,24 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Leave Management</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review and approve employee time-off requests.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Leave Management</h2>
+                    <p className="text-slate-500 text-sm mt-1">Review and approve employee time-off requests.</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
                         <input 
                             type="text"
                             placeholder="Search requests..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm dark:text-white dark:placeholder:text-slate-600"
+                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
                         />
                     </div>
                     {canManageLeaves && (
                         <button 
                             onClick={() => setShowNew(true)} 
-                            className="neo-button bg-brand-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-200 dark:shadow-none"
+                            className="neo-button bg-brand-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-200"
                         >
                             <Plus className="w-5 h-5" /> New Request
                         </button>
@@ -4584,58 +4584,58 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="glass-card dark:bg-slate-900/80 p-8 rounded-3xl border-2 border-brand-100 dark:border-brand-900/30 shadow-xl mb-8">
-                            <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+                        <div className="glass-card p-8 rounded-3xl border-2 border-brand-100 shadow-xl mb-8">
+                            <h4 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-brand-600" />
                                 Create New Leave Request
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Employee</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Employee</label>
                                     <select 
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
                                         value={newReq.employeeId} 
                                         onChange={e=>setNewReq({...newReq, employeeId:e.target.value})}
                                     >
                                         <option value="">Select Staff Member</option>
-                                        {employees.map((e:any)=><option key={e.id} value={e.id} className="dark:bg-slate-900">{e.name}</option>)}
+                                        {employees.map((e:any)=><option key={e.id} value={e.id}>{e.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Leave Type</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Leave Type</label>
                                     <select 
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
                                         value={newReq.type} 
                                         onChange={e=>setNewReq({...newReq, type:e.target.value as any})}
                                     >
-                                        <option value={AttendanceStatus.ANNUAL_LEAVE} className="dark:bg-slate-900">Annual Leave</option>
-                                        <option value={AttendanceStatus.SICK_LEAVE} className="dark:bg-slate-900">Sick Leave</option>
-                                        <option value={AttendanceStatus.EMERGENCY_LEAVE} className="dark:bg-slate-900">Emergency Leave</option>
-                                        <option value={AttendanceStatus.UNPAID_LEAVE} className="dark:bg-slate-900">Unpaid Leave</option>
+                                        <option value={AttendanceStatus.ANNUAL_LEAVE}>Annual Leave</option>
+                                        <option value={AttendanceStatus.SICK_LEAVE}>Sick Leave</option>
+                                        <option value={AttendanceStatus.EMERGENCY_LEAVE}>Emergency Leave</option>
+                                        <option value={AttendanceStatus.UNPAID_LEAVE}>Unpaid Leave</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Start Date</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
                                     <input 
                                         type="date" 
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
                                         value={newReq.startDate} 
                                         onChange={e=>setNewReq({...newReq, startDate:e.target.value})} 
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">End Date</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">End Date</label>
                                     <input 
                                         type="date" 
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all dark:text-white" 
+                                        className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all" 
                                         value={newReq.endDate} 
                                         onChange={e=>setNewReq({...newReq, endDate:e.target.value})} 
                                     />
                                 </div>
                                 <div className="space-y-2 lg:col-span-4">
-                                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Reason / Description</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Reason / Description</label>
                                     <textarea 
-                                        className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-slate-700 transition-all min-h-[100px] dark:text-white dark:placeholder:text-slate-600" 
+                                        className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all min-h-[100px]" 
                                         placeholder="Briefly explain the reason for leave..." 
                                         value={newReq.reason} 
                                         onChange={e=>setNewReq({...newReq, reason:e.target.value})} 
@@ -4645,13 +4645,13 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                             <div className="flex justify-end gap-3">
                                 <button 
                                     onClick={() => setShowNew(false)} 
-                                    className="px-6 py-2.5 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all"
+                                    className="px-6 py-2.5 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     onClick={handleSave} 
-                                    className="neo-button bg-brand-600 text-white px-8 py-2.5 rounded-2xl font-bold shadow-lg shadow-brand-200 dark:shadow-none"
+                                    className="neo-button bg-brand-600 text-white px-8 py-2.5 rounded-2xl font-bold shadow-lg shadow-brand-200"
                                 >
                                     Submit Request
                                 </button>
@@ -4661,19 +4661,19 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                 )}
             </AnimatePresence>
 
-            <div className="glass-card dark:bg-slate-900/80 rounded-3xl overflow-hidden border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+            <div className="glass-card rounded-3xl overflow-hidden border border-white shadow-xl shadow-slate-200/50">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Employee</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Type</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Period</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Status</th>
-                                <th className="p-5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Employee</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Period</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                                <th className="p-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                        <tbody className="divide-y divide-slate-50">
                             <AnimatePresence mode="popLayout">
                                 {filteredRequests.sort((a:any, b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((req: LeaveRequest) => {
                                     const emp = employees.find((e:any) => e.id === req.employeeId);
@@ -4684,11 +4684,11 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
-                                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group"
+                                            className="hover:bg-slate-50/50 transition-colors group"
                                         >
                                             <td className="p-5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-[12px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 overflow-hidden">
+                                                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[12px] font-bold text-slate-500 border border-slate-200 overflow-hidden">
                                                         {emp?.profileImage ? (
                                                             <img src={emp.profileImage} alt={emp.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                                         ) : (
@@ -4696,31 +4696,31 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <div className="text-sm font-bold text-slate-900 dark:text-white">{emp?.name || 'Unknown'}</div>
-                                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{emp?.role || '-'}</div>
+                                                        <div className="text-sm font-bold text-slate-900">{emp?.name || 'Unknown'}</div>
+                                                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{emp?.role || '-'}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="p-5">
-                                                <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{req.type}</div>
-                                                <div className="text-[10px] text-slate-400 dark:text-slate-500 italic truncate max-w-[150px]">{req.reason || 'No reason provided'}</div>
+                                                <div className="text-sm font-bold text-slate-700">{req.type}</div>
+                                                <div className="text-[10px] text-slate-400 italic truncate max-w-[150px]">{req.reason || 'No reason provided'}</div>
                                             </td>
                                             <td className="p-5">
-                                                <div className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400">
+                                                <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
                                                     <span>{new Date(req.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
-                                                    <ArrowRight className="w-3 h-3 text-slate-300 dark:text-slate-600" />
+                                                    <ArrowRight className="w-3 h-3 text-slate-300" />
                                                     <span>{new Date(req.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
                                                 </div>
-                                                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">
+                                                <div className="text-[10px] text-slate-400 font-bold">
                                                     {Math.ceil((new Date(req.endDate).getTime() - new Date(req.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} Days
                                                 </div>
                                             </td>
                                             <td className="p-5">
                                                 <span className={cn(
                                                     "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-                                                    req.status === LeaveStatus.APPROVED ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30' :
-                                                    req.status === LeaveStatus.REJECTED ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/30' :
-                                                    'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-900/30'
+                                                    req.status === LeaveStatus.APPROVED ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                    req.status === LeaveStatus.REJECTED ? 'bg-red-50 text-red-600 border-red-100' :
+                                                    'bg-orange-50 text-orange-600 border-orange-100'
                                                 )}>
                                                     {req.status}
                                                 </span>
@@ -4731,14 +4731,14 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                                                         <>
                                                             <button 
                                                                 onClick={() => handleStatus(req.id!, LeaveStatus.APPROVED)}
-                                                                className="p-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all"
+                                                                className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
                                                                 title="Approve"
                                                             >
                                                                 <Check className="w-5 h-5" />
                                                             </button>
                                                             <button 
                                                                 onClick={() => handleStatus(req.id!, LeaveStatus.REJECTED)}
-                                                                className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+                                                                className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                                                 title="Reject"
                                                             >
                                                                 <X className="w-5 h-5" />
@@ -4746,7 +4746,7 @@ const LeaveManagementView = ({ employees, leaveRequests, user, companies }: any)
                                                         </>
                                                     )}
                                                     <button 
-                                                        className="p-2 text-slate-300 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+                                                        className="p-2 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
                                                         title="View Details"
                                                     >
                                                         <Eye className="w-5 h-5" />
@@ -4820,8 +4820,8 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Payroll Register</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Monthly salary breakdown and net pay calculations.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Payroll Register</h2>
+                    <p className="text-slate-500 text-sm mt-1">Monthly salary breakdown and net pay calculations.</p>
                  </div>
                  <div className="flex items-center gap-3">
                      <div className="relative group">
@@ -4831,7 +4831,7 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
                             placeholder="Search staff..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm dark:text-white dark:placeholder:text-slate-600"
+                            className="pl-11 pr-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all w-64 shadow-sm"
                         />
                     </div>
                      <div className="relative group">
@@ -4840,12 +4840,12 @@ const PayrollRegisterView = ({ employees, attendance, deductions, selectedMonth,
                             type="month" 
                             value={selectedMonth} 
                             onChange={e=>onMonthChange(e.target.value)} 
-                            className="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm" 
+                            className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm" 
                          />
                      </div>
                      <button 
                         onClick={handleExport} 
-                        className="neo-button bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                        className="neo-button bg-white text-slate-700 px-6 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 border border-slate-200 shadow-sm hover:bg-slate-50 transition-all"
                      >
                          <Download className="w-4 h-4" /> Export
                      </button>

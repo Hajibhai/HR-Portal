@@ -23,7 +23,7 @@
   }
   
   body {
-    @apply bg-white text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-900;
+    @apply bg-slate-50 text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-900;
   }
   
   /* Custom scrollbar */
@@ -35,7 +35,7 @@
     @apply bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full border-4 border-transparent bg-clip-content hover:bg-slate-400;
+    @apply bg-slate-200 rounded-full border-4 border-transparent bg-clip-content hover:bg-slate-300;
   }
 }
 
